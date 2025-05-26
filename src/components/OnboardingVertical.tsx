@@ -12,7 +12,10 @@ const OnboardingVertical = () => {
     role: '',
     industry: '',
     experience: 0,
-    preferences: []
+    preferences: [],
+    assessmentAnswers: {},
+    assignedWorkflow: '',
+    learningProfile: {}
   });
   const navigate = useNavigate();
 
@@ -45,6 +48,7 @@ const OnboardingVertical = () => {
   }, [currentStep]);
 
   const handleStepComplete = (stepData: any) => {
+    console.log('Step completed with data:', stepData);
     setUserProfile(prev => ({ ...prev, ...stepData }));
     
     if (currentStep < 4) {
@@ -58,6 +62,7 @@ const OnboardingVertical = () => {
       }, 300);
     } else {
       // Onboarding complete, navigate to dashboard
+      console.log('Onboarding completed with profile:', userProfile);
       setTimeout(() => {
         navigate('/');
       }, 2000);
@@ -112,7 +117,7 @@ const OnboardingVertical = () => {
           />
         </section>
 
-        {/* Step 3: Assessment */}
+        {/* Step 3: Learning Style Assessment */}
         <section 
           id="step-3" 
           className={`onboarding-step min-h-screen flex items-center justify-center px-6 transition-opacity duration-1000 ${

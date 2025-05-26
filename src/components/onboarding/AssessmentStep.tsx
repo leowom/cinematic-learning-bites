@@ -11,52 +11,112 @@ interface AssessmentStepProps {
 
 const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, userData }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
 
   const questions = [
     {
-      question: "Qual è la tua priorità principale nell'apprendimento AI?",
+      id: 0,
+      title: "Approccio Nuovo Apprendimento",
+      question: "Quando impari qualcosa di nuovo, preferisci:",
       options: [
-        { id: 'efficiency', label: 'Aumentare efficienza operativa', value: 'efficiency' },
-        { id: 'innovation', label: 'Guidare innovazione aziendale', value: 'innovation' },
-        { id: 'automation', label: 'Automatizzare processi ripetitivi', value: 'automation' },
-        { id: 'analysis', label: 'Migliorare analisi dati', value: 'analysis' }
+        { id: 'practical', label: 'Vedere esempi pratici', style: 'learn-by-doing' },
+        { id: 'documentation', label: 'Leggere documentazione dettagliata', style: 'microlearning' },
+        { id: 'experiment', label: 'Sperimentare subito', style: 'problem-solution' }
       ]
     },
     {
-      question: "Come preferisci apprendere nuove competenze professionali?",
+      id: 1,
+      title: "Memorizzazione Concetti",
+      question: "Per memorizzare concetti complessi:",
       options: [
-        { id: 'hands-on', label: 'Progetti pratici e case study', value: 'hands-on' },
-        { id: 'theory', label: 'Approfondimenti teorici', value: 'theory' },
-        { id: 'collaboration', label: 'Sessioni collaborative', value: 'collaboration' },
-        { id: 'self-paced', label: 'Apprendimento autonomo', value: 'self-paced' }
+        { id: 'visual', label: 'Diagrammi e grafici', style: 'visual' },
+        { id: 'audio', label: 'Spiegazioni audio', style: 'auditory' },
+        { id: 'hands-on', label: 'Pratica hands-on', style: 'kinesthetic' },
+        { id: 'notes', label: 'Prendere note dettagliate', style: 'reading-writing' }
       ]
     },
     {
-      question: "Quanto tempo puoi dedicare all'apprendimento quotidiano?",
+      id: 2,
+      title: "Strategia Apprendimento",
+      question: "Il tuo approccio ideale:",
       options: [
-        { id: '5min', label: '5 minuti - Quick insights', value: '5min' },
-        { id: '15min', label: '15 minuti - Sessione completa', value: '15min' },
-        { id: '30min', label: '30 minuti - Approfondimento', value: '30min' },
-        { id: '60min', label: '1 ora - Studio intensivo', value: '60min' }
+        { id: 'step-by-step', label: 'Step-by-step dettagliato', style: 'microlearning' },
+        { id: 'overview', label: 'Panoramica generale prima', style: 'problem-solution' },
+        { id: 'mixed', label: 'Mix dei due approcci', style: 'adaptive' }
+      ]
+    },
+    {
+      id: 3,
+      title: "Gestione Feedback",
+      question: "Quando ricevi feedback:",
+      options: [
+        { id: 'reflect', label: 'Ho bisogno di tempo per riflettere', style: 'reflective' },
+        { id: 'immediate', label: 'Preferisco correggere immediatamente', style: 'active' }
+      ]
+    },
+    {
+      id: 4,
+      title: "Ambiente Ideale",
+      question: "Il tuo ambiente di apprendimento ideale:",
+      options: [
+        { id: 'quiet', label: 'Silenzioso e concentrato', style: 'individual' },
+        { id: 'background', label: 'Con background audio', style: 'auditory' },
+        { id: 'collaborative', label: 'Collaborativo con colleghi', style: 'social' }
+      ]
+    },
+    {
+      id: 5,
+      title: "Ritmo Preferito",
+      question: "Il tuo ritmo di apprendimento preferito:",
+      options: [
+        { id: 'regular', label: 'Costante e regolare', style: 'sequential' },
+        { id: 'intensive', label: 'Intensivo a blocchi concentrati', style: 'global' },
+        { id: 'flexible', label: 'Flessibile in base al tempo', style: 'adaptive' }
+      ]
+    },
+    {
+      id: 6,
+      title: "Motivazione Principale",
+      question: "La tua motivazione principale per l'AI:",
+      options: [
+        { id: 'career', label: 'Avanzamento di carriera', style: 'professional' },
+        { id: 'curiosity', label: 'Curiosità personale', style: 'intrinsic' },
+        { id: 'business', label: 'Obiettivi aziendali', style: 'extrinsic' },
+        { id: 'competition', label: 'Competizione con colleghi', style: 'competitive' }
+      ]
+    },
+    {
+      id: 7,
+      title: "Tempo Disponibile",
+      question: "Tempo realisticamente disponibile ogni giorno:",
+      options: [
+        { id: 'micro', label: '5-10 minuti', style: 'micro-learning' },
+        { id: 'standard', label: '15-20 minuti', style: 'standard' },
+        { id: 'deep', label: '30+ minuti', style: 'deep-learning' }
       ]
     }
   ];
 
-  const handleAnswer = (answer: string) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = answer;
+  const handleAnswer = (questionId: number, answerId: string) => {
+    const newAnswers = { ...answers, [questionId]: answerId };
     setAnswers(newAnswers);
-
-    if (currentQuestion < questions.length - 1) {
-      setTimeout(() => {
+    
+    // Auto-advance to next question after selection
+    setTimeout(() => {
+      if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(prev => prev + 1);
-      }, 300);
-    } else {
-      setTimeout(() => {
-        onComplete({ preferences: newAnswers });
-      }, 500);
-    }
+        // Smooth scroll to next question
+        const nextQuestionElement = document.getElementById(`question-${currentQuestion + 1}`);
+        if (nextQuestionElement) {
+          nextQuestionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }, 800);
+  };
+
+  const handleComplete = () => {
+    // Pass answers to next step for AI analysis
+    onComplete({ assessmentAnswers: answers });
   };
 
   const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
@@ -66,79 +126,100 @@ const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, u
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-          Assessment personalizzato
+          Questionario Stili di Apprendimento
         </h2>
         <p className="text-xl text-white/70">
-          3 domande per calibrare la tua esperienza AI
+          Claude analizzerà le tue preferenze per creare il workflow ottimale
         </p>
-        
-        {/* Progress Bar */}
-        <div className="mt-8 w-full max-w-md mx-auto">
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
-            <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-500 ease-out"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-          <p className="text-white/60 text-sm mt-2">
-            Domanda {currentQuestion + 1} di {questions.length}
-          </p>
-        </div>
       </div>
 
-      {/* Question Card */}
-      <GlassmorphismCard 
-        className={`mb-12 transform transition-all duration-1000 ${
-          isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
-        }`}
-        size="large"
-        elevated={isActive}
-      >
-        <div className="text-center mb-8">
-          <h3 className="text-2xl lg:text-3xl font-semibold text-white leading-relaxed">
-            {questions[currentQuestion]?.question}
-          </h3>
+      {/* Progress Indicator */}
+      <GlassmorphismCard className="mb-8" size="small">
+        <div className="flex items-center justify-between text-white/80 mb-2">
+          <span>Domanda {currentQuestion + 1} di {questions.length}</span>
+          <span>{Math.round(progressPercentage)}%</span>
         </div>
-
-        {/* Answer Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {questions[currentQuestion]?.options.map((option, index) => (
-            <button
-              key={option.id}
-              onClick={() => handleAnswer(option.value)}
-              className={`p-6 rounded-xl border backdrop-blur-sm text-left transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group ${
-                answers[currentQuestion] === option.value
-                  ? 'bg-blue-500/20 border-blue-400/50 shadow-xl translate-z-10'
-                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
-              }`}
-              style={{ 
-                animationDelay: `${index * 100}ms`,
-                opacity: isActive ? 1 : 0.7
-              }}
-            >
-              <div className="flex items-start space-x-4">
-                <div className={`w-3 h-3 rounded-full mt-2 transition-all duration-300 ${
-                  answers[currentQuestion] === option.value
-                    ? 'bg-blue-400'
-                    : 'bg-white/20 group-hover:bg-white/40'
-                }`} />
-                <div>
-                  <div className="text-white font-medium text-lg mb-1">
-                    {option.label}
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
+        <div className="w-full bg-white/10 rounded-full h-2">
+          <div 
+            className="bg-gradient-to-r from-blue-500 to-amber-500 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
       </GlassmorphismCard>
 
-      {/* Navigation Info */}
-      <div className="text-center">
-        <p className="text-white/50 text-sm">
-          Seleziona una risposta per continuare
-        </p>
+      {/* Questions Vertical Stack */}
+      <div className="space-y-8">
+        {questions.map((question, index) => (
+          <div 
+            key={question.id}
+            id={`question-${index}`}
+            className={`transform transition-all duration-1000 ${
+              index <= currentQuestion && isActive 
+                ? 'translate-y-0 opacity-100' 
+                : index > currentQuestion 
+                  ? 'translate-y-20 opacity-50' 
+                  : 'opacity-70'
+            }`}
+          >
+            <GlassmorphismCard 
+              className={`question-card ${index === currentQuestion ? 'question-active' : ''}`}
+              size="large"
+              elevated={index === currentQuestion}
+            >
+              <div className="mb-6">
+                <div className="text-sm uppercase tracking-wide text-blue-400/80 mb-2">
+                  {question.title}
+                </div>
+                <h3 className="text-2xl font-semibold text-white mb-6">
+                  {question.question}
+                </h3>
+              </div>
+
+              <div className="grid gap-4">
+                {question.options.map((option) => {
+                  const isSelected = answers[question.id] === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => handleAnswer(question.id, option.id)}
+                      disabled={index > currentQuestion}
+                      className={`answer-option p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 text-left transform hover:scale-102 ${
+                        isSelected
+                          ? 'answer-selected bg-amber-500/15 border-amber-400/50 shadow-lg translate-z-10'
+                          : 'bg-white/5 border-white/10 hover:bg-blue-500/10 hover:border-blue-400/30'
+                      } ${index > currentQuestion ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
+                          isSelected 
+                            ? 'bg-amber-400 border-amber-400' 
+                            : 'border-white/30'
+                        }`} />
+                        <div className="text-white font-medium">{option.label}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </GlassmorphismCard>
+          </div>
+        ))}
       </div>
+
+      {/* Complete Button */}
+      {Object.keys(answers).length === questions.length && (
+        <div className="text-center mt-12">
+          <GlassmorphismCard className="inline-block">
+            <Button 
+              onClick={handleComplete}
+              size="lg"
+              className="text-xl px-12 py-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 border-0 shadow-2xl transform hover:scale-105 transition-all duration-300"
+            >
+              Analizza con AI →
+            </Button>
+          </GlassmorphismCard>
+        </div>
+      )}
     </div>
   );
 };

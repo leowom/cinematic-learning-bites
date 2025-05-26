@@ -7,13 +7,15 @@ interface GlassmorphismCardProps {
   className?: string;
   size?: 'small' | 'medium' | 'large';
   elevated?: boolean;
+  style?: React.CSSProperties;
 }
 
 const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({ 
   children, 
   className, 
   size = 'medium',
-  elevated = false 
+  elevated = false,
+  style
 }) => {
   const sizeClasses = {
     small: 'p-4',
@@ -42,7 +44,8 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
       )}
       style={{
         transformStyle: 'preserve-3d',
-        willChange: 'transform'
+        willChange: 'transform',
+        ...style
       }}
     >
       {/* Inner glow effect */}

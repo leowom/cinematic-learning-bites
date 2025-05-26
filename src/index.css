@@ -243,4 +243,76 @@
   .translate-z-20 {
     transform: translateZ(20px);
   }
+
+  /* Onboarding Specific Styles */
+  .slider {
+    background: linear-gradient(to right, #3b82f6 0%, #3b82f6 50%, rgba(255,255,255,0.1) 50%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    transition: background-position 0.3s ease;
+  }
+
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+
+  .step-reveal {
+    animation: stepReveal 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+
+  @keyframes stepReveal {
+    from {
+      opacity: 0;
+      transform: translateY(40px) translateZ(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) translateZ(0);
+    }
+  }
+
+  .onboarding-step {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
+  /* Professional Glassmorphism for Onboarding */
+  .answer-option {
+    background: rgba(30, 64, 175, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .answer-option:hover {
+    background: rgba(30, 64, 175, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-4px) translateZ(15px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Progress Enhancement */
+  .step-progress {
+    background: linear-gradient(90deg, 
+      rgba(59, 130, 246, 0.2) 0%, 
+      rgba(34, 197, 94, 0.2) 100%);
+    backdrop-filter: blur(8px);
+  }
 }

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -147,6 +146,37 @@
 
   .animate-glow {
     animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Additional Professional Glassmorphism Styles */
+  .hero-glassmorphism {
+    background: linear-gradient(135deg, rgba(30,64,175,0.1), rgba(217,119,6,0.1));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .feature-bentobox {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    transform: translateZ(0);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .feature-bentobox:hover {
+    transform: translateZ(30px) translateY(-8px);
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* Section Reveal Animation */
+  .section-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .section-reveal.animate-fade-in {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

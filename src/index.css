@@ -178,6 +178,79 @@
     opacity: 1;
     transform: translateY(0);
   }
+
+  /* Analytics specific animations */
+  .analytics-section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .analytics-section.analytics-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Data-focused glassmorphism with minimal transparency */
+  .analytics-container {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .analytics-container:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+  }
+
+  /* High contrast data elements */
+  .chart-area {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  .data-table {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  .data-row:nth-child(even) {
+    background: #f8fafc !important;
+  }
+
+  .data-row:hover {
+    background: #eff6ff !important;
+  }
+
+  /* KPI cards with maximum contrast */
+  .kpi-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0;
+    color: #0f172a !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .kpi-card:hover {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+
+  /* Admin specific styles */
+  .admin-section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .admin-section.admin-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer utilities {

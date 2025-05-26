@@ -8,28 +8,28 @@ const ExecutiveSummary = () => {
       title: "Active Users",
       value: "2,847",
       change: "+12.5%",
-      trend: "up",
+      trend: "up" as const,
       subtitle: "vs last month"
     },
     {
       title: "Completion Rate",
       value: "94%",
       change: "+8.3%",
-      trend: "up",
+      trend: "up" as const,
       subtitle: "avg course completion"
     },
     {
       title: "Productivity Increase",
       value: "12%",
       change: "+2.1%",
-      trend: "up",
+      trend: "up" as const,
       subtitle: "measured improvement"
     },
     {
       title: "ROI Achievement",
       value: "156%",
       change: "+18%",
-      trend: "up",
+      trend: "up" as const,
       subtitle: "return on investment"
     }
   ];

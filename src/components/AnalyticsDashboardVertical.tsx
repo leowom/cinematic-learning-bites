@@ -11,14 +11,17 @@ const AnalyticsDashboardVertical = () => {
     document.documentElement.style.scrollBehavior = 'smooth';
     
     const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      threshold: 0.15,
+      rootMargin: '0px 0px -20px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('analytics-reveal');
+          // Add small delay for smoother staggered animation
+          setTimeout(() => {
+            entry.target.classList.add('analytics-reveal');
+          }, 50);
         }
       });
     }, observerOptions);
@@ -34,10 +37,10 @@ const AnalyticsDashboardVertical = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 overflow-x-hidden">
-      {/* Minimal ambient background for enterprise look */}
+      {/* Simplified ambient background for better performance */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-blue-600/4 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/6 w-80 h-80 bg-emerald-500/3 rounded-full blur-2xl" />
+        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-blue-600/4 rounded-full blur-2xl" />
+        <div className="absolute bottom-1/3 right-1/6 w-80 h-80 bg-emerald-500/3 rounded-full blur-xl" />
       </div>
 
       {/* Analytics Dashboard Content */}

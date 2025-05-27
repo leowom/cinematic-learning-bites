@@ -26,30 +26,30 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
   return (
     <div
       className={cn(
-        // Base glassmorphism styles
+        // Optimized base styles without backdrop-filter
         'relative rounded-2xl border border-white/20',
-        'bg-white/10 backdrop-blur-xl',
+        'bg-white/5',
         'shadow-2xl shadow-black/20',
-        'transition-all duration-500 ease-out',
+        'transition-all duration-150 ease-out',
         'transform-gpu',
-        // Hover effects
-        'hover:bg-white/15 hover:border-white/30',
+        // Fast hover effects
+        'hover:bg-white/8 hover:border-white/30',
         'hover:shadow-3xl hover:shadow-black/30',
-        'hover:-translate-y-2 hover:scale-[1.02]',
+        'hover:-translate-y-1',
         // Size classes
         sizeClasses[size],
         // Elevated state
-        elevated && 'translate-z-10 bg-white/15',
+        elevated && 'bg-white/8',
         className
       )}
       style={{
-        transformStyle: 'preserve-3d',
-        willChange: 'transform',
+        minHeight: size === 'small' ? '100px' : size === 'medium' ? '150px' : '200px',
+        willChange: elevated ? 'transform' : 'auto',
         ...style
       }}
     >
-      {/* Inner glow effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+      {/* Subtle gradient overlay instead of backdrop blur */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
       
       {/* Content */}
       <div className="relative z-10">

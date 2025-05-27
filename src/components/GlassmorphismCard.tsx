@@ -23,36 +23,42 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
     large: 'p-8'
   };
 
+  const minHeights = {
+    small: '120px',
+    medium: '180px',
+    large: '240px'
+  };
+
   return (
     <div
       className={cn(
-        // Optimized base styles without backdrop-filter
+        // Optimized base styles - NO backdrop-filter
         'relative rounded-2xl border border-white/20',
-        'bg-white/5',
+        'bg-white/95',
         'shadow-2xl shadow-black/20',
-        'transition-all duration-150 ease-out',
-        'transform-gpu',
-        // Fast hover effects
-        'hover:bg-white/8 hover:border-white/30',
+        'transition-all duration-100 ease-out',
+        'stable-card',
+        // Fast hover effects - box-shadow only
         'hover:shadow-3xl hover:shadow-black/30',
-        'hover:-translate-y-1',
         // Size classes
         sizeClasses[size],
         // Elevated state
-        elevated && 'bg-white/8',
+        elevated && 'bg-white/98',
         className
       )}
       style={{
-        minHeight: size === 'small' ? '100px' : size === 'medium' ? '150px' : '200px',
-        willChange: elevated ? 'transform' : 'auto',
+        minHeight: minHeights[size],
+        width: '100%',
+        contain: 'layout style paint',
+        willChange: 'auto',
         ...style
       }}
     >
-      {/* Subtle gradient overlay instead of backdrop blur */}
+      {/* Subtle gradient overlay - NO blur effects */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
       
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 h-full">
         {children}
       </div>
     </div>

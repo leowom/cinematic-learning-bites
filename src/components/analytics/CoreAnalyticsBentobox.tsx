@@ -12,19 +12,19 @@ const CoreAnalyticsBentobox = () => {
         <p className="text-blue-200/80">Detailed performance metrics and insights</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="stable-grid">
         {/* Engagement Metrics Panel */}
-        <div className="analytics-container bg-white/5 border border-white/10 rounded-xl p-1">
+        <div className="analytics-container bg-white/95 border border-white/20 rounded-xl p-1" style={{ minHeight: '350px' }}>
           <EngagementChart />
         </div>
 
         {/* Learning Performance Panel */}
-        <div className="analytics-container bg-white/5 border border-white/10 rounded-xl p-1">
+        <div className="analytics-container bg-white/95 border border-white/20 rounded-xl p-1" style={{ minHeight: '350px' }}>
           <LearningPerformanceChart />
         </div>
 
         {/* Business Impact Panel */}
-        <div className="analytics-container bg-white/5 border border-white/10 rounded-xl p-1 lg:col-span-2 xl:col-span-1">
+        <div className="analytics-container bg-white/95 border border-white/20 rounded-xl p-1" style={{ minHeight: '350px' }}>
           <BusinessImpactChart />
         </div>
       </div>

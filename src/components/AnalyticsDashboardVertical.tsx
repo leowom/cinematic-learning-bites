@@ -18,10 +18,10 @@ const AnalyticsDashboardVertical = () => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          // Add small delay for smoother staggered animation
+          // Reduced delay for better performance
           setTimeout(() => {
             entry.target.classList.add('analytics-reveal');
-          }, 50);
+          }, 25);
         }
       });
     }, observerOptions);
@@ -37,36 +37,36 @@ const AnalyticsDashboardVertical = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 overflow-x-hidden">
-      {/* Simplified ambient background for better performance */}
+      {/* Simplified ambient background - NO blur effects */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-blue-600/4 rounded-full blur-2xl" />
-        <div className="absolute bottom-1/3 right-1/6 w-80 h-80 bg-emerald-500/3 rounded-full blur-xl" />
+        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-blue-600/4 rounded-full" />
+        <div className="absolute bottom-1/3 right-1/6 w-80 h-80 bg-emerald-500/3 rounded-full" />
       </div>
 
       {/* Analytics Dashboard Content */}
       <div className="relative z-10">
         {/* Analytics Header */}
-        <section className="analytics-section sticky top-0 z-40 mb-8">
+        <section className="analytics-section sticky top-0 z-40 mb-8" style={{ minHeight: '80px' }}>
           <AnalyticsHeader />
         </section>
 
         {/* Executive Summary */}
-        <section className="analytics-section px-6 mb-12">
+        <section className="analytics-section px-6 mb-12" style={{ minHeight: '200px' }}>
           <ExecutiveSummary />
         </section>
 
         {/* Core Analytics Bentobox */}
-        <section className="analytics-section px-6 mb-12">
+        <section className="analytics-section px-6 mb-12" style={{ minHeight: '400px' }}>
           <CoreAnalyticsBentobox />
         </section>
 
         {/* Detailed Analytics */}
-        <section className="analytics-section px-6 mb-12">
+        <section className="analytics-section px-6 mb-12" style={{ minHeight: '300px' }}>
           <DetailedAnalyticsSection />
         </section>
 
         {/* Export Actions */}
-        <section className="analytics-section px-6 pb-20">
+        <section className="analytics-section px-6 pb-20" style={{ minHeight: '120px' }}>
           <ExportActions />
         </section>
       </div>

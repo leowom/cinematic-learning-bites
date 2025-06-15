@@ -106,21 +106,23 @@
 }
 
 @layer components {
-  /* PERFORMANCE OPTIMIZED - No backdrop-filter, stable layout */
+  /* PERFORMANCE OPTIMIZED - Semi-transparent dark backgrounds for readability */
   .analytics-container {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transition: box-shadow 0.1s ease;
     min-height: 200px;
     width: 100%;
     contain: layout style paint;
+    color: white;
   }
 
   .analytics-container:hover {
     box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    background: rgba(15, 23, 42, 0.90);
   }
 
-  /* High contrast data elements - optimized for performance */
+  /* High contrast data elements - white backgrounds for charts */
   .chart-area {
     background: #ffffff !important;
     color: #1e293b !important;
@@ -149,7 +151,7 @@
     transition: background-color 0.1s ease;
   }
 
-  /* Optimized KPI cards - fast interactions only */
+  /* Optimized KPI cards - white backgrounds for readability */
   .kpi-card {
     background: #ffffff !important;
     border: 1px solid #e2e8f0;
@@ -188,13 +190,14 @@
     animation: fadeInUp 0.1s ease forwards;
   }
 
-  /* Optimized glassmorphism components - NO backdrop-filter */
+  /* Optimized glassmorphism components - dark semi-transparent backgrounds */
   .glass {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.3);
     min-height: 180px;
     width: 100%;
     contain: layout style paint;
+    color: white;
   }
 
   .glass-hover {
@@ -203,36 +206,41 @@
 
   .glass-hover:hover {
     box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    background: rgba(15, 23, 42, 0.90);
   }
 
   .glass-hover:active {
     transition: none;
   }
 
-  /* Feature bentobox - performance optimized */
+  /* Feature bentobox - readable dark backgrounds */
   .feature-bentobox {
-    background: rgba(255,255,255,0.95);
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     transition: box-shadow 0.1s ease;
     min-height: 200px;
     width: 100%;
     contain: layout style paint;
+    color: white;
   }
 
   .feature-bentobox:hover {
     box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    background: rgba(15, 23, 42, 0.90);
   }
 
   .feature-bentobox:active {
     transition: none;
   }
 
-  /* Hero glassmorphism - solid background */
+  /* Hero glassmorphism - maintain gradient but with better contrast */
   .hero-glassmorphism {
-    background: linear-gradient(135deg, rgba(30,64,175,0.95), rgba(217,119,6,0.95));
+    background: linear-gradient(135deg, rgba(30,64,175,0.90), rgba(217,119,6,0.90));
     border: 1px solid rgba(255,255,255,0.2);
     min-height: 200px;
     width: 100%;
     contain: layout style paint;
+    color: white;
   }
 
   /* Admin section optimizations */

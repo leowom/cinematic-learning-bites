@@ -32,18 +32,20 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
   return (
     <div
       className={cn(
-        // Optimized base styles - NO backdrop-filter
-        'relative rounded-2xl border border-white/20',
-        'bg-white/95',
+        // Performance optimized base styles with better contrast
+        'relative rounded-2xl border border-white/30',
+        // Semi-transparent dark background for better text readability
+        'bg-slate-900/85',
         'shadow-2xl shadow-black/20',
         'transition-all duration-100 ease-out',
         'stable-card',
         // Fast hover effects - box-shadow only
         'hover:shadow-3xl hover:shadow-black/30',
+        'hover:bg-slate-900/90',
         // Size classes
         sizeClasses[size],
         // Elevated state
-        elevated && 'bg-white/98',
+        elevated && 'bg-slate-800/90',
         className
       )}
       style={{
@@ -54,11 +56,11 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
         ...style
       }}
     >
-      {/* Subtle gradient overlay - NO blur effects */}
+      {/* Subtle gradient overlay for depth */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
       
-      {/* Content */}
-      <div className="relative z-10 h-full">
+      {/* Content with ensured readability */}
+      <div className="relative z-10 h-full text-white">
         {children}
       </div>
     </div>

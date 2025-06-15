@@ -14,17 +14,17 @@ const CoreAnalyticsBentobox = () => {
 
       <div className="stable-grid">
         {/* Engagement Metrics Panel */}
-        <div className="analytics-container bg-white/95 border border-white/20 rounded-xl p-1" style={{ minHeight: '350px' }}>
+        <div className="analytics-container rounded-xl p-1" style={{ minHeight: '350px' }}>
           <EngagementChart />
         </div>
 
         {/* Learning Performance Panel */}
-        <div className="analytics-container bg-white/95 border border-white/20 rounded-xl p-1" style={{ minHeight: '350px' }}>
+        <div className="analytics-container rounded-xl p-1" style={{ minHeight: '350px' }}>
           <LearningPerformanceChart />
         </div>
 
         {/* Business Impact Panel */}
-        <div className="analytics-container bg-white/95 border border-white/20 rounded-xl p-1" style={{ minHeight: '350px' }}>
+        <div className="analytics-container rounded-xl p-1" style={{ minHeight: '350px' }}>
           <BusinessImpactChart />
         </div>
       </div>

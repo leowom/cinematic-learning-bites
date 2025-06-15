@@ -1,6 +1,5 @@
 
 import React, { useEffect, useRef } from 'react';
-import HeroSection3D from './HeroSection3D';
 import CurrentCourseSection from './CurrentCourseSection';
 import BentoGrid from './BentoGrid';
 import FloatingActions from './FloatingActions';
@@ -45,12 +44,7 @@ const DashboardVertical = () => {
       </div>
 
       {/* Content Sections */}
-      <div className="relative z-10 space-y-24 pb-32">
-        {/* Hero Section */}
-        <section className="reveal-section opacity-0 transition-all duration-1000">
-          <HeroSection3D />
-        </section>
-
+      <div className="relative z-10 space-y-24 py-16">
         {/* Current Course Section */}
         <section className="reveal-section opacity-0 transition-all duration-1000 px-6">
           <CurrentCourseSection />

@@ -1,14 +1,15 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import FoundationStep from '@/components/prompt-lab/FoundationStep';
+import DisasterDemo from '@/components/prompt-lab/DisasterDemo';
 import RoleSelectionStep from '@/components/prompt-lab/RoleSelectionStep';
 import BusinessContextStep from '@/components/prompt-lab/BusinessContextStep';
 import TaskDefinitionStep from '@/components/prompt-lab/TaskDefinitionStep';
 import StyleConstraintsStep from '@/components/prompt-lab/StyleConstraintsStep';
 import OutputFormatStep from '@/components/prompt-lab/OutputFormatStep';
+import MasteryTest from '@/components/prompt-lab/MasteryTest';
 import LivePreviewPanel from '@/components/prompt-lab/LivePreviewPanel';
-import TestingSection from '@/components/prompt-lab/TestingSection';
 import CompletionModal from '@/components/prompt-lab/CompletionModal';
 
 interface PromptData {
@@ -20,10 +21,13 @@ interface PromptData {
   tone: { formal: number; empathy: number };
   outputFormat: string[];
   qualityScore: number;
+  // New educational fields
+  foundationComplete: boolean;
+  disasterUnderstood: boolean;
 }
 
 const PromptEngineeringLab = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // Start from 0 now
   const [isCompleted, setIsCompleted] = useState(false);
   const [promptData, setPromptData] = useState<PromptData>({
     role: '',
@@ -33,7 +37,9 @@ const PromptEngineeringLab = () => {
     tasks: [],
     tone: { formal: 60, empathy: 40 },
     outputFormat: [],
-    qualityScore: 0
+    qualityScore: 0,
+    foundationComplete: false,
+    disasterUnderstood: false
   });
 
   const updatePromptData = (field: keyof PromptData, value: any) => {
@@ -44,11 +50,25 @@ const PromptEngineeringLab = () => {
   };
 
   const handleStepComplete = () => {
-    if (currentStep < 5) {
+    if (currentStep < 7) { // Now goes to step 7
       setCurrentStep(currentStep + 1);
     } else {
       setIsCompleted(true);
     }
+  };
+
+  const getStepTitle = () => {
+    const titles = [
+      "🤔 STEP 0/7: Cos'è un Prompt?",
+      "💥 STEP 1/7: Il Prompt Generico (Disaster Demo)",
+      "🎭 STEP 2/7: Definisci Ruolo AI",
+      "🌍 STEP 3/7: Contesto Business",
+      "🎯 STEP 4/7: Task Specifici",
+      "⚖️ STEP 5/7: Style & Constraints",
+      "📤 STEP 6/7: Output Format",
+      "🎓 STEP 7/7: Test di Mastery"
+    ];
+    return titles[currentStep] || "Prompt Engineering Lab";
   };
 
   return (
@@ -65,10 +85,11 @@ const PromptEngineeringLab = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-white leading-tight mb-4">
-            🧠 Prompt Engineering Lab
+            🎓 Dalle Fondamenta al Prompt Perfetto
           </h1>
           <p className="text-white/70 leading-relaxed max-w-2xl mx-auto">
-            Impara a costruire prompt efficaci step-by-step. Trasforma prompt generici in istruzioni precise che ottengono risultati professionali.
+            Un viaggio educativo step-by-step per imparare il prompt engineering partendo da zero. 
+            Ogni passo ti porterà dalla confusione alla mastery professionale.
           </p>
         </div>
 
@@ -76,15 +97,21 @@ const PromptEngineeringLab = () => {
         <div className="mb-8">
           <div className="bg-slate-900/90 border border-white/30 rounded-2xl p-4 shadow-xl shadow-black/20">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-white/70 text-sm">Progress</span>
-              <span className="text-white font-semibold">{currentStep}/5</span>
+              <span className="text-white/70 text-sm">{getStepTitle()}</span>
+              <span className="text-white font-semibold">{currentStep + 1}/8</span>
             </div>
             <div className="bg-slate-700 rounded-full h-3">
               <div 
                 className="bg-gradient-to-r from-blue-500 to-green-400 h-3 rounded-full transition-all duration-1000"
-                style={{ width: `${(currentStep / 5) * 100}%` }}
+                style={{ width: `${((currentStep + 1) / 8) * 100}%` }}
               />
             </div>
+            {promptData.qualityScore > 0 && (
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-white/60 text-xs">Quality Score:</span>
+                <span className="text-green-400 font-bold">{promptData.qualityScore}/10</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -92,36 +119,57 @@ const PromptEngineeringLab = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column - Steps */}
           <div className="lg:col-span-2 space-y-6">
+            {currentStep === 0 && (
+              <FoundationStep 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
             {currentStep === 1 && (
-              <RoleSelectionStep 
+              <DisasterDemo 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
                 onComplete={handleStepComplete}
               />
             )}
             {currentStep === 2 && (
-              <BusinessContextStep 
+              <RoleSelectionStep 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
                 onComplete={handleStepComplete}
               />
             )}
             {currentStep === 3 && (
-              <TaskDefinitionStep 
+              <BusinessContextStep 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
                 onComplete={handleStepComplete}
               />
             )}
             {currentStep === 4 && (
-              <StyleConstraintsStep 
+              <TaskDefinitionStep 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
                 onComplete={handleStepComplete}
               />
             )}
             {currentStep === 5 && (
+              <StyleConstraintsStep 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
+            {currentStep === 6 && (
               <OutputFormatStep 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
+            {currentStep === 7 && (
+              <MasteryTest 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
                 onComplete={handleStepComplete}
@@ -129,18 +177,13 @@ const PromptEngineeringLab = () => {
             )}
           </div>
 
-          {/* Right column - Live Preview */}
-          <div className="lg:col-span-1">
-            <LivePreviewPanel promptData={promptData} />
-          </div>
+          {/* Right column - Live Preview (only show from step 2 onwards) */}
+          {currentStep >= 2 && (
+            <div className="lg:col-span-1">
+              <LivePreviewPanel promptData={promptData} />
+            </div>
+          )}
         </div>
-
-        {/* Testing section */}
-        {currentStep === 5 && (
-          <div className="mt-12">
-            <TestingSection promptData={promptData} />
-          </div>
-        )}
       </div>
 
       {/* Completion Modal */}

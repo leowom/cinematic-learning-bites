@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '../GlassmorphismCard';
@@ -158,7 +159,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
             </div>
             
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-              learning bites AI analizza le tue preferenze professionali...
+              LearningBites AI analizza le tue preferenze professionali...
             </h2>
             
             <div className="space-y-2 text-white/70">
@@ -230,7 +231,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
         }`}
         size="medium"
       >
-        <h3 className="text-2xl font-semibold text-white mb-6 text-center">Come learning bites AI ha scelto il tuo workflow</h3>
+        <h3 className="text-2xl font-semibold text-white mb-6 text-center">Come LearningBites AI ha scelto il tuo workflow</h3>
         <div className="space-y-4 text-white/80">
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-blue-400 rounded-full"></div>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import FoundationStep from '@/components/prompt-lab/FoundationStep';
@@ -94,8 +93,8 @@ const PromptEngineeringLab = () => {
 
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-white leading-tight mb-4">
+        <div className="text-center element-spacing">
+          <h1 className="text-3xl font-bold text-white leading-tight sub-element-spacing">
             🎓 Dalle Fondamenta al Prompt Perfetto
           </h1>
           <p className="text-white/70 leading-relaxed max-w-2xl mx-auto">
@@ -105,7 +104,7 @@ const PromptEngineeringLab = () => {
         </div>
 
         {/* Progress indicator */}
-        <div className="mb-8">
+        <div className="section-spacing">
           <div className="step-card glassmorphism-base">
             <div className="flex items-center justify-between sub-element-spacing relative z-10">
               <span className="text-white/70 text-sm">{getStepTitle()}</span>

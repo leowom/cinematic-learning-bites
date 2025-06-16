@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -125,15 +124,25 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
 
   return (
     <div className="step-card glassmorphism-base">
-      <h2 className="text-2xl font-semibold text-white mb-4 relative z-10">
-        🎯 STEP 4/7: Task Specifici e Misurabili
+      <h2 className="text-2xl font-semibold text-white element-spacing relative z-10">
+        🎯 STEP 4/9: Task Specifici e Misurabili
       </h2>
       
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
-          <p className="text-white/70 leading-relaxed element-spacing">
+          <p className="text-white/80 leading-relaxed element-spacing">
             Seleziona i compiti che l'AI deve svolgere. Ogni task ha specifiche precise e metriche misurabili.
           </p>
+
+          <div className="bg-blue-600/20 border border-blue-400/30 rounded-lg p-4 element-spacing">
+            <h4 className="text-blue-400 font-medium sub-element-spacing">🧠 PERCHÉ PIÙ TASK = PIÙ COMPLESSITÀ?</h4>
+            <div className="text-white/80 text-sm leading-relaxed space-y-2">
+              <p><strong>Cognitive Load:</strong> Ogni task aggiuntivo richiede all'AI di processare più informazioni simultaneamente, come chiedere a una persona di fare 6 cose contemporaneamente.</p>
+              <p><strong>Context Switching:</strong> L'AI deve "saltare" mentalmente tra diversi tipi di analisi (sentiment → urgenza → categorizzazione), perdendo focus.</p>
+              <p><strong>Output Conflicts:</strong> Task multipli possono generare istruzioni contraddittorie (es: "sii conciso" + "includi tutti i dettagli").</p>
+              <p><strong>Quality Degradation:</strong> Oltre 6-8 task, la precisione diminuisce perché l'AI non riesce a mantenere la qualità su tutti i fronti.</p>
+            </div>
+          </div>
 
           {/* Complexity vs Efficiency Meter */}
           <div className="bg-slate-800/40 rounded-lg p-4 border border-white/10 element-spacing">

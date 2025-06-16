@@ -32,47 +32,58 @@ const FoundationStep: React.FC<Props> = ({ promptData, updatePromptData, onCompl
   };
 
   return (
-    <div className="bg-slate-900/90 border border-white/30 rounded-2xl p-6 shadow-xl shadow-black/20 hover:bg-slate-800/95 transition-all duration-300">
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/3 to-transparent pointer-events-none" />
-      
-      <h2 className="text-2xl font-semibold text-white mb-4 relative z-10">
-        🤔 STEP 0/7: Ma cos'è esattamente un "prompt"?
+    <div className="step-card glassmorphism-base">
+      <h2 className="text-2xl font-semibold text-white element-spacing relative z-10">
+        🤔 STEP 0/9: Ma cos'è esattamente un "prompt"?
       </h2>
       
       <div className="relative z-10 space-y-6">
-        <div className="bg-slate-800/50 border border-white/20 rounded-lg p-4">
-          <p className="text-white/80 text-sm leading-relaxed mb-4">
+        <div className="section-spacing">
+          <p className="text-white/80 leading-relaxed element-spacing">
             💭 Un prompt è come dare istruzioni a una persona. Più sei specifico, migliore è il risultato!
           </p>
           
-          <div className="bg-slate-700/60 rounded-lg p-3 mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="text-white/60 mb-2">👤 UMANO:</div>
-                <div className="text-white/80">"Aiutami con le email" →</div>
-                <div className="text-white/60 text-xs">Umano: "Di cosa si tratta?"</div>
-              </div>
-              <div>
-                <div className="text-white/60 mb-2">🤖 AI:</div>
-                <div className="text-white/80">"Aiutami con le email" →</div>
-                <div className="text-white/60 text-xs">AI: "Ecco 50 consigli generici..."</div>
+          <div className="bg-slate-800/50 border border-white/20 rounded-lg p-4 element-spacing">
+            <div className="bg-slate-700/60 rounded-lg p-3 element-spacing">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div className="text-white/60 sub-element-spacing">👤 UMANO:</div>
+                  <div className="text-white/80">"Aiutami con le email" →</div>
+                  <div className="text-white/60 text-xs">Umano: "Di cosa si tratta?"</div>
+                </div>
+                <div>
+                  <div className="text-white/60 sub-element-spacing">🤖 AI:</div>
+                  <div className="text-white/80">"Aiutami con le email" →</div>
+                  <div className="text-white/60 text-xs">AI: "Ecco 50 consigli generici..."</div>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-3">
-            <div className="text-green-400 text-sm font-medium mb-1">✅ SPECIFICO = RISULTATO MIGLIORE</div>
-            <div className="text-white/80 text-sm">
-              "Scrivi una risposta professionale per un cliente arrabbiato che chiede rimborso"
+
+            <div className="bg-red-600/20 border border-red-400/30 rounded-lg p-3 element-spacing">
+              <div className="text-red-400 text-sm font-medium sub-element-spacing">❌ PROBLEMA COMUNE:</div>
+              <div className="text-white/80 text-sm leading-relaxed">
+                L'AI non sa chi dovrebbe essere! Senza ruolo definito = risposta generica da "chiunque". 
+                Con ruolo specifico = risposta da professional esperto con credibilità e competenza.
+              </div>
+            </div>
+            
+            <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-3">
+              <div className="text-green-400 text-sm font-medium sub-element-spacing">✅ SPECIFICO = RISULTATO MIGLIORE</div>
+              <div className="text-white/80 text-sm leading-relaxed">
+                "Tu sei un customer service manager con 8 anni di esperienza. Scrivi una risposta professionale per un cliente arrabbiato che chiede rimborso"
+              </div>
+              <div className="text-green-400/70 text-xs mt-2">
+                → Ora l'AI sa esattamente che ruolo assumere e che expertise dimostrare
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/40 border border-white/10 rounded-lg p-4">
-          <h3 className="text-white font-medium mb-3">🧪 PROVA TU STESSO:</h3>
+        <div className="bg-slate-800/40 border border-white/10 rounded-lg p-4 section-spacing">
+          <h3 className="text-white font-medium element-spacing">🧪 PROVA TU STESSO:</h3>
           <div className="space-y-3">
             <div>
-              <label className="text-white/70 text-sm block mb-2">
+              <label className="text-white/70 text-sm block sub-element-spacing">
                 Scrivi la tua istruzione all'AI:
               </label>
               <textarea
@@ -94,16 +105,16 @@ const FoundationStep: React.FC<Props> = ({ promptData, updatePromptData, onCompl
         </div>
 
         {showDemo && (
-          <div className="bg-slate-800/50 border border-amber-400/30 rounded-lg p-4 animate-fade-in">
-            <h4 className="text-amber-400 font-medium mb-2">🤖 AI Response:</h4>
-            <div className="bg-slate-900/60 rounded-lg p-3 mb-4">
+          <div className="bg-slate-800/50 border border-amber-400/30 rounded-lg p-4 animate-fade-in section-spacing">
+            <h4 className="text-amber-400 font-medium sub-element-spacing">🤖 AI Response:</h4>
+            <div className="bg-slate-900/60 rounded-lg p-3 element-spacing">
               <p className="text-white/80 text-sm leading-relaxed">
                 {getAIResponse(userPrompt)}
               </p>
             </div>
             
-            <div className="bg-red-600/20 border border-red-400/30 rounded-lg p-3 mb-4">
-              <h5 className="text-red-400 font-medium mb-2">💡 SCOPERTA:</h5>
+            <div className="bg-red-600/20 border border-red-400/30 rounded-lg p-3">
+              <h5 className="text-red-400 font-medium sub-element-spacing">💡 SCOPERTA:</h5>
               <ul className="text-white/70 text-sm space-y-1">
                 <li>• L'AI fa <strong>esattamente</strong> quello che chiedi</li>
                 <li>• Se sei vago → risposta vaga</li>

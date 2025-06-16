@@ -25,8 +25,8 @@ const OnboardingVertical = () => {
     
     // Intersection Observer for step reveals
     const observerOptions = {
-      threshold: 0.2,
-      rootMargin: '0px 0px -100px 0px'
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -53,13 +53,21 @@ const OnboardingVertical = () => {
     
     if (currentStep < 4) {
       setCurrentStep(prev => prev + 1);
-      // Smooth scroll to next step
+      // Improved scroll to next step with better timing and fallback
       setTimeout(() => {
         const nextStep = document.getElementById(`step-${currentStep + 1}`);
         if (nextStep) {
-          nextStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Calculate optimal scroll position
+          const stepRect = nextStep.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
+          const scrollTop = window.pageYOffset + stepRect.top - (windowHeight * 0.1);
+          
+          window.scrollTo({
+            top: scrollTop,
+            behavior: 'smooth'
+          });
         }
-      }, 300);
+      }, 500);
     } else {
       // Onboarding complete, navigate to dashboard
       console.log('Onboarding completed with profile:', userProfile);
@@ -93,7 +101,7 @@ const OnboardingVertical = () => {
         {/* Step 1: Welcome Professional */}
         <section 
           id="step-1" 
-          className={`onboarding-step min-h-screen flex items-center justify-center px-6 transition-opacity duration-1000 ${
+          className={`onboarding-step min-h-screen flex items-center justify-center px-4 lg:px-6 transition-opacity duration-1000 ${
             currentStep >= 1 ? 'opacity-100' : 'opacity-50 pointer-events-none'
           }`}
         >
@@ -106,7 +114,7 @@ const OnboardingVertical = () => {
         {/* Step 2: Profile Builder */}
         <section 
           id="step-2" 
-          className={`onboarding-step min-h-screen flex items-center justify-center px-6 transition-opacity duration-1000 ${
+          className={`onboarding-step min-h-screen flex items-center justify-center px-4 lg:px-6 transition-opacity duration-1000 ${
             currentStep >= 2 ? 'opacity-100' : 'opacity-30 pointer-events-none'
           }`}
         >
@@ -120,7 +128,7 @@ const OnboardingVertical = () => {
         {/* Step 3: Learning Style Assessment */}
         <section 
           id="step-3" 
-          className={`onboarding-step min-h-screen flex items-center justify-center px-6 transition-opacity duration-1000 ${
+          className={`onboarding-step min-h-screen flex items-center justify-center px-4 lg:px-6 transition-opacity duration-1000 ${
             currentStep >= 3 ? 'opacity-100' : 'opacity-30 pointer-events-none'
           }`}
         >
@@ -134,7 +142,7 @@ const OnboardingVertical = () => {
         {/* Step 4: AI Personalization */}
         <section 
           id="step-4" 
-          className={`onboarding-step min-h-screen flex items-center justify-center px-6 transition-opacity duration-1000 ${
+          className={`onboarding-step min-h-screen flex items-center justify-center px-4 lg:px-6 transition-opacity duration-1000 ${
             currentStep >= 4 ? 'opacity-100' : 'opacity-30 pointer-events-none'
           }`}
         >

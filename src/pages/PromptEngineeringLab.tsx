@@ -137,10 +137,10 @@ const PromptEngineeringLab = () => {
           </div>
         </div>
 
-        {/* Main content grid with optimized spacing */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-          {/* Left column - Steps */}
-          <div className="lg:col-span-2">
+        {/* Main content - centered layout for early steps, grid for later steps */}
+        {currentStep < 2 ? (
+          /* Centered layout for steps 0-1 */
+          <div className="max-w-4xl mx-auto">
             {currentStep === 0 && (
               <FoundationStep 
                 promptData={promptData}
@@ -155,71 +155,76 @@ const PromptEngineeringLab = () => {
                 onComplete={handleStepComplete}
               />
             )}
-            {currentStep === 2 && (
-              <RoleSelectionStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 3 && (
-              <BusinessContextStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 4 && (
-              <EnhancedTaskDefinitionStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 5 && (
-              <StyleConstraintsStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 6 && (
-              <OutputFormatStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 7 && (
-              <FreeWritingStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 8 && (
-              <AITestingStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 9 && (
-              <MasteryTest 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
           </div>
+        ) : (
+          /* Grid layout for steps 2+ with preview panel */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+            {/* Left column - Steps */}
+            <div className="lg:col-span-2">
+              {currentStep === 2 && (
+                <RoleSelectionStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 3 && (
+                <BusinessContextStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 4 && (
+                <EnhancedTaskDefinitionStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 5 && (
+                <StyleConstraintsStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 6 && (
+                <OutputFormatStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 7 && (
+                <FreeWritingStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 8 && (
+                <AITestingStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 9 && (
+                <MasteryTest 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+            </div>
 
-          {/* Right column - Live Preview (only show from step 2 onwards) */}
-          {currentStep >= 2 && (
+            {/* Right column - Live Preview */}
             <div className="lg:col-span-1">
               <EnhancedLivePreviewPanel promptData={promptData} />
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Completion Modal */}

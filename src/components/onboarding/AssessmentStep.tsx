@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '../GlassmorphismCard';
@@ -123,9 +122,9 @@ const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, u
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+      {/* Header - Added proper spacing */}
+      <div className="text-center mb-16 pt-8">
+        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
           Questionario Stili di Apprendimento
         </h2>
         <p className="text-xl text-white/70">

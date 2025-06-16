@@ -1,4 +1,5 @@
 
+
 /* Prompt Lab Unified Spacing System */
 .prompt-lab-container {
   @apply max-w-6xl mx-auto px-6 py-16 relative z-10;
@@ -27,7 +28,8 @@
 
 .glassmorphism-base::before {
   content: '';
-  @apply absolute inset-0 rounded-2xl bg-gradient-to-br from-white/3 to-transparent pointer-events-none;
+  @apply absolute inset-0 rounded-2xl pointer-events-none;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.03), transparent);
 }
 
 .prompt-preview {
@@ -47,3 +49,4 @@
 .optimal-zone {
   @apply bg-green-600/20 border border-green-400/30 rounded-lg p-3;
 }
+

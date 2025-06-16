@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Building, TrendingUp, AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -14,10 +15,10 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
   const businessTypes = [
     { id: 'ecommerce', label: 'E-commerce', active: false },
     { id: 'saas', label: 'SaaS', active: false },
-    { id: 'consulting', label: 'Consulting', active: false },
-    { id: 'healthcare', label: 'Healthcare', active: false },
-    { id: 'education', label: 'Education', active: false },
-    { id: 'finance', label: 'Finance', active: false }
+    { id: 'consulting', label: 'Consulenza', active: false },
+    { id: 'healthcare', label: 'Sanitario', active: false },
+    { id: 'education', label: 'Formazione', active: false },
+    { id: 'finance', label: 'Finanziario', active: false }
   ];
 
   const handleBusinessTypeSelect = (type: string) => {
@@ -29,9 +30,9 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
 
   const generateContext = (businessType: string) => {
     const contexts = {
-      'ecommerce': 'PMI di fashion & lifestyle con 50-200 email/giorno che soffre di tempi di risposta lenti e necessita automazione per gestire resi, tracking ordini e supporto clienti.',
-      'saas': 'Software company B2B con customer base internazionale che gestisce richieste tecniche, onboarding utenti e renewal subscriptions con focus su retention.',
-      'consulting': 'Agenzia di consulenza strategica che gestisce comunicazioni con clienti C-level, proposal follow-up e scheduling meeting con alta personalizzazione.',
+      'ecommerce': 'PMI di fashion e lifestyle con 50-200 email al giorno che richiede tempi di risposta rapidi e automazione per gestire resi, tracking ordini e supporto clienti.',
+      'saas': 'Azienda software B2B con customer base internazionale che gestisce richieste tecniche, onboarding utenti e rinnovi subscription con focus sulla retention.',
+      'consulting': 'Agenzia di consulenza strategica che gestisce comunicazioni con clienti C-level, follow-up di proposte e programmazione meeting con alta personalizzazione.',
       'healthcare': 'Clinica privata che gestisce prenotazioni, promemoria pazienti, risultati esami e comunicazioni mediche con massima privacy e compliance.',
       'education': 'Istituto formativo online che gestisce iscrizioni corsi, supporto studenti, certificazioni e comunicazioni docenti con approccio educativo.',
       'finance': 'Consulenza finanziaria che gestisce richieste investimenti, aggiornamenti portfolio e compliance normativa con massima precisione.'
@@ -42,76 +43,86 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
 
   const progressionLevels = [
     {
-      level: "📊 LIVELLO 1 - Solo ruolo",
+      level: "Livello 1 - Solo ruolo",
       description: '"Sei un customer service manager con esperienza"',
       result: "→ Risposta professionale ma generica"
     },
     {
-      level: "📊 LIVELLO 2 - + Info azienda",
+      level: "Livello 2 - Informazioni azienda",
       description: '+ "per azienda e-commerce di abbigliamento"',
-      result: "→ Menziona policy tessuti, care instructions"
+      result: "→ Menziona policy tessuti e istruzioni di cura"
     },
     {
-      level: "📊 LIVELLO 3 - + Policy specifiche",
-      description: '+ "Rimborsi entro 30 giorni, spediz gratis >€50"',
+      level: "Livello 3 - Policy specifiche",
+      description: '+ "Rimborsi entro 30 giorni, spedizione gratuita sopra 50€"',
       result: "→ Applica policy corrette, offre spedizione"
     },
     {
-      level: "📊 LIVELLO 4 - + Volume/pressione",
-      description: '+ "500 email/giorno, clienti spesso frustrati"',
-      result: "→ Tone più empatico, gestione de-escalation"
+      level: "Livello 4 - Volume e pressione",
+      description: '+ "500 email al giorno, clienti spesso frustrati"',
+      result: "→ Tono più empatico, gestione de-escalation"
     }
   ];
 
   return (
-    <div className="bg-slate-900/90 border border-white/30 rounded-2xl p-6 shadow-xl shadow-black/20 hover:bg-slate-800/95 transition-all duration-300">
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/3 to-transparent pointer-events-none" />
-      
-      <h2 className="text-2xl font-semibold text-white mb-4 flex items-center relative z-10">
-        🌍 STEP 3/7: L'AI ha bisogno di sapere la situazione!
-      </h2>
+    <div className="step-card glassmorphism-base">
+      <div className="flex items-center space-x-3 mb-6 relative z-10">
+        <Building className="w-6 h-6 text-slate-300" />
+        <h2 className="text-xl font-medium text-slate-200">
+          Definizione del Contesto Business
+        </h2>
+      </div>
       
       <div className="relative z-10 space-y-6">
-        <div className="bg-amber-600/20 border border-amber-400/30 rounded-lg p-4">
-          <h3 className="text-amber-400 font-medium mb-2">🤔 DOMANDA:</h3>
-          <p className="text-white/80 text-sm leading-relaxed mb-2">
-            Perché l'AI ha risposto in modo generico anche con ruolo professionale?
+        <div className="section-spacing">
+          <p className="text-slate-300 leading-relaxed element-spacing">
+            L'AI necessita di comprendere il contesto aziendale specifico per fornire risposte appropriate e contestuali.
           </p>
-          <div className="bg-slate-800/50 rounded-lg p-3">
-            <span className="text-blue-400 font-medium">💡 RISPOSTA:</span>
-            <span className="text-white/80 text-sm ml-2">Non sa niente della TUA azienda!</span>
-          </div>
-        </div>
-
-        {!showProgression && (
-          <div className="bg-blue-600/20 border border-blue-400/30 rounded-lg p-4">
-            <h3 className="text-blue-400 font-medium mb-3">🧪 ESPERIMENTO:</h3>
-            <p className="text-white/80 text-sm mb-3">
-              Aggiungiamo contesto step by step e vediamo come migliora la risposta!
+          
+          <div className="bg-orange-900/15 border border-orange-700/30 rounded-lg p-4 element-spacing">
+            <h3 className="text-orange-300 font-medium mb-3 flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4" />
+              <span>Problema Comune:</span>
+            </h3>
+            <p className="text-slate-300 text-sm leading-relaxed sub-element-spacing">
+              Anche con un ruolo professionale definito, l'AI produce risposte generiche perché manca il contesto del business specifico.
             </p>
-            <div className="space-y-2">
-              {progressionLevels.map((level, index) => (
-                <div key={index} className="bg-slate-800/40 rounded-lg p-3">
-                  <div className="text-blue-400 text-sm font-medium">{level.level}</div>
-                  <div className="text-white/70 text-xs mt-1">{level.description}</div>
-                  <div className="text-green-400 text-xs mt-1">{level.result}</div>
-                </div>
-              ))}
+            <div className="bg-slate-800/50 rounded-lg p-3">
+              <span className="text-orange-300 font-medium text-sm">Soluzione:</span>
+              <span className="text-slate-300 text-sm ml-2">Fornire informazioni dettagliate sull'azienda e il settore di riferimento.</span>
             </div>
           </div>
-        )}
+
+          {!showProgression && (
+            <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4 element-spacing">
+              <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4" />
+                <span>Progressione della Qualità:</span>
+              </h3>
+              <div className="space-y-2">
+                {progressionLevels.map((level, index) => (
+                  <div key={index} className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
+                    <div className="text-slate-200 text-sm font-medium sub-element-spacing">{level.level}</div>
+                    <div className="text-slate-400 text-xs sub-element-spacing">{level.description}</div>
+                    <div className="text-emerald-300 text-xs">{level.result}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         
-        <div>
-          <label className="text-white/70 mb-3 block">🏢 Seleziona il tipo di azienda:</label>
+        <div className="section-spacing">
+          <label className="text-slate-200 font-medium element-spacing block">Seleziona il tipo di business:</label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {businessTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => handleBusinessTypeSelect(type.id)}
-                className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm border ${
                   promptData.businessType === type.id
-                    ? 'bg-blue-600/40 border border-blue-400/50 text-white'
-                    : 'bg-slate-700/60 border border-white/20 text-white/70 hover:bg-slate-600/80'
+                    ? 'bg-slate-700 border border-slate-600 text-slate-200'
+                    : 'bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/80'
                 }`}
               >
                 {type.label}
@@ -121,41 +132,45 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
         </div>
         
         {promptData.context && (
-          <div className="bg-slate-800/50 border border-white/20 rounded-lg p-4">
-            <h4 className="text-white font-medium mb-2 flex items-center">
-              🎁 Context Auto-Generated:
+          <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4 section-spacing">
+            <h4 className="text-slate-200 font-medium element-spacing flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-emerald-300" />
+              <span>Contesto Generato Automaticamente:</span>
             </h4>
-            <p className="text-white/70 text-sm leading-relaxed">
+            <p className="text-slate-300 text-sm leading-relaxed">
               "{promptData.context}"
             </p>
           </div>
         )}
 
         {showProgression && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4">
-              <h4 className="text-green-400 font-medium mb-3">📈 PROGRESSIVE BUILDING RISULTATI:</h4>
+          <div className="space-y-4 animate-fade-in section-spacing">
+            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
+              <h4 className="text-emerald-300 font-medium mb-3 flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4" />
+                <span>Risultati della Costruzione Progressiva:</span>
+              </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-white/70">Solo ruolo:</span>
-                  <span className="text-yellow-400">Generico ma professionale</span>
+                  <span className="text-slate-300">Solo ruolo:</span>
+                  <span className="text-orange-300">Generico ma professionale</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-white/70">+ Business type:</span>
-                  <span className="text-green-400">Industry-specific knowledge</span>
+                  <span className="text-slate-300">Con tipo di business:</span>
+                  <span className="text-emerald-300">Conoscenza settoriale</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-white/70">+ Context completo:</span>
-                  <span className="text-green-400">Policy-aware responses</span>
+                  <span className="text-slate-300">Con contesto completo:</span>
+                  <span className="text-emerald-300">Risposte policy-aware</span>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-800/40 rounded-lg p-4 border border-white/10">
-                <label className="text-white/70 text-sm mb-2 block">📊 Volume email/giorno:</label>
+              <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
+                <label className="text-slate-300 text-sm element-spacing block">Volume email giornaliero:</label>
                 <select 
-                  className="w-full bg-slate-700/60 border border-white/20 rounded text-white p-2 text-sm"
+                  className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
                   onChange={(e) => updatePromptData('emailVolume', e.target.value)}
                 >
                   <option value="">Seleziona volume</option>
@@ -166,10 +181,10 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
                 </select>
               </div>
               
-              <div className="bg-slate-800/40 rounded-lg p-4 border border-white/10">
-                <label className="text-white/70 text-sm mb-2 block">⚡ Urgenza media:</label>
+              <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
+                <label className="text-slate-300 text-sm element-spacing block">Livello di urgenza medio:</label>
                 <select 
-                  className="w-full bg-slate-700/60 border border-white/20 rounded text-white p-2 text-sm"
+                  className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
                   onChange={(e) => updatePromptData('urgencyLevel', e.target.value)}
                 >
                   <option value="">Seleziona urgenza</option>
@@ -181,10 +196,10 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
               </div>
             </div>
 
-            <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-3">
-              <span className="text-green-400 font-medium">🎯 Quality Score: +2 punti!</span>
-              <span className="text-white/80 text-sm ml-2">
-                Il contesto specifico ha trasformato risposte generiche in soluzioni business-aware!
+            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-3">
+              <span className="text-emerald-300 font-medium">Punteggio Qualità: +2 punti!</span>
+              <span className="text-slate-300 text-sm ml-2">
+                Il contesto specifico trasforma risposte generiche in soluzioni business-aware.
               </span>
             </div>
           </div>
@@ -194,9 +209,10 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
           <Button
             onClick={onComplete}
             disabled={!promptData.businessType}
-            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-6 py-2 rounded-xl font-medium transition-all duration-300 disabled:opacity-50"
+            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 border border-slate-600 flex items-center space-x-2"
           >
-            Incredibile! Ma come diciamo COSA fare? →
+            <span>Continua con la Definizione dei Task</span>
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </div>

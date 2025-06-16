@@ -64,9 +64,9 @@ const ProgressRing3D: React.FC<ProgressRing3DProps> = ({ progress, size = 240 })
         </defs>
       </svg>
       
-      {/* Center content with better background */}
+      {/* Center content - simplified */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center transform translate-z-10 bg-black/30 backdrop-blur-sm rounded-full px-4 py-2">
+        <div className="text-center">
           <div className="text-4xl font-bold text-white mb-1 drop-shadow-lg">{progress}%</div>
           <div className="text-sm text-white/80 font-medium drop-shadow-sm">Completato</div>
         </div>

@@ -110,7 +110,7 @@ const ProfileBuilderStep: React.FC<ProfileBuilderStepProps> = ({ onComplete, isA
 
       {/* Experience Slider */}
       <GlassmorphismCard 
-        className={`mb-12 transform transition-all duration-1000 delay-400 ${
+        className={`mb-20 transform transition-all duration-1000 delay-400 ${
           isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
         }`}
         size="medium"

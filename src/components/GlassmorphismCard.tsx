@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface GlassmorphismCardProps {
@@ -10,7 +10,7 @@ interface GlassmorphismCardProps {
   style?: React.CSSProperties;
 }
 
-const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({ 
+const GlassmorphismCard: React.FC<GlassmorphismCardProps> = memo(({ 
   children, 
   className, 
   size = 'medium',
@@ -32,31 +32,34 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
   return (
     <div
       className={cn(
-        // Performance optimized base styles
+        // Performance optimized base styles - reduced backdrop-blur
         'relative rounded-2xl border border-white/30',
-        'bg-slate-900/85',
+        'bg-slate-900/90',
         'shadow-xl shadow-black/20',
-        'transition-all duration-200 ease-out',
+        'transition-all duration-300 ease-out',
         'stable-card',
-        // Simplified hover effects for better performance
+        // Optimized hover effects
         'hover:shadow-2xl hover:shadow-black/30',
-        'hover:bg-slate-900/90',
+        'hover:bg-slate-800/95',
+        // GPU acceleration hints
+        'will-change-transform',
         // Size classes
         sizeClasses[size],
         // Elevated state
-        elevated && 'bg-slate-800/90',
+        elevated && 'bg-slate-800/95 shadow-2xl',
         className
       )}
       style={{
         minHeight: minHeights[size],
         width: '100%',
         contain: 'layout style paint',
-        willChange: 'auto',
+        backfaceVisibility: 'hidden',
+        transform: 'translateZ(0)', // Force GPU layer
         ...style
       }}
     >
-      {/* Subtle gradient overlay for depth */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+      {/* Simplified gradient overlay for better performance */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/3 to-transparent pointer-events-none" />
       
       {/* Content with ensured readability */}
       <div className="relative z-10 h-full text-white">
@@ -64,6 +67,8 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
       </div>
     </div>
   );
-};
+});
+
+GlassmorphismCard.displayName = 'GlassmorphismCard';
 
 export default GlassmorphismCard;

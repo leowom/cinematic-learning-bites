@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '../GlassmorphismCard';
 
@@ -14,95 +14,8 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
   const [assignedWorkflow, setAssignedWorkflow] = useState('');
   const [learningProfile, setLearningProfile] = useState<any>({});
 
-  // AI Logic for Workflow Assignment
-  const analyzeAnswers = (answers: Record<number, string>) => {
-    const scores = {
-      'learn-by-doing': 0,
-      'microlearning': 0,
-      'problem-solution': 0
-    };
-
-    // Analyze each answer and assign scores
-    Object.entries(answers).forEach(([questionIndex, answerId]) => {
-      const qIndex = parseInt(questionIndex);
-      
-      switch (qIndex) {
-        case 0: // Approach to new learning
-          if (answerId === 'practical') scores['learn-by-doing'] += 3;
-          if (answerId === 'documentation') scores['microlearning'] += 3;
-          if (answerId === 'experiment') scores['problem-solution'] += 3;
-          break;
-        case 1: // Memory concepts
-          if (answerId === 'hands-on') scores['learn-by-doing'] += 2;
-          if (answerId === 'visual' || answerId === 'notes') scores['microlearning'] += 2;
-          if (answerId === 'audio') scores['problem-solution'] += 1;
-          break;
-        case 2: // Learning strategy
-          if (answerId === 'step-by-step') scores['microlearning'] += 3;
-          if (answerId === 'overview') scores['problem-solution'] += 3;
-          if (answerId === 'mixed') {
-            scores['learn-by-doing'] += 1;
-            scores['microlearning'] += 1;
-            scores['problem-solution'] += 1;
-          }
-          break;
-        case 3: // Feedback management
-          if (answerId === 'reflect') scores['microlearning'] += 2;
-          if (answerId === 'immediate') scores['learn-by-doing'] += 2;
-          break;
-        case 4: // Environment
-          if (answerId === 'quiet') scores['microlearning'] += 2;
-          if (answerId === 'collaborative') scores['problem-solution'] += 2;
-          if (answerId === 'background') scores['learn-by-doing'] += 1;
-          break;
-        case 5: // Pace
-          if (answerId === 'regular') scores['microlearning'] += 2;
-          if (answerId === 'intensive') scores['problem-solution'] += 2;
-          if (answerId === 'flexible') scores['learn-by-doing'] += 2;
-          break;
-        case 6: // Motivation
-          if (answerId === 'competition') scores['problem-solution'] += 2;
-          if (answerId === 'curiosity') scores['learn-by-doing'] += 2;
-          if (answerId === 'career' || answerId === 'business') scores['microlearning'] += 1;
-          break;
-        case 7: // Time available
-          if (answerId === 'micro') scores['microlearning'] += 3;
-          if (answerId === 'standard') scores['learn-by-doing'] += 2;
-          if (answerId === 'deep') scores['problem-solution'] += 2;
-          break;
-      }
-    });
-
-    // Determine winning workflow
-    const maxScore = Math.max(...Object.values(scores));
-    const winningWorkflow = Object.keys(scores).find(key => scores[key as keyof typeof scores] === maxScore);
-    
-    return {
-      workflow: winningWorkflow,
-      scores,
-      profile: {
-        dominantStyle: winningWorkflow,
-        adaptability: scores['learn-by-doing'] > 0 && scores['microlearning'] > 0 && scores['problem-solution'] > 0 ? 'high' : 'moderate'
-      }
-    };
-  };
-
-  useEffect(() => {
-    if (isActive && userData.assessmentAnswers) {
-      // Simulate AI processing
-      const timer1 = setTimeout(() => {
-        const analysis = analyzeAnswers(userData.assessmentAnswers);
-        setAssignedWorkflow(analysis.workflow || 'learn-by-doing');
-        setLearningProfile(analysis.profile);
-        setProcessing(false);
-        setShowResults(true);
-      }, 3000);
-
-      return () => clearTimeout(timer1);
-    }
-  }, [isActive, userData]);
-
-  const getWorkflowDetails = (workflow: string) => {
+  // Memoized workflow details to prevent recalculation
+  const getWorkflowDetails = useMemo(() => (workflow: string) => {
     const details = {
       'learn-by-doing': {
         title: 'Learn-by-Doing',
@@ -127,7 +40,41 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
       }
     };
     return details[workflow as keyof typeof details] || details['learn-by-doing'];
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isActive && userData.assessmentAnswers) {
+      // Use Web Worker for heavy AI processing to prevent main thread blocking
+      const worker = new Worker(new URL('../../workers/assessmentWorker.ts', import.meta.url), {
+        type: 'module'
+      });
+
+      worker.postMessage({ answers: userData.assessmentAnswers });
+      
+      worker.onmessage = (e) => {
+        const analysis = e.data;
+        setAssignedWorkflow(analysis.workflow);
+        setLearningProfile(analysis.profile);
+        setProcessing(false);
+        setShowResults(true);
+        worker.terminate();
+      };
+
+      // Fallback timeout
+      const fallbackTimer = setTimeout(() => {
+        setAssignedWorkflow('learn-by-doing');
+        setLearningProfile({ dominantStyle: 'learn-by-doing', adaptability: 'moderate' });
+        setProcessing(false);
+        setShowResults(true);
+        worker.terminate();
+      }, 3000);
+
+      return () => {
+        clearTimeout(fallbackTimer);
+        worker.terminate();
+      };
+    }
+  }, [isActive, userData]);
 
   const handleComplete = () => {
     onComplete({ 
@@ -141,13 +88,13 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
     return (
       <div className="max-w-4xl mx-auto text-center pt-20 lg:pt-32">
         <GlassmorphismCard 
-          className={`transform transition-all duration-1000 ${
+          className={`transform transition-all duration-500 ${
             isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
           }`}
           size="large"
           elevated={isActive}
         >
-          {/* AI Processing Animation */}
+          {/* Optimized AI Processing Animation - Single pulse instead of multiple */}
           <div className="mb-8">
             <div className="w-24 h-24 mx-auto mb-6 relative">
               <div className="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
@@ -162,19 +109,22 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
             </h2>
             
             <div className="space-y-2 text-white/70">
-              <p className="animate-pulse">🧠 Elaborazione stili di apprendimento</p>
-              <p className="animate-pulse delay-500">⚡ Calibrazione workflow AI</p>
-              <p className="animate-pulse delay-1000">🎯 Personalizzazione percorso ottimale</p>
+              <p>🧠 Elaborazione stili di apprendimento</p>
+              <p>⚡ Calibrazione workflow AI</p>
+              <p>🎯 Personalizzazione percorso ottimale</p>
             </div>
           </div>
 
-          {/* Neural Network Visualization */}
+          {/* Simplified Neural Network Visualization - Reduced complexity */}
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-            {[...Array(9)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <div 
                 key={i}
-                className="h-3 bg-gradient-to-r from-blue-500/40 to-amber-500/40 rounded-full animate-pulse"
-                style={{ animationDelay: `${i * 200}ms` }}
+                className="h-3 bg-gradient-to-r from-blue-500/40 to-amber-500/40 rounded-full"
+                style={{ 
+                  animation: `pulse 2s ease-in-out infinite`,
+                  animationDelay: `${i * 300}ms` 
+                }}
               />
             ))}
           </div>
@@ -199,7 +149,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
 
       {/* Assigned Workflow */}
       <GlassmorphismCard 
-        className={`mb-12 transform transition-all duration-1000 ${
+        className={`mb-12 transform transition-all duration-500 ${
           showResults ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
         }`}
         size="large"
@@ -225,7 +175,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
 
       {/* AI Logic Reveal */}
       <GlassmorphismCard 
-        className={`mb-12 transform transition-all duration-1000 delay-300 ${
+        className={`mb-12 transform transition-all duration-500 delay-150 ${
           showResults ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
         }`}
         size="medium"
@@ -253,7 +203,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
 
       {/* Profile Summary */}
       <GlassmorphismCard 
-        className={`mb-12 transform transition-all duration-1000 delay-600 ${
+        className={`mb-12 transform transition-all duration-500 delay-300 ${
           showResults ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
         }`}
         size="large"

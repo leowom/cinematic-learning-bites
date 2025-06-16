@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, TrendingUp, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import { Users, CheckCircle, ArrowRight, Brain, Building, Headphones, Briefcase, TrendingUp } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -10,44 +10,73 @@ interface Props {
 }
 
 const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [selectedRole, setSelectedRole] = useState('');
-  const [experience, setExperience] = useState(5);
+  const [selectedRole, setSelectedRole] = useState(promptData.role || '');
+  const [experience, setExperience] = useState(promptData.experience || 5);
   const [showAnalysis, setShowAnalysis] = useState(false);
 
   const roles = [
-    { id: 'customer-service', name: 'Responsabile Customer Service', sector: 'Servizio Clienti' },
-    { id: 'sales-manager', name: 'Manager Vendite', sector: 'Commerciale' },
-    { id: 'hr-specialist', name: 'Specialista Risorse Umane', sector: 'HR' },
-    { id: 'marketing-lead', name: 'Marketing Lead', sector: 'Marketing' },
-    { id: 'project-manager', name: 'Project Manager', sector: 'Gestione Progetti' },
-    { id: 'business-analyst', name: 'Business Analyst', sector: 'Analisi Business' }
+    {
+      id: 'customer-service',
+      title: 'Responsabile Customer Service',
+      icon: Headphones,
+      description: 'Gestione completa del servizio clienti e risoluzione problematiche',
+      qualities: ['Empatia', 'Problem-solving', 'Comunicazione efficace'],
+      impact: 'Migliora customer satisfaction del 40%'
+    },
+    {
+      id: 'business-analyst',
+      title: 'Business Analyst',
+      icon: TrendingUp,
+      description: 'Analisi processi aziendali e ottimizzazione workflow operativi',
+      qualities: ['Analisi dati', 'Process improvement', 'Strategic thinking'],
+      impact: 'Ottimizza efficienza operativa del 35%'
+    },
+    {
+      id: 'project-manager',
+      title: 'Project Manager',
+      icon: Briefcase,
+      description: 'Coordinamento progetti e gestione team multidisciplinari',
+      qualities: ['Leadership', 'Pianificazione', 'Risk management'],
+      impact: 'Accelera delivery progetti del 30%'
+    },
+    {
+      id: 'sales-director',
+      title: 'Direttore Vendite',
+      icon: Building,
+      description: 'Sviluppo strategie commerciali e gestione pipeline vendite',
+      qualities: ['Negoziazione', 'Strategic planning', 'Team building'],
+      impact: 'Incrementa conversioni del 45%'
+    }
   ];
 
   const handleRoleSelect = (roleId: string) => {
-    const role = roles.find(r => r.id === roleId);
     setSelectedRole(roleId);
-    updatePromptData('role', role?.name || '');
+    updatePromptData('role', roleId);
     setShowAnalysis(true);
-    updatePromptData('qualityScore', 3);
+    
+    // Update quality score based on role selection
+    const baseScore = 3;
+    updatePromptData('qualityScore', baseScore);
   };
 
   const handleExperienceChange = (value: number) => {
     setExperience(value);
     updatePromptData('experience', value);
+    
+    // Update quality score based on experience
+    const experienceBonus = Math.min(value * 0.3, 2);
+    updatePromptData('qualityScore', (promptData.qualityScore || 3) + experienceBonus);
   };
 
-  const getExperienceLabel = (years: number) => {
-    if (years < 3) return 'Junior';
-    if (years < 7) return 'Middle';
-    if (years < 12) return 'Senior';
-    return 'Expert';
+  const getSelectedRole = () => {
+    return roles.find(role => role.id === selectedRole);
   };
 
-  const getAuthorityLevel = (years: number) => {
-    if (years < 3) return { level: 'Limitata', color: 'text-orange-300' };
-    if (years < 7) return { level: 'Buona', color: 'text-emerald-300' };
-    if (years < 12) return { level: 'Elevata', color: 'text-emerald-300' };
-    return { level: 'Massima', color: 'text-emerald-300' };
+  const getExperienceLevel = () => {
+    if (experience <= 2) return { label: 'Junior', color: 'text-orange-300' };
+    if (experience <= 5) return { label: 'Mid-level', color: 'text-slate-300' };
+    if (experience <= 8) return { label: 'Senior', color: 'text-emerald-300' };
+    return { label: 'Expert', color: 'text-blue-300' };
   };
 
   return (
@@ -62,101 +91,134 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
           <p className="text-slate-300 leading-relaxed element-spacing">
-            Il primo elemento fondamentale per un prompt efficace è la definizione di un ruolo professionale specifico. 
-            Questo stabilisce l'autorità e il contesto per le risposte AI.
+            L'assegnazione di un ruolo specifico all'AI stabilisce il contesto di competenza e autorità per le risposte. 
+            Un ruolo ben definito trasforma l'AI da assistente generico a consulente specializzato.
           </p>
           
-          <div className="bg-orange-900/15 border border-orange-700/30 rounded-lg p-4 element-spacing">
-            <div className="flex items-center space-x-2 sub-element-spacing">
-              <AlertTriangle className="w-4 h-4 text-orange-300" />
-              <span className="text-orange-300 text-sm font-medium">Perché è Critico:</span>
-            </div>
-            <div className="text-slate-300 text-sm leading-relaxed">
-              Senza un ruolo definito, l'AI risponde come un assistente generico. Con un ruolo specifico, 
-              attinge a conoscenze specialistiche e adotta il tono appropriato del settore.
+          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4 element-spacing">
+            <div className="bg-rose-900/15 border border-rose-700/30 rounded-lg p-3 element-spacing">
+              <div className="text-rose-300 font-medium sub-element-spacing">Impatto della Specificità del Ruolo:</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div className="text-slate-400 sub-element-spacing">Senza Ruolo:</div>
+                  <div className="text-slate-300">"Come gestisco questa situazione?"</div>
+                  <div className="text-slate-400 text-xs">Risposta generica senza autorità</div>
+                </div>
+                <div>
+                  <div className="text-slate-400 sub-element-spacing">Con Ruolo:</div>
+                  <div className="text-slate-300">"Come responsabile customer service..."</div>
+                  <div className="text-emerald-400 text-xs">Risposta esperta e attuabile</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="section-spacing">
-          <label className="text-slate-200 font-medium element-spacing block">Seleziona il ruolo professionale:</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {roles.map((role) => (
-              <button
-                key={role.id}
-                onClick={() => handleRoleSelect(role.id)}
-                className={`p-3 rounded-lg transition-all duration-200 text-left border ${
-                  selectedRole === role.id
-                    ? 'bg-slate-700 border-slate-600 text-slate-200'
-                    : 'bg-slate-800/60 border-slate-700/50 text-slate-300 hover:bg-slate-700/80'
-                }`}
-              >
-                <div className="font-medium text-sm sub-element-spacing">{role.name}</div>
-                <div className="text-slate-400 text-xs">{role.sector}</div>
-              </button>
-            ))}
+          <h3 className="text-slate-200 font-medium element-spacing">Seleziona il Ruolo Professionale:</h3>
+          <div className="grid grid-cols-1 gap-3">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              const isSelected = selectedRole === role.id;
+              
+              return (
+                <div
+                  key={role.id}
+                  className={`p-4 rounded-lg border transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'bg-slate-700/60 border-slate-600 ring-1 ring-slate-500'
+                      : 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-700/50'
+                  }`}
+                  onClick={() => handleRoleSelect(role.id)}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className={`p-2 rounded-lg ${
+                      isSelected ? 'bg-slate-600/60' : 'bg-slate-800/60'
+                    }`}>
+                      <Icon className="w-5 h-5 text-slate-300" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between sub-element-spacing">
+                        <h4 className="text-slate-200 font-medium">{role.title}</h4>
+                        {isSelected && <CheckCircle className="w-5 h-5 text-emerald-300" />}
+                      </div>
+                      <p className="text-slate-400 text-sm sub-element-spacing">{role.description}</p>
+                      <div className="flex flex-wrap gap-2 sub-element-spacing">
+                        {role.qualities.map((quality) => (
+                          <span
+                            key={quality}
+                            className="text-xs px-2 py-1 bg-slate-700/50 text-slate-300 rounded border border-slate-600/50"
+                          >
+                            {quality}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-emerald-400/80 text-xs">{role.impact}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {selectedRole && (
           <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4 section-spacing">
-            <h4 className="text-slate-200 font-medium element-spacing flex items-center space-x-2">
-              <TrendingUp className="w-4 h-4" />
-              <span>Livello di Esperienza:</span>
-            </h4>
-            
+            <h3 className="text-slate-200 font-medium element-spacing">Livello di Esperienza:</h3>
             <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between sub-element-spacing">
-                  <span className="text-slate-300 text-sm">Anni di esperienza: {experience}</span>
-                  <span className={`text-sm font-medium ${getAuthorityLevel(experience).color}`}>
-                    {getExperienceLabel(experience)} - Autorità {getAuthorityLevel(experience).level}
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 text-sm">Anni di esperienza:</span>
+                <div className="flex items-center space-x-3">
+                  <span className="text-slate-300 font-medium">{experience} anni</span>
+                  <span className={`text-sm font-medium ${getExperienceLevel().color}`}>
+                    ({getExperienceLevel().label})
                   </span>
                 </div>
+              </div>
+              
+              <div className="space-y-2">
                 <input
                   type="range"
                   min="1"
-                  max="20"
+                  max="10"
                   value={experience}
                   onChange={(e) => handleExperienceChange(Number(e.target.value))}
                   className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
                 />
-                <div className="flex justify-between text-slate-400 text-xs mt-1">
+                <div className="flex justify-between text-xs text-slate-500">
                   <span>1 anno</span>
-                  <span>10 anni</span>
-                  <span>20+ anni</span>
+                  <span>5 anni</span>
+                  <span>10+ anni</span>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {showAnalysis && (
+        {showAnalysis && selectedRole && (
           <div className="space-y-4 animate-fade-in section-spacing">
             <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
               <h4 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4" />
-                <span>Analisi dell'Impatto:</span>
+                <Brain className="w-4 h-4" />
+                <span>Analisi dell'Autorità del Ruolo:</span>
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="space-y-2">
-                  <div className="text-slate-300 font-medium">Prima (Senza Ruolo):</div>
-                  <ul className="text-slate-400 space-y-1">
-                    <li>• Risposta generica</li>
-                    <li>• Nessuna autorità</li>
-                    <li>• Tono inconsistente</li>
-                    <li>• Consigli superficiali</li>
-                  </ul>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="text-center">
+                  <div className="text-slate-400 sub-element-spacing">Ruolo</div>
+                  <div className="text-slate-200 text-lg font-medium">{getSelectedRole()?.title}</div>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-slate-300 font-medium">Dopo (Con Ruolo):</div>
-                  <ul className="text-emerald-300 space-y-1">
-                    <li>• Expertise settoriale</li>
-                    <li>• Credibilità professionale</li>
-                    <li>• Linguaggio appropriato</li>
-                    <li>• Soluzioni specifiche</li>
-                  </ul>
+                <div className="text-center">
+                  <div className="text-slate-400 sub-element-spacing">Esperienza</div>
+                  <div className={`text-lg font-medium ${getExperienceLevel().color}`}>
+                    {experience} anni
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-slate-400 sub-element-spacing">Livello</div>
+                  <div className={`text-lg font-medium ${getExperienceLevel().color}`}>
+                    {getExperienceLevel().label}
+                  </div>
                 </div>
               </div>
             </div>
@@ -164,21 +226,24 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
             <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3">
               <div className="text-slate-200 font-medium sub-element-spacing">Esempio di Trasformazione:</div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-slate-900/40 rounded-lg p-3">
-                  <div className="text-orange-300 font-medium sub-element-spacing">Generico:</div>
-                  <div className="text-slate-400">"Gestisci meglio le email"</div>
+                <div>
+                  <div className="text-rose-300 font-medium sub-element-spacing">Prima:</div>
+                  <div className="text-slate-400">"Aiutami con questo problema"</div>
                 </div>
-                <div className="bg-slate-900/40 rounded-lg p-3">
-                  <div className="text-emerald-300 font-medium sub-element-spacing">Con Ruolo:</div>
-                  <div className="text-slate-300">"Da Manager con 8 anni di esperienza: implementa workflow di triage, utilizza template pre-approvati, stabilisci SLA chiari"</div>
+                <div>
+                  <div className="text-emerald-300 font-medium sub-element-spacing">Dopo:</div>
+                  <div className="text-slate-300">
+                    "Sei {getSelectedRole()?.title} con {experience} anni di esperienza. 
+                    Fornisci una soluzione professionale per..."
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-3">
-              <span className="text-emerald-300 font-medium">Punteggio Qualità: +3 punti!</span>
+              <span className="text-emerald-300 font-medium">Punteggio Qualità: +{(3 + Math.min(experience * 0.3, 2)).toFixed(1)} punti!</span>
               <span className="text-slate-300 text-sm ml-2">
-                Il ruolo professionale trasforma risposte generiche in expertise settoriale.
+                Ruolo definito stabilisce autorità e competenza specifica.
               </span>
             </div>
           </div>
@@ -195,6 +260,34 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
           </Button>
         </div>
       </div>
+
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: #64748b;
+          border: 2px solid #475569;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+          background: #94a3b8;
+          border-color: #64748b;
+        }
+        
+        .slider::-moz-range-thumb {
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: #64748b;
+          border: 2px solid #475569;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,6 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useOpenAI } from '@/hooks/useOpenAI';
+import APIKeyModal from './APIKeyModal';
+import { Settings, Zap, AlertCircle } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -25,6 +27,10 @@ const AITestingStep: React.FC<Props> = ({ promptData, updatePromptData, onComple
   const [isLoading, setIsLoading] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [selectedTestCase, setSelectedTestCase] = useState(0);
+  const [showAPIModal, setShowAPIModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { apiKey, saveApiKey, testPromptWithGPT, hasApiKey } = useOpenAI();
 
   const testCases = [
     {
@@ -53,216 +59,34 @@ Sofia`,
     }
   ];
 
-  // Simulate AI API call with realistic scoring
-  const testPromptWithAI = async (prompt: string, testCase: any) => {
+  const handleRealAITest = async () => {
+    if (!hasApiKey) {
+      setShowAPIModal(true);
+      return;
+    }
+
+    const currentPrompt = generateCurrentPrompt();
+    const currentTest = testCases[selectedTestCase];
+
     setIsLoading(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Mock AI response based on prompt quality
-    const mockResponse = generateMockResponse(prompt, testCase);
-    const analysis = analyzeResponse(mockResponse, testCase, prompt);
-    
-    const result: TestResult = {
-      response: mockResponse,
-      score: calculateOverallScore(analysis),
-      analysis,
-      feedback: generateFeedback(analysis, prompt)
-    };
-    
-    setTestResult(result);
-    updatePromptData('aiTestScore', result.score);
-    setIsLoading(false);
-  };
+    setError(null);
 
-  const generateMockResponse = (prompt: string, testCase: any) => {
-    const hasRole = prompt.toLowerCase().includes('sei') || prompt.toLowerCase().includes('esperto');
-    const hasContext = prompt.includes('contesto') || prompt.includes('e-commerce');
-    const hasTasks = prompt.includes('sentiment') && prompt.includes('urgenza');
-    const hasFormat = prompt.includes('format') || prompt.includes('struttura');
-    
-    if (testCase.id === 'complaint') {
-      if (hasRole && hasContext && hasTasks && hasFormat) {
-        return `[SENTIMENT: Negativo 2/5 | URGENZA: 4/5 | CATEGORIA: Reclamo]
-
-Gentile Marco,
-
-La ringrazio per averci contattato riguardo l'ordine #12345. Comprendo perfettamente la sua frustrazione per il prodotto errato ricevuto e mi scuso sinceramente per questo inconveniente.
-
-Come cliente fedele dal 2019, merita un servizio eccellente. Procederò immediatamente con:
-
-1. RIMBORSO COMPLETO: €53 (prodotto + spedizione) accreditati entro 2-3 giorni lavorativi
-2. ETICHETTA RESO: Inviata via email per spedizione gratuita
-3. SCONTO 20%: Sul prossimo ordine come gesto di scuse
-
-Ho già segnalato il problema al nostro team qualità per evitare future occorrenze.
-
-Per qualsiasi urgenza: marco.rossi@azienda.com | Tel: 02-1234567
-
-Cordiali saluti,
-Marco Rossi - Senior Customer Service Manager`;
-      } else if (hasRole && hasContext) {
-        return `Gentile Marco,
-
-Mi scuso per l'errore nell'ordine #12345. Comprendo la sua frustrazione per aver ricevuto il prodotto sbagliato.
-
-Posso procedere con il rimborso come richiesto. L'importo verrà riaccreditato entro alcuni giorni lavorativi.
-
-La prego di utilizzare l'etichetta che le invieremo per il reso.
-
-Cordiali saluti,
-Team Customer Service`;
-      } else {
-        return `Salve Marco,
-
-Grazie per averci contattato. Mi dispiace per il problema con il suo ordine. 
-
-Possiamo aiutarla con il rimborso. Ci faccia sapere come preferisce procedere.
-
-Saluti,
-Customer Service`;
-      }
-    } else {
-      // Similar logic for inquiry test case
-      if (hasRole && hasContext && hasTasks && hasFormat) {
-        return `[SENTIMENT: Positivo 4/5 | URGENZA: 5/5 | CATEGORIA: Informazioni Vendite]
-
-Gentile Sofia,
-
-Grazie per il suo interesse nel nostro prodotto TEE-001-R-M.
-
-DISPONIBILITÀ: ✅ Articolo disponibile in magazzino
-SPEDIZIONE EXPRESS: ✅ Possibile consegna entro domani se ordina entro le 14:00 (€15)
-PRODOTTO: Maglietta rossa taglia M - €29,90
-
-Per ordinare immediatamente:
-- Telefono: 02-1234567 (servizio dedicato urgenze)
-- Online: www.azienda.com/express-checkout
-
-Il suo regalo sarà perfetto! 🎁
-
-Cordiali saluti,
-Lisa Verdi - Sales Specialist`;
-      } else {
-        return `Ciao Sofia,
-
-Sì, abbiamo il prodotto disponibile. La spedizione express costa €15 extra.
-
-Puoi ordinare sul sito o chiamarci.
-
-Grazie!`;
-      }
+    try {
+      console.log('🚀 Inizio test con GPT-4o...', { prompt: currentPrompt, testCase: currentTest.title });
+      
+      const result = await testPromptWithGPT(currentPrompt, currentTest);
+      
+      console.log('✅ Test completato:', result);
+      
+      setTestResult(result);
+      updatePromptData('aiTestScore', result.score);
+      
+    } catch (error: any) {
+      console.error('❌ Errore test AI:', error);
+      setError(error.message || 'Errore sconosciuto durante il test AI');
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const analyzeResponse = (response: string, testCase: any, prompt: string) => {
-    const completeness = calculateCompleteness(response, testCase.expectedElements);
-    const accuracy = calculateAccuracy(response, testCase);
-    const tone = calculateTone(response, testCase);
-    const specificity = calculateSpecificity(response);
-    const actionability = calculateActionability(response);
-
-    return { completeness, accuracy, tone, specificity, actionability };
-  };
-
-  const calculateCompleteness = (response: string, expectedElements: string[]) => {
-    const foundElements = expectedElements.filter(element => 
-      response.toLowerCase().includes(element.toLowerCase().replace(/\s+/g, '.*'))
-    );
-    return Math.round((foundElements.length / expectedElements.length) * 100);
-  };
-
-  const calculateAccuracy = (response: string, testCase: any) => {
-    let score = 70; // Base score
-    
-    if (response.includes('#12345') || response.includes('TEE-001')) score += 10;
-    if (response.includes('Marco') || response.includes('Sofia')) score += 10;
-    if (response.includes('rimborso') && testCase.id === 'complaint') score += 10;
-    
-    return Math.min(score, 100);
-  };
-
-  const calculateTone = (response: string, testCase: any) => {
-    let score = 60;
-    
-    if (response.includes('Gentile') || response.includes('La ringrazio')) score += 15;
-    if (response.includes('mi scuso') && testCase.id === 'complaint') score += 15;
-    if (response.includes('Cordiali saluti')) score += 10;
-    
-    return Math.min(score, 100);
-  };
-
-  const calculateSpecificity = (response: string) => {
-    let score = 50;
-    
-    if (response.includes('€') || response.includes('giorni')) score += 20;
-    if (response.includes('entro') || response.includes('ore')) score += 15;
-    if (response.includes('@') || response.includes('Tel:')) score += 15;
-    
-    return Math.min(score, 100);
-  };
-
-  const calculateActionability = (response: string) => {
-    let score = 40;
-    
-    if (response.includes('1.') || response.includes('•')) score += 20;
-    if (response.includes('procedere') || response.includes('contatti')) score += 20;
-    if (response.includes('etichetta') || response.includes('telefono')) score += 20;
-    
-    return Math.min(score, 100);
-  };
-
-  const calculateOverallScore = (analysis: any) => {
-    const weights = {
-      completeness: 0.25,
-      accuracy: 0.25,
-      tone: 0.20,
-      specificity: 0.15,
-      actionability: 0.15
-    };
-    
-    const weightedScore = Object.entries(weights).reduce((total, [key, weight]) => {
-      return total + (analysis[key] * weight);
-    }, 0);
-    
-    return Math.round(weightedScore / 10); // Convert to 1-10 scale
-  };
-
-  const generateFeedback = (analysis: any, prompt: string) => {
-    const feedback = [];
-    
-    if (analysis.completeness < 70) {
-      feedback.push("❌ Risposta incompleta: mancano elementi chiave richiesti dal cliente");
-    } else {
-      feedback.push("✅ Risposta completa: include tutti gli elementi essenziali");
-    }
-    
-    if (analysis.accuracy < 70) {
-      feedback.push("❌ Accuratezza bassa: dettagli imprecisi o mancanti");
-    } else {
-      feedback.push("✅ Risposta accurata: dettagli corretti e pertinenti");
-    }
-    
-    if (analysis.tone < 70) {
-      feedback.push("❌ Tone inappropriato: non adatto alla situazione del cliente");
-    } else {
-      feedback.push("✅ Tone appropriato: empatico e professionale");
-    }
-    
-    if (analysis.specificity < 70) {
-      feedback.push("⚠️ Poco specifico: aggiungi timeline, importi e contatti diretti");
-    } else {
-      feedback.push("✅ Altamente specifico: include dettagli actionable");
-    }
-    
-    if (analysis.actionability < 70) {
-      feedback.push("⚠️ Poco actionable: il cliente non sa cosa fare dopo");
-    } else {
-      feedback.push("✅ Chiaramente actionable: next steps evidenti");
-    }
-    
-    return feedback;
   };
 
   const generateCurrentPrompt = () => {
@@ -309,23 +133,69 @@ Grazie!`;
   return (
     <div className="step-card glassmorphism-base">
       <h2 className="text-2xl font-semibold text-white mb-4 relative z-10">
-        🧪 STEP 6/7: Test Reale con AI
+        🧪 STEP 8/9: Test Reale con GPT-4o
       </h2>
       
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
           <p className="text-white/70 leading-relaxed element-spacing">
-            Ora testiamo il tuo prompt con un'AI reale. Scegli un caso di test e vedi come performa il tuo prompt!
+            Ora testiamo il tuo prompt con GPT-4o reale! L'AI analizzerà il tuo prompt e genererà una risposta, 
+            poi valuterà automaticamente la qualità su 5 criteri specifici.
           </p>
 
-          <div className="bg-blue-600/20 border border-blue-400/30 rounded-lg p-4 element-spacing">
-            <h3 className="text-blue-400 font-medium sub-element-spacing">🎯 Test Obiettivo:</h3>
+          <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4 element-spacing">
+            <h3 className="text-green-400 font-medium sub-element-spacing flex items-center">
+              <Zap className="w-4 h-4 mr-2" />
+              🎯 Test con AI Reale:
+            </h3>
             <p className="text-white/80 text-sm leading-relaxed">
-              L'AI analizzerà il tuo prompt e genererà una risposta, poi valuterà la qualità su 5 criteri specifici 
-              per darti un score da 1-10 completamente oggettivo.
+              Usiamo GPT-4o per generare la risposta e poi un secondo GPT-4o per analizzare oggettivamente 
+              la qualità su completeness, accuracy, tone, specificity e actionability.
             </p>
           </div>
+
+          {/* API Status */}
+          <div className={`rounded-lg p-4 border ${
+            hasApiKey 
+              ? 'bg-green-600/20 border-green-400/30'
+              : 'bg-amber-600/20 border-amber-400/30'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Settings className="w-4 h-4" />
+                <span className="text-white font-medium">
+                  {hasApiKey ? '✅ OpenAI API Configurata' : '⚠️ API Key Richiesta'}
+                </span>
+              </div>
+              <Button
+                onClick={() => setShowAPIModal(true)}
+                variant="outline"
+                size="sm"
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                {hasApiKey ? 'Modifica' : 'Configura'} API
+              </Button>
+            </div>
+            {!hasApiKey && (
+              <p className="text-white/70 text-sm mt-2">
+                Configura la tua OpenAI API key per testare con GPT-4o reale
+              </p>
+            )}
+          </div>
         </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-600/20 border border-red-400/30 rounded-lg p-4">
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-red-400 font-medium">Errore Test AI:</h4>
+                <p className="text-white/80 text-sm mt-1">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Test Case Selection */}
         <div className="section-spacing">
@@ -371,17 +241,19 @@ Grazie!`;
         {/* Test Button */}
         <div className="text-center section-spacing">
           <Button
-            onClick={() => testPromptWithAI(currentPrompt, currentTest)}
+            onClick={handleRealAITest}
             disabled={isLoading || !currentPrompt}
             className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white px-8 py-3 rounded-xl font-medium text-lg"
           >
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Testing con AI...</span>
+                <span>Testing con GPT-4o...</span>
               </div>
+            ) : !hasApiKey ? (
+              '🔑 Configura API per Test Reale'
             ) : (
-              '🧪 Testa con AI Reale'
+              '🚀 Testa con GPT-4o Reale'
             )}
           </Button>
         </div>
@@ -481,6 +353,14 @@ Grazie!`;
           </Button>
         </div>
       </div>
+
+      {/* API Key Modal */}
+      <APIKeyModal
+        isOpen={showAPIModal}
+        onClose={() => setShowAPIModal(false)}
+        onSave={saveApiKey}
+        currentKey={apiKey}
+      />
     </div>
   );
 };

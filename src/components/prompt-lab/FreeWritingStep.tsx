@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Edit3, TrendingUp, Target, Brain, CheckCircle, ArrowRight, Lightbulb } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -91,20 +92,26 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
 
   return (
     <div className="step-card glassmorphism-base">
-      <h2 className="text-2xl font-semibold text-white mb-4 relative z-10">
-        ✍️ STEP BONUS: Scrivi il TUO Prompt da Zero
-      </h2>
+      <div className="flex items-center space-x-3 mb-6 relative z-10">
+        <Edit3 className="w-6 h-6 text-slate-300" />
+        <h2 className="text-xl font-medium text-slate-200">
+          STEP BONUS: Scrivi il TUO Prompt da Zero
+        </h2>
+      </div>
       
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
-          <p className="text-white/70 leading-relaxed element-spacing">
+          <p className="text-slate-300 leading-relaxed element-spacing">
             Ora prova a scrivere un prompt completo usando quello che hai imparato. 
             Sperimentazione libera per consolidare l'apprendimento!
           </p>
 
-          <div className="bg-blue-600/20 border border-blue-400/30 rounded-lg p-4 element-spacing">
-            <h3 className="text-blue-400 font-medium sub-element-spacing">🎯 Sfida:</h3>
-            <p className="text-white/80 text-sm leading-relaxed">
+          <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4 element-spacing">
+            <h3 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
+              <Target className="w-4 h-4" />
+              <span>🎯 Sfida:</span>
+            </h3>
+            <p className="text-slate-300 text-sm leading-relaxed">
               Scrivi un prompt per gestire email di customer service per un'azienda e-commerce. 
               Includi tutti gli elementi che abbiamo visto nei step precedenti.
             </p>
@@ -113,18 +120,18 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
 
         {/* Free Writing Area */}
         <div className="section-spacing">
-          <label className="text-white/70 text-sm block sub-element-spacing">
+          <label className="text-slate-200 font-medium sub-element-spacing block">
             Il tuo prompt personalizzato:
           </label>
           <textarea
             value={freeWrittenPrompt}
             onChange={(e) => setFreeWrittenPrompt(e.target.value)}
             placeholder="Inizia scrivendo: 'Sei un...' e continua con il tuo prompt completo..."
-            className="w-full bg-slate-700/60 border border-white/20 rounded-lg p-4 text-white placeholder-white/40 resize-none h-64"
+            className="w-full bg-slate-700/60 border border-slate-600/50 rounded-lg p-4 text-slate-200 placeholder-slate-400 resize-none h-64 focus:border-slate-500 focus:outline-none"
             rows={12}
           />
           <div className="flex justify-between items-center mt-2">
-            <span className="text-white/50 text-xs">
+            <span className="text-slate-400 text-xs">
               Caratteri: {freeWrittenPrompt.length}
             </span>
             <div className="flex space-x-2">
@@ -132,14 +139,14 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
                 onClick={() => setShowHints(!showHints)}
                 variant="outline"
                 size="sm"
-                className="text-white/60 border-white/20"
+                className="text-slate-300 border-slate-600 hover:bg-slate-700/60"
               >
                 {showHints ? 'Nascondi' : 'Mostra'} Hints
               </Button>
               <Button
                 onClick={handleFreeWritingSubmit}
                 disabled={freeWrittenPrompt.length < 50}
-                className="bg-green-600 hover:bg-green-500 text-white"
+                className="bg-emerald-700 hover:bg-emerald-600 text-slate-200 border border-emerald-600"
               >
                 Analizza Prompt
               </Button>
@@ -149,13 +156,16 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
 
         {/* Hints Section */}
         {showHints && (
-          <div className="bg-slate-800/40 rounded-lg p-4 border border-white/10 section-spacing">
-            <h4 className="text-white font-medium sub-element-spacing">💡 Hints Progressivi:</h4>
+          <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40 section-spacing">
+            <h4 className="text-slate-200 font-medium sub-element-spacing flex items-center space-x-2">
+              <Lightbulb className="w-4 h-4" />
+              <span>💡 Hints Progressivi:</span>
+            </h4>
             <div className="space-y-2">
               {hints.map((hint, index) => (
                 <div key={index} className="flex items-start">
-                  <span className="text-blue-400 mr-2">•</span>
-                  <span className="text-white/70 text-sm">{hint}</span>
+                  <span className="text-emerald-400 mr-2">•</span>
+                  <span className="text-slate-300 text-sm">{hint}</span>
                 </div>
               ))}
             </div>
@@ -166,45 +176,48 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
         {showComparison && (
           <div className="space-y-6 section-spacing">
             {/* Free Prompt Analysis */}
-            <div className="bg-slate-800/50 border border-white/20 rounded-lg p-4">
-              <h4 className="text-white font-medium sub-element-spacing">📊 Analisi del Tuo Prompt:</h4>
+            <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4">
+              <h4 className="text-slate-200 font-medium sub-element-spacing flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4" />
+                <span>📊 Analisi del Tuo Prompt:</span>
+              </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/70">Definizione Ruolo:</span>
-                    <span className={freePromptAnalysis.hasRole ? 'text-green-400' : 'text-red-400'}>
+                    <span className="text-slate-300">Definizione Ruolo:</span>
+                    <span className={freePromptAnalysis.hasRole ? 'text-emerald-400' : 'text-rose-400'}>
                       {freePromptAnalysis.hasRole ? '✅' : '❌'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/70">Contesto Business:</span>
-                    <span className={freePromptAnalysis.hasContext ? 'text-green-400' : 'text-red-400'}>
+                    <span className="text-slate-300">Contesto Business:</span>
+                    <span className={freePromptAnalysis.hasContext ? 'text-emerald-400' : 'text-rose-400'}>
                       {freePromptAnalysis.hasContext ? '✅' : '❌'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/70">Task Specifici:</span>
-                    <span className={freePromptAnalysis.hasTasks ? 'text-green-400' : 'text-red-400'}>
+                    <span className="text-slate-300">Task Specifici:</span>
+                    <span className={freePromptAnalysis.hasTasks ? 'text-emerald-400' : 'text-rose-400'}>
                       {freePromptAnalysis.hasTasks ? '✅' : '❌'}
                     </span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/70">Constraints/Tone:</span>
-                    <span className={freePromptAnalysis.hasConstraints ? 'text-green-400' : 'text-red-400'}>
+                    <span className="text-slate-300">Constraints/Tone:</span>
+                    <span className={freePromptAnalysis.hasConstraints ? 'text-emerald-400' : 'text-rose-400'}>
                       {freePromptAnalysis.hasConstraints ? '✅' : '❌'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/70">Output Format:</span>
-                    <span className={freePromptAnalysis.hasFormat ? 'text-green-400' : 'text-red-400'}>
+                    <span className="text-slate-300">Output Format:</span>
+                    <span className={freePromptAnalysis.hasFormat ? 'text-emerald-400' : 'text-rose-400'}>
                       {freePromptAnalysis.hasFormat ? '✅' : '❌'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/70">Score Totale:</span>
-                    <span className={`font-bold ${freePromptAnalysis.score >= 8 ? 'text-green-400' : freePromptAnalysis.score >= 6 ? 'text-amber-400' : 'text-red-400'}`}>
+                    <span className="text-slate-300">Score Totale:</span>
+                    <span className={`font-bold ${freePromptAnalysis.score >= 8 ? 'text-emerald-400' : freePromptAnalysis.score >= 6 ? 'text-orange-400' : 'text-rose-400'}`}>
                       {freePromptAnalysis.score}/10
                     </span>
                   </div>
@@ -215,18 +228,18 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
             {/* Side by Side Comparison */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-white font-medium sub-element-spacing">✍️ Il Tuo Prompt:</h4>
-                <div className="bg-slate-800/50 border border-blue-400/30 rounded-lg p-4 prompt-preview">
-                  <pre className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">
+                <h4 className="text-slate-200 font-medium sub-element-spacing">✍️ Il Tuo Prompt:</h4>
+                <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4 prompt-preview">
+                  <pre className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
                     {freeWrittenPrompt || 'Nessun prompt scritto ancora...'}
                   </pre>
                 </div>
               </div>
 
               <div>
-                <h4 className="text-white font-medium sub-element-spacing">🎯 Versione Guidata:</h4>
-                <div className="bg-slate-800/50 border border-green-400/30 rounded-lg p-4 prompt-preview">
-                  <pre className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">
+                <h4 className="text-slate-200 font-medium sub-element-spacing">🎯 Versione Guidata:</h4>
+                <div className="bg-slate-800/50 border border-emerald-700/30 rounded-lg p-4 prompt-preview">
+                  <pre className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
                     {guidedPrompt || 'Completa gli step precedenti per vedere il prompt guidato...'}
                   </pre>
                 </div>
@@ -234,9 +247,12 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
             </div>
 
             {/* Learning Insights */}
-            <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/30 rounded-lg p-4">
-              <h4 className="text-purple-400 font-medium sub-element-spacing">🧠 Learning Insights:</h4>
-              <div className="text-white/80 text-sm space-y-2">
+            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
+              <h4 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
+                <Brain className="w-4 h-4" />
+                <span>🧠 Learning Insights:</span>
+              </h4>
+              <div className="text-slate-300 text-sm space-y-2">
                 {freePromptAnalysis.score >= 8 && (
                   <p>🎉 Eccellente! Hai assimilato bene i concetti di prompt engineering. Il tuo prompt include tutti gli elementi chiave.</p>
                 )}
@@ -255,9 +271,10 @@ const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComp
         <div className="flex justify-end">
           <Button
             onClick={onComplete}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white px-6 py-2 rounded-xl font-medium transition-all duration-300"
+            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
           >
-            Continua al Test Finale →
+            <span>Continua al Test Finale</span>
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </div>

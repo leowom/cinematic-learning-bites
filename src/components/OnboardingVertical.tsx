@@ -1,12 +1,15 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePreloadComponents } from '@/hooks/usePreloadComponents';
 import WelcomeStep from './onboarding/WelcomeStep';
 import ProfileBuilderStep from './onboarding/ProfileBuilderStep';
 import AssessmentStep from './onboarding/AssessmentStep';
 import PersonalizationStep from './onboarding/PersonalizationStep';
 
 const OnboardingVertical = () => {
+  // Use preloading hook for better performance
+  usePreloadComponents();
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [userProfile, setUserProfile] = useState({
     role: '',

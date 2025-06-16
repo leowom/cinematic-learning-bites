@@ -2,63 +2,78 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
+import { splitVendorChunkPlugin } from 'vite';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   server: {
     host: "::",
     port: 8080,
+    // Server-side optimizations
+    preTransformRequests: true,
+    sourcemapIgnoreList: false,
   },
   plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+    react(), 
+    splitVendorChunkPlugin()
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
-    // Performance optimizations
+    target: 'esnext',
+    minify: 'terser',
+    cssMinify: true,
+    reportCompressedSize: false,
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-toast', 'lucide-react'],
-          'query-vendor': ['@tanstack/react-query'],
-          'chart-vendor': ['recharts'],
-          // Feature chunks
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-router': ['react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-slot', '@radix-ui/react-toast'],
+          'vendor-query': ['@tanstack/react-query'],
           'onboarding': [
-            './src/components/onboarding/WelcomeStep',
-            './src/components/onboarding/ProfileBuilderStep',
-            './src/components/onboarding/AssessmentStep',
-            './src/components/onboarding/PersonalizationStep'
-          ],
-          'admin': ['./src/pages/AdminDashboard', './src/components/AdminDashboardVertical'],
-          'analytics': ['./src/pages/Analytics', './src/components/AnalyticsDashboardVertical']
+            './src/components/OnboardingVertical.tsx',
+            './src/components/onboarding/WelcomeStep.tsx',
+            './src/components/onboarding/ProfileBuilderStep.tsx',
+            './src/components/onboarding/AssessmentStep.tsx',
+            './src/components/onboarding/PersonalizationStep.tsx'
+          ]
+        },
+        chunkFileNames: (chunkInfo) => {
+          const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop().replace('.tsx', '').replace('.ts', '') : 'chunk';
+          return `js/${facadeModuleId}-[hash].js`;
         }
       }
     },
-    // Enable compression and optimization
-    minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production'
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn']
+      },
+      mangle: {
+        safari10: true
+      },
+      format: {
+        safari10: true
       }
-    },
-    // CSS code splitting
-    cssCodeSplit: true,
-    // Source maps only in development
-    sourcemap: mode === 'development'
+    }
   },
-  // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
-    exclude: ['@radix-ui/react-accordion'] // Large unused components
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      '@tanstack/react-query',
+      'lucide-react'
+    ],
+    exclude: ['@vite/client', '@vite/env']
+  },
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   }
-}));
+});

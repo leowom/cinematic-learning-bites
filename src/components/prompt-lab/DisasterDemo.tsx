@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Zap, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -16,62 +17,68 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
     updatePromptData('disasterUnderstood', true);
   };
 
-  const clientEmail = `Oggetto: PRODOTTO ROTTO!!!
+  const clientEmail = `Subject: DEFECTIVE PRODUCT - IMMEDIATE REFUND REQUIRED
 
-Ciao, ho ricevuto ieri la vostra maglietta ma ha un buco gigante! Sono furioso, voglio i soldi indietro SUBITO o chiamo l'avvocato!
+Dear Customer Service,
 
-Marco Rossi`;
+I received your t-shirt yesterday but it arrived with a significant tear. This is unacceptable quality and I demand an immediate refund or I will escalate this matter through legal channels.
 
-  const badPrompt = `"Rispondi a questa email del cliente"`;
+Marco Rossi
+Order #12345`;
 
-  const badResponse = `Ciao Marco,
+  const badPrompt = `"Respond to this customer email"`;
 
-Grazie per la tua email. Mi dispiace per il problema. Cosa posso fare per aiutarti?
+  const badResponse = `Hello Marco,
 
-Saluti`;
+Thank you for your email. I apologize for any inconvenience. What can I do to help you?
+
+Best regards`;
 
   return (
-    <div className="bg-slate-900/90 border border-white/30 rounded-2xl p-6 shadow-xl shadow-black/20 hover:bg-slate-800/95 transition-all duration-300">
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/3 to-transparent pointer-events-none" />
+    <div className="bg-slate-900/90 border border-slate-700/50 rounded-xl p-6 shadow-xl shadow-black/10 hover:bg-slate-800/95 transition-all duration-300">
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-slate-800/5 to-transparent pointer-events-none" />
       
-      <h2 className="text-2xl font-semibold text-white mb-4 relative z-10">
-        💥 STEP 1/7: Vediamo cosa succede con un prompt generico
-      </h2>
+      <div className="flex items-center space-x-3 mb-6 relative z-10">
+        <Zap className="w-6 h-6 text-slate-300" />
+        <h2 className="text-xl font-medium text-slate-200">
+          Analyzing Ineffective Prompt Patterns
+        </h2>
+      </div>
       
       <div className="relative z-10 space-y-6">
-        <p className="text-white/70 leading-relaxed">
-          Testiamo un prompt generico con una situazione reale di customer service. Preparati al disastro! 😅
+        <p className="text-slate-400 leading-relaxed">
+          Let's examine how generic prompts fail in real-world customer service scenarios and identify improvement opportunities.
         </p>
 
-        {/* Email cliente */}
+        {/* Customer Email */}
         <div>
-          <h3 className="text-white font-medium mb-3 flex items-center">
-            📧 Email Cliente Reale:
+          <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
+            <span>Customer Communication:</span>
           </h3>
-          <div className="bg-slate-800/50 border border-white/20 rounded-lg p-4">
-            <pre className="text-white/80 text-sm whitespace-pre-wrap font-sans">
+          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4">
+            <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans">
               {clientEmail}
             </pre>
           </div>
         </div>
 
-        {/* Prompt generico */}
+        {/* Generic Prompt */}
         <div>
-          <h3 className="text-white font-medium mb-3 flex items-center">
-            🤖 PROMPT GENERICO:
+          <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
+            <span>Generic Prompt Used:</span>
           </h3>
-          <div className="bg-red-600/20 border border-red-400/30 rounded-lg p-4">
-            <code className="text-red-300 text-sm">{badPrompt}</code>
+          <div className="bg-rose-900/15 border border-rose-700/30 rounded-lg p-4">
+            <code className="text-rose-300 text-sm">{badPrompt}</code>
           </div>
         </div>
 
-        {/* AI Response disastrosa */}
+        {/* Poor AI Response */}
         <div>
-          <h3 className="text-white font-medium mb-3 flex items-center">
-            🤖 AI RESPONSE (Disastro):
+          <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
+            <span>Resulting AI Response:</span>
           </h3>
-          <div className="bg-slate-800/50 border border-red-400/30 rounded-lg p-4">
-            <pre className="text-white/80 text-sm whitespace-pre-wrap font-sans">
+          <div className="bg-slate-800/30 border border-rose-700/30 rounded-lg p-4">
+            <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans">
               {badResponse}
             </pre>
           </div>
@@ -81,64 +88,72 @@ Saluti`;
           <div className="text-center">
             <Button
               onClick={handleShowAnalysis}
-              className="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-xl font-medium"
+              className="bg-orange-800 hover:bg-orange-700 text-orange-100 px-6 py-3 rounded-lg font-medium border border-orange-700"
             >
-              😱 Analizza i Problemi
+              Analyze Response Quality
             </Button>
           </div>
         )}
 
         {showAnalysis && (
           <div className="space-y-4 animate-fade-in">
-            <div className="bg-red-600/20 border border-red-400/30 rounded-lg p-4">
-              <h4 className="text-red-400 font-medium mb-3">❌ PROBLEMI EVIDENTI:</h4>
-              <ul className="space-y-2 text-white/80 text-sm">
+            <div className="bg-rose-900/15 border border-rose-700/30 rounded-lg p-4">
+              <h4 className="text-rose-300 font-medium mb-3 flex items-center space-x-2">
+                <AlertTriangle className="w-4 h-4" />
+                <span>Critical Issues Identified:</span>
+              </h4>
+              <ul className="space-y-2 text-slate-300 text-sm">
                 <li className="flex items-start">
-                  <span className="text-red-400 mr-2">•</span>
-                  Non si scusa per l'errore aziendale
+                  <span className="text-rose-400 mr-2">•</span>
+                  Lacks acknowledgment of company responsibility
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-400 mr-2">•</span>
-                  Non offre soluzione concreta (rimborso/sostituzione)
+                  <span className="text-rose-400 mr-2">•</span>
+                  No concrete resolution offered (refund/replacement)
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-400 mr-2">•</span>
-                  Tone troppo casual per cliente arrabbiato
+                  <span className="text-rose-400 mr-2">•</span>
+                  Inappropriate tone for escalated customer concern
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-400 mr-2">•</span>
-                  Non menziona rimborso nonostante richiesta esplicita
+                  <span className="text-rose-400 mr-2">•</span>
+                  Ignores specific refund request
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-400 mr-2">•</span>
-                  Chiede al cliente cosa fare (unprofessional)
+                  <span className="text-rose-400 mr-2">•</span>
+                  Places burden on customer to direct resolution
                 </li>
               </ul>
             </div>
 
-            <div className="bg-amber-600/20 border border-amber-400/30 rounded-lg p-4">
-              <h4 className="text-amber-400 font-medium mb-2">💭 RISULTATO:</h4>
-              <p className="text-white/80 text-sm leading-relaxed">
-                "Marco sarà ancora più arrabbiato! Questa risposta non risolve il problema e potrebbe 
-                escalare la situazione. L'AI non aveva le informazioni necessarie per gestire 
-                professionalmente la situazione."
+            <div className="bg-orange-900/15 border border-orange-700/30 rounded-lg p-4">
+              <h4 className="text-orange-300 font-medium mb-2">Business Impact:</h4>
+              <p className="text-slate-300 text-sm leading-relaxed">
+                This response likely escalates customer frustration and could result in negative reviews, 
+                social media complaints, or lost customer relationships. The lack of professional 
+                authority undermines brand credibility.
               </p>
             </div>
 
-            <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4">
-              <h4 className="text-green-400 font-medium mb-2">✅ LA BUONA NOTIZIA:</h4>
-              <p className="text-white/80 text-sm leading-relaxed">
-                Possiamo fare MOLTO meglio! Nei prossimi step imparerai come trasformare questo 
-                disastro in una risposta professionale che soddisfa il cliente e risolve il problema.
+            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
+              <h4 className="text-emerald-300 font-medium mb-2 flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4" />
+                <span>Solution Preview:</span>
+              </h4>
+              <p className="text-slate-300 text-sm leading-relaxed">
+                Through structured prompt engineering, we can transform this interaction into a 
+                professional resolution that addresses customer concerns, maintains brand integrity, 
+                and follows established service protocols.
               </p>
             </div>
 
             <div className="flex justify-end">
               <Button
                 onClick={onComplete}
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-6 py-2 rounded-xl font-medium transition-all duration-300"
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 border border-slate-600"
               >
-                Vediamo come migliorare! →
+                <span>Begin Structured Approach</span>
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
           </div>

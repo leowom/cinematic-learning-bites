@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Brain, Target, Users, Building, Settings, FileText, Edit3, TestTube, Award, Zap } from 'lucide-react';
 import FoundationStep from '@/components/prompt-lab/FoundationStep';
 import DisasterDemo from '@/components/prompt-lab/DisasterDemo';
 import RoleSelectionStep from '@/components/prompt-lab/RoleSelectionStep';
@@ -66,60 +67,77 @@ const PromptEngineeringLab = () => {
     }
   };
 
-  const getStepTitle = () => {
-    const titles = [
-      "🤔 STEP 0/9: Cos'è un Prompt?",
-      "💥 STEP 1/9: Il Prompt Generico (Disaster Demo)",
-      "🎭 STEP 2/9: Definisci Ruolo AI",
-      "🌍 STEP 3/9: Contesto Business",
-      "🎯 STEP 4/9: Task Specifici e Misurabili",
-      "⚖️ STEP 5/9: Style & Constraints",
-      "📤 STEP 6/9: Output Format",
-      "✍️ STEP 7/9: Free Writing Challenge",
-      "🧪 STEP 8/9: Test Reale con AI",
-      "🎓 STEP 9/9: Mastery Finale"
+  const getStepInfo = () => {
+    const steps = [
+      { icon: Brain, title: "Foundation Concepts", subtitle: "Understanding prompt fundamentals" },
+      { icon: Zap, title: "Common Pitfalls Demo", subtitle: "Learning from ineffective examples" },
+      { icon: Users, title: "Role Definition", subtitle: "Establishing AI identity and expertise" },
+      { icon: Building, title: "Business Context", subtitle: "Setting operational framework" },
+      { icon: Target, title: "Task Specification", subtitle: "Defining measurable objectives" },
+      { icon: Settings, title: "Style & Constraints", subtitle: "Establishing communication parameters" },
+      { icon: FileText, title: "Output Format", subtitle: "Structuring response templates" },
+      { icon: Edit3, title: "Free Writing Challenge", subtitle: "Independent prompt construction" },
+      { icon: TestTube, title: "AI Testing", subtitle: "Validation and optimization" },
+      { icon: Award, title: "Mastery Assessment", subtitle: "Final evaluation and certification" }
     ];
-    return titles[currentStep] || "Prompt Engineering Lab";
+    return steps[currentStep] || { icon: Brain, title: "Prompt Engineering Lab", subtitle: "Professional prompt development" };
   };
 
+  const stepInfo = getStepInfo();
+  const StepIcon = stepInfo.icon;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative">
-      {/* Atmospheric overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 font-inter">
+      {/* Subtle atmospheric overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent pointer-events-none" />
       
-      {/* Ambient elements */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl" />
-      <div className="absolute top-3/4 left-1/3 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl" />
+      {/* Minimal ambient elements */}
+      <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-slate-700/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-slate-600/5 rounded-full blur-3xl" />
 
       <div className="prompt-lab-container">
-        {/* Compact Progress indicator - removed unnecessary header text */}
-        <div className="mb-4">
+        {/* Professional Progress Header */}
+        <div className="mb-6">
           <div className="step-card glassmorphism-base">
-            <div className="flex items-center justify-between mb-2 relative z-10">
-              <span className="text-white/70 text-xs lg:text-sm">{getStepTitle()}</span>
-              <span className="text-white font-semibold text-sm">{currentStep + 1}/10</span>
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-slate-800/60 rounded-lg border border-slate-700/50">
+                  <StepIcon className="w-5 h-5 text-slate-300" />
+                </div>
+                <div>
+                  <h1 className="text-slate-200 font-medium text-lg">{stepInfo.title}</h1>
+                  <p className="text-slate-400 text-sm">{stepInfo.subtitle}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-slate-300 font-medium text-sm">Step {currentStep + 1} of 10</div>
+                <div className="text-slate-400 text-xs">Progress: {Math.round(((currentStep + 1) / 10) * 100)}%</div>
+              </div>
             </div>
-            <div className="bg-slate-700 rounded-full h-2 lg:h-3 relative z-10">
+            
+            <div className="bg-slate-800/50 rounded-lg h-2 relative z-10 mb-3">
               <div 
-                className="bg-gradient-to-r from-blue-500 to-green-400 h-2 lg:h-3 rounded-full transition-all duration-1000"
+                className="bg-gradient-to-r from-slate-600 to-slate-500 h-2 rounded-lg transition-all duration-1000"
                 style={{ width: `${((currentStep + 1) / 10) * 100}%` }}
               />
             </div>
-            <div className="mt-1 lg:mt-2 flex items-center justify-between relative z-10">
-              <span className="text-white/60 text-xs">Progress</span>
-              {promptData.qualityScore > 0 && (
-                <div className="flex items-center space-x-2 lg:space-x-4">
-                  <div className="flex items-center space-x-1">
-                    <span className="text-white/60 text-xs">Quality:</span>
-                    <span className="text-green-400 font-bold text-xs lg:text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
-                  </div>
+            
+            {promptData.qualityScore > 0 && (
+              <div className="flex items-center justify-between relative z-10">
+                <span className="text-slate-400 text-xs">Quality Metrics</span>
+                <div className="flex items-center space-x-4">
+                  {promptData.qualityScore > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-slate-400 text-xs">Quality:</span>
+                      <span className="text-emerald-300 font-medium text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
+                    </div>
+                  )}
                   {promptData.taskComplexity > 0 && (
                     <div className="flex items-center space-x-1">
-                      <span className="text-white/60 text-xs">Complexity:</span>
-                      <span className={`font-bold text-xs lg:text-sm ${
-                        promptData.taskComplexity <= 6 ? 'text-green-400' : 
-                        promptData.taskComplexity <= 10 ? 'text-amber-400' : 'text-red-400'
+                      <span className="text-slate-400 text-xs">Complexity:</span>
+                      <span className={`font-medium text-sm ${
+                        promptData.taskComplexity <= 6 ? 'text-emerald-300' : 
+                        promptData.taskComplexity <= 10 ? 'text-orange-300' : 'text-rose-300'
                       }`}>
                         {promptData.taskComplexity}/15
                       </span>
@@ -127,13 +145,13 @@ const PromptEngineeringLab = () => {
                   )}
                   {promptData.aiTestScore > 0 && (
                     <div className="flex items-center space-x-1">
-                      <span className="text-white/60 text-xs">AI Test:</span>
-                      <span className="text-blue-400 font-bold text-xs lg:text-sm">{promptData.aiTestScore}/10</span>
+                      <span className="text-slate-400 text-xs">Test Score:</span>
+                      <span className="text-slate-300 font-medium text-sm">{promptData.aiTestScore}/10</span>
                     </div>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -158,7 +176,7 @@ const PromptEngineeringLab = () => {
           </div>
         ) : (
           /* Grid layout for steps 2+ with preview panel */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left column - Steps */}
             <div className="lg:col-span-2">
               {currentStep === 2 && (

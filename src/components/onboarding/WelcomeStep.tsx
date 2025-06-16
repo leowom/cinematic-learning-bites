@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '../GlassmorphismCard';
@@ -9,7 +10,7 @@ interface WelcomeStepProps {
 
 const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
   return (
-    <div className="text-center max-w-4xl mx-auto px-4">
+    <div className="text-center max-w-4xl mx-auto px-4 pt-16 lg:pt-24 xl:pt-32">
       {/* Professional Welcome Hero - Optimized animations */}
       <GlassmorphismCard 
         className={`mb-8 lg:mb-12 transform transition-all duration-500 ${
@@ -20,7 +21,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
       >
         <div className="text-center">
           {/* Business Illustration Placeholder - Simplified animations */}
-          <div className="mb-6 lg:mb-8 relative">
+          <div className="mb-10 lg:mb-12 xl:mb-16 relative">
             <div className="w-24 h-24 lg:w-32 lg:h-32 mx-auto rounded-full bg-gradient-to-br from-blue-500/20 to-amber-500/20 backdrop-blur-sm border border-white/20 flex items-center justify-center">
               <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-white/30 to-white/10 rounded-lg backdrop-blur-md flex items-center justify-center">
                 <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-400/60 rounded" />

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Brain, Target, Users, Building, Settings, FileText, Edit3, TestTube, Award, Zap } from 'lucide-react';
 import FoundationStep from '@/components/prompt-lab/FoundationStep';
@@ -14,10 +14,6 @@ import AITestingStep from '@/components/prompt-lab/AITestingStep';
 import MasteryTest from '@/components/prompt-lab/MasteryTest';
 import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePreviewPanel';
 import CompletionModal from '@/components/prompt-lab/CompletionModal';
-import PromptLabHeader from '@/components/prompt-lab/PromptLabHeader';
-import StepNavigator from '@/components/prompt-lab/StepNavigator';
-import NavigationControls from '@/components/prompt-lab/NavigationControls';
-import ProgressManager from '@/components/prompt-lab/ProgressManager';
 import '../styles/prompt-lab.css';
 
 interface PromptData {
@@ -32,6 +28,7 @@ interface PromptData {
   taskComplexity: number;
   aiTestScore: number;
   freeWrittenPrompt: string;
+  // Educational fields
   foundationComplete: boolean;
   disasterUnderstood: boolean;
 }
@@ -39,10 +36,6 @@ interface PromptData {
 const PromptEngineeringLab = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>(new Array(10).fill(false));
-  
   const [promptData, setPromptData] = useState<PromptData>({
     role: '',
     experience: 5,
@@ -64,203 +57,192 @@ const PromptEngineeringLab = () => {
       ...prev,
       [field]: value
     }));
-    setHasUnsavedChanges(true);
   };
 
   const handleStepComplete = () => {
-    const newCompletedSteps = [...completedSteps];
-    newCompletedSteps[currentStep] = true;
-    setCompletedSteps(newCompletedSteps);
-    setHasUnsavedChanges(false);
-    
-    if (currentStep < 9) {
+    if (currentStep < 9) { // Now goes to step 9 (0-9 = 10 steps)
       setCurrentStep(currentStep + 1);
     } else {
       setIsCompleted(true);
     }
   };
 
-  const handleStepNavigation = (stepIndex: number) => {
-    if (stepIndex <= currentStep || completedSteps[stepIndex]) {
-      setCurrentStep(stepIndex);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentStep < 9 && completedSteps[currentStep]) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleSave = () => {
-    setHasUnsavedChanges(false);
-    // Progress is automatically saved by ProgressManager
-  };
-
-  const handleDataRestore = (data: PromptData, step: number, completed: boolean[]) => {
-    setPromptData(data);
-    setCurrentStep(step);
-    setCompletedSteps(completed);
-    setHasUnsavedChanges(false);
-  };
-
   const getStepInfo = () => {
     const steps = [
-      { icon: Brain, title: "Concetti Fondamentali", subtitle: "Comprensione dei fondamenti del prompt engineering" },
-      { icon: Zap, title: "Demo Errori Comuni", subtitle: "Apprendimento dagli esempi inefficaci" },
-      { icon: Users, title: "Definizione Ruolo", subtitle: "Stabilire identità e competenza dell'AI" },
-      { icon: Building, title: "Contesto Aziendale", subtitle: "Impostare il framework operativo" },
-      { icon: Target, title: "Specifiche Task", subtitle: "Definire obiettivi misurabili" },
-      { icon: Settings, title: "Stile e Vincoli", subtitle: "Stabilire parametri di comunicazione" },
-      { icon: FileText, title: "Formato Output", subtitle: "Strutturare template di risposta" },
-      { icon: Edit3, title: "Sfida Scrittura Libera", subtitle: "Costruzione autonoma del prompt" },
-      { icon: TestTube, title: "Test AI", subtitle: "Validazione e ottimizzazione" },
-      { icon: Award, title: "Valutazione Finale", subtitle: "Valutazione finale e certificazione" }
+      { icon: Brain, title: "Foundation Concepts", subtitle: "Understanding prompt fundamentals" },
+      { icon: Zap, title: "Common Pitfalls Demo", subtitle: "Learning from ineffective examples" },
+      { icon: Users, title: "Role Definition", subtitle: "Establishing AI identity and expertise" },
+      { icon: Building, title: "Business Context", subtitle: "Setting operational framework" },
+      { icon: Target, title: "Task Specification", subtitle: "Defining measurable objectives" },
+      { icon: Settings, title: "Style & Constraints", subtitle: "Establishing communication parameters" },
+      { icon: FileText, title: "Output Format", subtitle: "Structuring response templates" },
+      { icon: Edit3, title: "Free Writing Challenge", subtitle: "Independent prompt construction" },
+      { icon: TestTube, title: "AI Testing", subtitle: "Validation and optimization" },
+      { icon: Award, title: "Mastery Assessment", subtitle: "Final evaluation and certification" }
     ];
-    return steps[currentStep] || { icon: Brain, title: "Prompt Engineering Lab", subtitle: "Sviluppo professionale di prompt" };
+    return steps[currentStep] || { icon: Brain, title: "Prompt Engineering Lab", subtitle: "Professional prompt development" };
   };
 
   const stepInfo = getStepInfo();
-  const isStepComplete = completedSteps[currentStep] || false;
-  const canGoBack = currentStep > 0;
-  const canGoForward = currentStep < 9 && completedSteps[currentStep];
+  const StepIcon = stepInfo.icon;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 font-inter">
-      <ProgressManager
-        currentStep={currentStep}
-        promptData={promptData}
-        completedSteps={completedSteps}
-        onDataRestore={handleDataRestore}
-      />
+      {/* Subtle atmospheric overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent pointer-events-none" />
       
-      {/* Header Navigation */}
-      <PromptLabHeader
-        currentStep={currentStep}
-        totalSteps={10}
-        stepTitle={stepInfo.title}
-        hasUnsavedChanges={hasUnsavedChanges}
-        onSave={handleSave}
-      />
+      {/* Minimal ambient elements */}
+      <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-slate-700/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-slate-600/5 rounded-full blur-3xl" />
 
-      <div className="flex h-[calc(100vh-4rem)]">
-        {/* Step Navigator Sidebar */}
-        {showSidebar && (
-          <StepNavigator
-            currentStep={currentStep}
-            completedSteps={completedSteps}
-            onStepClick={handleStepNavigation}
-          />
-        )}
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex">
-          {/* Content Container */}
-          <div className={`flex-1 ${currentStep < 2 ? '' : 'lg:flex'}`}>
-            {/* Steps Content */}
-            <div className={`${currentStep < 2 ? 'max-w-4xl mx-auto p-6' : 'flex-1 p-6'}`}>
-              {/* Step Content */}
-              <div className="space-y-6">
-                {currentStep === 0 && (
-                  <FoundationStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 1 && (
-                  <DisasterDemo 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 2 && (
-                  <RoleSelectionStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 3 && (
-                  <BusinessContextStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 4 && (
-                  <EnhancedTaskDefinitionStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 5 && (
-                  <StyleConstraintsStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 6 && (
-                  <OutputFormatStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 7 && (
-                  <FreeWritingStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 8 && (
-                  <AITestingStep 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-                {currentStep === 9 && (
-                  <MasteryTest 
-                    promptData={promptData}
-                    updatePromptData={updatePromptData}
-                    onComplete={handleStepComplete}
-                  />
-                )}
-
-                {/* Navigation Controls */}
-                <NavigationControls
-                  currentStep={currentStep}
-                  totalSteps={10}
-                  canGoBack={canGoBack}
-                  canGoForward={canGoForward}
-                  isStepComplete={isStepComplete}
-                  onPrevious={handlePrevious}
-                  onNext={handleNext}
-                  onComplete={handleStepComplete}
-                  isLastStep={currentStep === 9}
-                />
+      <div className="prompt-lab-container">
+        {/* Professional Progress Header */}
+        <div className="mb-6">
+          <div className="step-card glassmorphism-base">
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-slate-800/60 rounded-lg border border-slate-700/50">
+                  <StepIcon className="w-5 h-5 text-slate-300" />
+                </div>
+                <div>
+                  <h1 className="text-slate-200 font-medium text-lg">{stepInfo.title}</h1>
+                  <p className="text-slate-400 text-sm">{stepInfo.subtitle}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-slate-300 font-medium text-sm">Step {currentStep + 1} of 10</div>
+                <div className="text-slate-400 text-xs">Progress: {Math.round(((currentStep + 1) / 10) * 100)}%</div>
               </div>
             </div>
-
-            {/* Live Preview Panel - Only for steps 2+ */}
-            {currentStep >= 2 && (
-              <div className="w-80 border-l border-slate-700/50 bg-slate-900/30">
-                <EnhancedLivePreviewPanel promptData={promptData} />
+            
+            <div className="bg-slate-800/50 rounded-lg h-2 relative z-10 mb-3">
+              <div 
+                className="bg-gradient-to-r from-slate-600 to-slate-500 h-2 rounded-lg transition-all duration-1000"
+                style={{ width: `${((currentStep + 1) / 10) * 100}%` }}
+              />
+            </div>
+            
+            {promptData.qualityScore > 0 && (
+              <div className="flex items-center justify-between relative z-10">
+                <span className="text-slate-400 text-xs">Quality Metrics</span>
+                <div className="flex items-center space-x-4">
+                  {promptData.qualityScore > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-slate-400 text-xs">Quality:</span>
+                      <span className="text-emerald-300 font-medium text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
+                    </div>
+                  )}
+                  {promptData.taskComplexity > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-slate-400 text-xs">Complexity:</span>
+                      <span className={`font-medium text-sm ${
+                        promptData.taskComplexity <= 6 ? 'text-emerald-300' : 
+                        promptData.taskComplexity <= 10 ? 'text-orange-300' : 'text-rose-300'
+                      }`}>
+                        {promptData.taskComplexity}/15
+                      </span>
+                    </div>
+                  )}
+                  {promptData.aiTestScore > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-slate-400 text-xs">Test Score:</span>
+                      <span className="text-slate-300 font-medium text-sm">{promptData.aiTestScore}/10</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
         </div>
+
+        {/* Main content - centered layout for early steps, grid for later steps */}
+        {currentStep < 2 ? (
+          /* Centered layout for steps 0-1 */
+          <div className="max-w-4xl mx-auto">
+            {currentStep === 0 && (
+              <FoundationStep 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
+            {currentStep === 1 && (
+              <DisasterDemo 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
+          </div>
+        ) : (
+          /* Grid layout for steps 2+ with preview panel */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left column - Steps */}
+            <div className="lg:col-span-2">
+              {currentStep === 2 && (
+                <RoleSelectionStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 3 && (
+                <BusinessContextStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 4 && (
+                <EnhancedTaskDefinitionStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 5 && (
+                <StyleConstraintsStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 6 && (
+                <OutputFormatStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 7 && (
+                <FreeWritingStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 8 && (
+                <AITestingStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+              {currentStep === 9 && (
+                <MasteryTest 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              )}
+            </div>
+
+            {/* Right column - Live Preview */}
+            <div className="lg:col-span-1">
+              <EnhancedLivePreviewPanel promptData={promptData} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Completion Modal */}

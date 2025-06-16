@@ -8,7 +8,7 @@ interface ScreensaverEasterEggProps {
 
 const ScreensaverEasterEgg: React.FC<ScreensaverEasterEggProps> = ({ isActive, onDeactivate }) => {
   const [position, setPosition] = useState({ x: 50, y: 50 });
-  const [velocity, setVelocity] = useState({ x: 2, y: 1.5 });
+  const [velocity, setVelocity] = useState({ x: 0.5, y: 0.3 });
   const [logoColor, setLogoColor] = useState('from-blue-500 to-amber-500');
 
   const colors = [
@@ -54,7 +54,7 @@ const ScreensaverEasterEgg: React.FC<ScreensaverEasterEggProps> = ({ isActive, o
       });
     };
 
-    const interval = setInterval(animateLoop, 16); // ~60fps
+    const interval = setInterval(animateLoop, 50); // Rallentato da 16ms a 50ms
     return () => clearInterval(interval);
   }, [isActive, velocity, changeColor]);
 

@@ -49,13 +49,15 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
         </div>
       </GlassmorphismCard>
 
-      {/* Professional CTA - Fixed proportions */}
+      {/* Professional CTA - Reduced container size */}
       <div className={`transform transition-all duration-1000 delay-300 ${
         isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
       }`}>
         <GlassmorphismCard 
           className="inline-block w-full max-w-sm mx-auto"
+          size="small"
           elevated={isActive}
+          style={{ minHeight: 'auto' }}
         >
           <Button 
             onClick={() => onComplete({})}

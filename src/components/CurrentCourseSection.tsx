@@ -78,12 +78,23 @@ const CurrentCourseSection = () => {
     }, 150);
   };
 
+  const handleWheel = (e: React.WheelEvent) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault();
+      if (e.deltaX > 0) {
+        nextCourse();
+      } else {
+        prevCourse();
+      }
+    }
+  };
+
   const currentCourse = courses[currentIndex];
   const descriptionLimit = 120;
   const shouldTruncate = currentCourse.description.length > descriptionLimit;
 
   return (
-    <div className="max-w-6xl mx-auto relative">
+    <div className="max-w-6xl mx-auto relative" onWheel={handleWheel}>
       <h2 className="text-3xl font-bold text-white mb-8 text-center">
         I Tuoi Corsi Attivi
       </h2>
@@ -210,24 +221,6 @@ const CurrentCourseSection = () => {
             }`}
           />
         ))}
-      </div>
-
-      {/* Mouse wheel scroll handler */}
-      <div 
-        className="absolute inset-0 z-10"
-        onWheel={(e) => {
-          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-            e.preventDefault();
-            if (e.deltaX > 0) {
-              nextCourse();
-            } else {
-              prevCourse();
-            }
-          }
-        }}
-        style={{ pointerEvents: 'none' }}
-      >
-        <div className="w-full h-full" style={{ pointerEvents: 'auto' }} />
       </div>
     </div>
   );

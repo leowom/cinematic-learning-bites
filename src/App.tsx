@@ -10,6 +10,7 @@ import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import { LazyAdminDashboard, LazyAnalytics, LazyDashboard } from "./components/LazyComponents";
+import "./styles/animations.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

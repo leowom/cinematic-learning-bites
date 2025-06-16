@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '../GlassmorphismCard';
 
@@ -8,28 +8,34 @@ interface WelcomeStepProps {
   isActive: boolean;
 }
 
-const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
+const WelcomeStep: React.FC<WelcomeStepProps> = memo(({ onComplete, isActive }) => {
+  const handleComplete = () => {
+    onComplete({});
+  };
+
   return (
     <div className="text-center max-w-4xl mx-auto px-4 pt-16 lg:pt-24 xl:pt-32">
       {/* Professional Welcome Hero - Optimized animations */}
       <GlassmorphismCard 
-        className={`mb-8 lg:mb-12 transform transition-all duration-500 ${
-          isActive ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-70'
+        className={`mb-8 lg:mb-12 transform transition-all duration-700 ease-out will-change-transform ${
+          isActive ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-70'
         }`}
         size="large"
         elevated={isActive}
       >
         <div className="text-center">
-          {/* Business Illustration Placeholder - Simplified animations */}
-          <div className="mb-10 lg:mb-12 xl:mb-16 relative">
-            <div className="w-24 h-24 lg:w-32 lg:h-32 mx-auto rounded-full bg-gradient-to-br from-blue-500/20 to-amber-500/20 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-white/30 to-white/10 rounded-lg backdrop-blur-md flex items-center justify-center">
-                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-400/60 rounded" />
+          {/* Business Illustration Placeholder - GPU optimized */}
+          <div className="mb-10 lg:mb-12 xl:mb-16 relative will-change-transform">
+            <div className="w-24 h-24 lg:w-32 lg:h-32 mx-auto rounded-full bg-gradient-to-br from-blue-500/15 to-amber-500/15 border border-white/15 flex items-center justify-center transform-gpu">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-white/20 to-white/5 rounded-lg flex items-center justify-center">
+                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-400/50 rounded transform-gpu" />
               </div>
             </div>
-            {/* Simplified floating elements */}
-            <div className="absolute -top-2 -right-2 lg:-top-4 lg:-right-4 w-4 h-4 lg:w-6 lg:h-6 bg-amber-400/40 rounded-full" />
-            <div className="absolute -bottom-1 -left-3 lg:-bottom-2 lg:-left-6 w-3 h-3 lg:w-4 lg:h-4 bg-green-400/40 rounded-full" />
+            {/* Optimized floating elements - reduced to single pulse */}
+            <div className="absolute -top-2 -right-2 lg:-top-4 lg:-right-4 w-4 h-4 lg:w-6 lg:h-6 bg-amber-400/30 rounded-full opacity-70" 
+                 style={{ animation: 'pulse 3s ease-in-out infinite' }} />
+            <div className="absolute -bottom-1 -left-3 lg:-bottom-2 lg:-left-6 w-3 h-3 lg:w-4 lg:h-4 bg-green-400/30 rounded-full opacity-60" 
+                 style={{ animation: 'pulse 4s ease-in-out infinite 1s' }} />
           </div>
 
           <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 lg:mb-6 leading-tight">
@@ -50,8 +56,8 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
       </GlassmorphismCard>
 
       {/* Professional CTA - Performance optimized */}
-      <div className={`transform transition-all duration-500 delay-150 ${
-        isActive ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-70'
+      <div className={`transform transition-all duration-700 ease-out delay-200 will-change-transform ${
+        isActive ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-70'
       }`}>
         <GlassmorphismCard 
           className="inline-block w-full max-w-sm mx-auto"
@@ -60,9 +66,9 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
           style={{ minHeight: 'auto' }}
         >
           <Button 
-            onClick={() => onComplete({})}
+            onClick={handleComplete}
             size="lg"
-            className="w-full text-lg lg:text-xl px-8 lg:px-12 py-4 lg:py-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-0 shadow-xl transition-colors duration-200"
+            className="w-full text-lg lg:text-xl px-8 lg:px-12 py-4 lg:py-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-0 shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
           >
             Inizia personalizzazione
           </Button>
@@ -70,8 +76,8 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
       </div>
 
       {/* Ambient Description - Ottimizzato per responsive */}
-      <div className={`mt-8 lg:mt-12 transform transition-all duration-500 delay-300 ${
-        isActive ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-70'
+      <div className={`mt-8 lg:mt-12 transform transition-all duration-700 ease-out delay-400 will-change-transform ${
+        isActive ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-70'
       }`}>
         {/* Versione desktop e tablet */}
         <div className="hidden sm:block">
@@ -113,6 +119,8 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
       </div>
     </div>
   );
-};
+});
+
+WelcomeStep.displayName = 'WelcomeStep';
 
 export default WelcomeStep;

@@ -1,24 +1,60 @@
 
-/* Prompt Lab Unified Spacing System */
+/* Prompt Lab Unified Spacing System - Optimized for smaller screens */
 .prompt-lab-container {
-  @apply max-w-6xl mx-auto px-6 py-8 relative z-10; /* Reduced from py-16 to py-8 */
+  @apply max-w-6xl mx-auto px-6 py-4 relative z-10; /* Reduced from py-8 to py-4 */
 }
 
 .step-card {
-  @apply bg-slate-900/90 border border-white/30 rounded-2xl p-8 shadow-xl shadow-black/20 hover:bg-slate-800/95 transition-all duration-300;
-  margin-bottom: 2rem; /* 32px consistent spacing */
+  @apply bg-slate-900/90 border border-white/30 rounded-2xl p-6 shadow-xl shadow-black/20 hover:bg-slate-800/95 transition-all duration-300; /* Reduced padding from p-8 to p-6 */
+  margin-bottom: 1.5rem; /* Reduced from 2rem to 1.5rem (24px) */
 }
 
 .section-spacing {
-  margin-bottom: 1.5rem; /* 24px between sections */
+  margin-bottom: 1rem; /* Reduced from 1.5rem to 1rem (16px) */
 }
 
 .element-spacing {
-  margin-bottom: 1rem; /* 16px between elements */
+  margin-bottom: 0.75rem; /* Reduced from 1rem to 0.75rem (12px) */
 }
 
 .sub-element-spacing {
-  margin-bottom: 0.75rem; /* 12px between sub-elements */
+  margin-bottom: 0.5rem; /* Reduced from 0.75rem to 0.5rem (8px) */
+}
+
+/* Responsive spacing for smaller screens */
+@media (max-height: 800px) {
+  .prompt-lab-container {
+    @apply py-2; /* Even less padding on shorter screens */
+  }
+  
+  .step-card {
+    @apply p-4; /* Reduced padding further */
+    margin-bottom: 1rem; /* Tighter spacing between cards */
+  }
+  
+  .section-spacing {
+    margin-bottom: 0.75rem; /* 12px on smaller screens */
+  }
+  
+  .element-spacing {
+    margin-bottom: 0.5rem; /* 8px on smaller screens */
+  }
+  
+  .sub-element-spacing {
+    margin-bottom: 0.25rem; /* 4px on smaller screens */
+  }
+}
+
+/* Additional optimization for MacBook Air 13" specifically */
+@media (min-width: 1280px) and (max-height: 832px) {
+  .prompt-lab-container {
+    @apply py-3; /* Balanced padding for 13" MacBook Air */
+  }
+  
+  .step-card {
+    @apply p-5; /* Slightly more padding than mobile but less than desktop */
+    margin-bottom: 1.25rem; /* 20px spacing */
+  }
 }
 
 .glassmorphism-base {
@@ -32,8 +68,8 @@
 }
 
 .prompt-preview {
-  min-height: 300px;
-  max-height: 500px;
+  min-height: 250px; /* Reduced from 300px */
+  max-height: 400px; /* Reduced from 500px */
   @apply overflow-y-auto;
 }
 
@@ -47,4 +83,12 @@
 
 .optimal-zone {
   @apply bg-green-600/20 border border-green-400/30 rounded-lg p-3;
+}
+
+/* Compact header spacing on smaller screens */
+@media (max-height: 800px) {
+  .prompt-preview {
+    min-height: 200px;
+    max-height: 350px;
+  }
 }

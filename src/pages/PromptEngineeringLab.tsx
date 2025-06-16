@@ -92,42 +92,42 @@ const PromptEngineeringLab = () => {
       <div className="absolute top-3/4 left-1/3 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl" />
 
       <div className="prompt-lab-container">
-        {/* Header */}
-        <div className="text-center element-spacing">
-          <h1 className="text-3xl font-bold text-white leading-tight sub-element-spacing">
+        {/* Compact Header */}
+        <div className="text-center mb-4">
+          <h1 className="text-2xl lg:text-3xl font-bold text-white leading-tight mb-2">
             🎓 Dalle Fondamenta al Prompt Perfetto
           </h1>
-          <p className="text-white/70 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-white/70 leading-relaxed max-w-2xl mx-auto text-sm lg:text-base">
             Un viaggio educativo step-by-step per imparare il prompt engineering partendo da zero. 
             Ogni passo ti porterà dalla confusione alla mastery professionale.
           </p>
         </div>
 
-        {/* Progress indicator */}
-        <div className="section-spacing">
+        {/* Compact Progress indicator */}
+        <div className="mb-4">
           <div className="step-card glassmorphism-base">
-            <div className="flex items-center justify-between sub-element-spacing relative z-10">
-              <span className="text-white/70 text-sm">{getStepTitle()}</span>
-              <span className="text-white font-semibold">{currentStep + 1}/10</span>
+            <div className="flex items-center justify-between mb-2 relative z-10">
+              <span className="text-white/70 text-xs lg:text-sm">{getStepTitle()}</span>
+              <span className="text-white font-semibold text-sm">{currentStep + 1}/10</span>
             </div>
-            <div className="bg-slate-700 rounded-full h-3 relative z-10">
+            <div className="bg-slate-700 rounded-full h-2 lg:h-3 relative z-10">
               <div 
-                className="bg-gradient-to-r from-blue-500 to-green-400 h-3 rounded-full transition-all duration-1000"
+                className="bg-gradient-to-r from-blue-500 to-green-400 h-2 lg:h-3 rounded-full transition-all duration-1000"
                 style={{ width: `${((currentStep + 1) / 10) * 100}%` }}
               />
             </div>
-            <div className="mt-2 flex items-center justify-between relative z-10">
+            <div className="mt-1 lg:mt-2 flex items-center justify-between relative z-10">
               <span className="text-white/60 text-xs">Progress</span>
               {promptData.qualityScore > 0 && (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 lg:space-x-4">
                   <div className="flex items-center space-x-1">
                     <span className="text-white/60 text-xs">Quality:</span>
-                    <span className="text-green-400 font-bold text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
+                    <span className="text-green-400 font-bold text-xs lg:text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
                   </div>
                   {promptData.taskComplexity > 0 && (
                     <div className="flex items-center space-x-1">
                       <span className="text-white/60 text-xs">Complexity:</span>
-                      <span className={`font-bold text-sm ${
+                      <span className={`font-bold text-xs lg:text-sm ${
                         promptData.taskComplexity <= 6 ? 'text-green-400' : 
                         promptData.taskComplexity <= 10 ? 'text-amber-400' : 'text-red-400'
                       }`}>
@@ -138,7 +138,7 @@ const PromptEngineeringLab = () => {
                   {promptData.aiTestScore > 0 && (
                     <div className="flex items-center space-x-1">
                       <span className="text-white/60 text-xs">AI Test:</span>
-                      <span className="text-blue-400 font-bold text-sm">{promptData.aiTestScore}/10</span>
+                      <span className="text-blue-400 font-bold text-xs lg:text-sm">{promptData.aiTestScore}/10</span>
                     </div>
                   )}
                 </div>
@@ -147,10 +147,10 @@ const PromptEngineeringLab = () => {
           </div>
         </div>
 
-        {/* Main content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main content grid with optimized spacing */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Left column - Steps */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2">
             {currentStep === 0 && (
               <FoundationStep 
                 promptData={promptData}

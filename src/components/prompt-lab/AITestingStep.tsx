@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useOpenAI } from '@/hooks/useOpenAI';
-import APIKeyModal from './APIKeyModal';
-import { Settings, Zap, AlertCircle } from 'lucide-react';
+import { Zap, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -27,10 +26,9 @@ const AITestingStep: React.FC<Props> = ({ promptData, updatePromptData, onComple
   const [isLoading, setIsLoading] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [selectedTestCase, setSelectedTestCase] = useState(0);
-  const [showAPIModal, setShowAPIModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { apiKey, saveApiKey, testPromptWithGPT, hasApiKey } = useOpenAI();
+  const { testPromptWithGPT } = useOpenAI();
 
   const testCases = [
     {
@@ -60,11 +58,6 @@ Sofia`,
   ];
 
   const handleRealAITest = async () => {
-    if (!hasApiKey) {
-      setShowAPIModal(true);
-      return;
-    }
-
     const currentPrompt = generateCurrentPrompt();
     const currentTest = testCases[selectedTestCase];
 
@@ -72,7 +65,7 @@ Sofia`,
     setError(null);
 
     try {
-      console.log('🚀 Inizio test con GPT-4o...', { prompt: currentPrompt, testCase: currentTest.title });
+      console.log('🚀 Inizio test con GPT-4o via Supabase...', { prompt: currentPrompt, testCase: currentTest.title });
       
       const result = await testPromptWithGPT(currentPrompt, currentTest);
       
@@ -139,14 +132,14 @@ Sofia`,
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
           <p className="text-white/70 leading-relaxed element-spacing">
-            Ora testiamo il tuo prompt con GPT-4o reale! L'AI analizzerà il tuo prompt e genererà una risposta, 
+            Ora testiamo il tuo prompt con GPT-4o reale tramite Supabase! L'AI analizzerà il tuo prompt e genererà una risposta, 
             poi valuterà automaticamente la qualità su 5 criteri specifici.
           </p>
 
           <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4 element-spacing">
             <h3 className="text-green-400 font-medium sub-element-spacing flex items-center">
               <Zap className="w-4 h-4 mr-2" />
-              🎯 Test con AI Reale:
+              🎯 Test con AI Reale tramite Supabase:
             </h3>
             <p className="text-white/80 text-sm leading-relaxed">
               Usiamo GPT-4o per generare la risposta e poi un secondo GPT-4o per analizzare oggettivamente 
@@ -154,33 +147,17 @@ Sofia`,
             </p>
           </div>
 
-          {/* API Status */}
-          <div className={`rounded-lg p-4 border ${
-            hasApiKey 
-              ? 'bg-green-600/20 border-green-400/30'
-              : 'bg-amber-600/20 border-amber-400/30'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Settings className="w-4 h-4" />
-                <span className="text-white font-medium">
-                  {hasApiKey ? '✅ OpenAI API Configurata' : '⚠️ API Key Richiesta'}
-                </span>
-              </div>
-              <Button
-                onClick={() => setShowAPIModal(true)}
-                variant="outline"
-                size="sm"
-                className="border-white/30 text-white hover:bg-white/10"
-              >
-                {hasApiKey ? 'Modifica' : 'Configura'} API
-              </Button>
+          {/* Supabase Status */}
+          <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-400" />
+              <span className="text-white font-medium">
+                ✅ Connesso a Supabase - API Key gestita in sicurezza
+              </span>
             </div>
-            {!hasApiKey && (
-              <p className="text-white/70 text-sm mt-2">
-                Configura la tua OpenAI API key per testare con GPT-4o reale
-              </p>
-            )}
+            <p className="text-white/70 text-sm mt-2">
+              La tua OpenAI API key è configurata nelle secrets di Supabase
+            </p>
           </div>
         </div>
 
@@ -192,6 +169,9 @@ Sofia`,
               <div>
                 <h4 className="text-red-400 font-medium">Errore Test AI:</h4>
                 <p className="text-white/80 text-sm mt-1">{error}</p>
+                <p className="text-white/60 text-xs mt-2">
+                  Assicurati che la OPENAI_API_KEY sia configurata nelle secrets di Supabase
+                </p>
               </div>
             </div>
           </div>
@@ -250,8 +230,6 @@ Sofia`,
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 <span>Testing con GPT-4o...</span>
               </div>
-            ) : !hasApiKey ? (
-              '🔑 Configura API per Test Reale'
             ) : (
               '🚀 Testa con GPT-4o Reale'
             )}
@@ -353,14 +331,6 @@ Sofia`,
           </Button>
         </div>
       </div>
-
-      {/* API Key Modal */}
-      <APIKeyModal
-        isOpen={showAPIModal}
-        onClose={() => setShowAPIModal(false)}
-        onSave={saveApiKey}
-        currentKey={apiKey}
-      />
     </div>
   );
 };

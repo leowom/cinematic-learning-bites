@@ -85,7 +85,7 @@ ${testCase.email}`;
 });
 
 async function analyzeResponseWithGPT(response: string, testCase: any, originalPrompt: string, apiKey: string) {
-  const analysisPrompt = `Analizza questa risposta di customer service e dammi un punteggio da 1-100 per ogni criterio. Rispondi SOLO in formato JSON.
+  const analysisPrompt = `Analizza questa risposta di customer service e dammi un punteggio da 1-100 per ogni criterio. Rispondi in formato JSON puro, senza markdown o backticks.
 
 RISPOSTA DA ANALIZZARE:
 ${response}
@@ -103,7 +103,7 @@ CRITERI DI VALUTAZIONE:
 4. SPECIFICITY: Include dettagli specifici (date, importi, contatti)?
 5. ACTIONABILITY: Il cliente sa esattamente cosa fare dopo?
 
-Rispondi in questo formato JSON:
+Rispondi in questo formato JSON (solo JSON, niente altro):
 {
   "completeness": 85,
   "accuracy": 90,
@@ -141,8 +141,16 @@ Rispondi in questo formato JSON:
     
     console.log('🔍 Raw analysis response:', analysisText);
     
+    // Rimuovi eventuali backticks markdown e spazi extra
+    const cleanedText = analysisText
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .replace(/^\s+|\s+$/g, '');
+    
+    console.log('🧹 Cleaned analysis text:', cleanedText);
+    
     // Parse del JSON
-    const analysisJson = JSON.parse(analysisText);
+    const analysisJson = JSON.parse(cleanedText);
     
     // Calcola score generale (media pesata)
     const weights = { completeness: 0.25, accuracy: 0.25, tone: 0.20, specificity: 0.15, actionability: 0.15 };

@@ -69,13 +69,47 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onComplete, isActive }) => {
         </GlassmorphismCard>
       </div>
 
-      {/* Ambient Description - Optimized */}
+      {/* Ambient Description - Ottimizzato per responsive */}
       <div className={`mt-8 lg:mt-12 transform transition-all duration-500 delay-300 ${
         isActive ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-70'
       }`}>
-        <p className="text-white/60 text-base lg:text-lg px-4">
-          ⚡ Setup personalizzato in 3 minuti • 🎯 AI adattiva • 📊 Analytics aziendali
-        </p>
+        {/* Versione desktop e tablet */}
+        <div className="hidden sm:block">
+          <p className="text-white/60 text-base lg:text-lg px-4">
+            <span className="inline-flex items-center gap-2">
+              <span>⚡</span>
+              <span>Setup personalizzato in 3 minuti</span>
+            </span>
+            <span className="mx-2">•</span>
+            <span className="inline-flex items-center gap-2">
+              <span>🎯</span>
+              <span>AI adattiva</span>
+            </span>
+            <span className="mx-2">•</span>
+            <span className="inline-flex items-center gap-2">
+              <span>📊</span>
+              <span>Analytics aziendali</span>
+            </span>
+          </p>
+        </div>
+        
+        {/* Versione mobile - layout verticale */}
+        <div className="block sm:hidden">
+          <div className="space-y-2 text-white/60 text-sm px-4">
+            <div className="flex items-center justify-center gap-2">
+              <span>⚡</span>
+              <span>Setup personalizzato in 3 minuti</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span>🎯</span>
+              <span>AI adattiva</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span>📊</span>
+              <span>Analytics aziendali</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import FoundationStep from '@/components/prompt-lab/FoundationStep';
@@ -92,18 +93,7 @@ const PromptEngineeringLab = () => {
       <div className="absolute top-3/4 left-1/3 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl" />
 
       <div className="prompt-lab-container">
-        {/* Compact Header */}
-        <div className="text-center mb-4">
-          <h1 className="text-2xl lg:text-3xl font-bold text-white leading-tight mb-2">
-            🎓 Dalle Fondamenta al Prompt Perfetto
-          </h1>
-          <p className="text-white/70 leading-relaxed max-w-2xl mx-auto text-sm lg:text-base">
-            Un viaggio educativo step-by-step per imparare il prompt engineering partendo da zero. 
-            Ogni passo ti porterà dalla confusione alla mastery professionale.
-          </p>
-        </div>
-
-        {/* Compact Progress indicator */}
+        {/* Compact Progress indicator - removed unnecessary header text */}
         <div className="mb-4">
           <div className="step-card glassmorphism-base">
             <div className="flex items-center justify-between mb-2 relative z-10">

@@ -255,7 +255,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
                 </div>
                 <div>
                   <div className="text-emerald-300 font-medium sub-element-spacing">Specifico:</div>
-                  <div className="text-slate-300">"Gestisci rimborsi entro 2h, con procedura escalation per importi >100€"</div>
+                  <div className="text-slate-300">"Gestisci rimborsi entro 2h, con procedura escalation per importi maggiori di 100€"</div>
                 </div>
               </div>
             </div>

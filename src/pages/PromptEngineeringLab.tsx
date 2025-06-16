@@ -5,12 +5,15 @@ import FoundationStep from '@/components/prompt-lab/FoundationStep';
 import DisasterDemo from '@/components/prompt-lab/DisasterDemo';
 import RoleSelectionStep from '@/components/prompt-lab/RoleSelectionStep';
 import BusinessContextStep from '@/components/prompt-lab/BusinessContextStep';
-import TaskDefinitionStep from '@/components/prompt-lab/TaskDefinitionStep';
+import EnhancedTaskDefinitionStep from '@/components/prompt-lab/EnhancedTaskDefinitionStep';
 import StyleConstraintsStep from '@/components/prompt-lab/StyleConstraintsStep';
 import OutputFormatStep from '@/components/prompt-lab/OutputFormatStep';
+import FreeWritingStep from '@/components/prompt-lab/FreeWritingStep';
+import AITestingStep from '@/components/prompt-lab/AITestingStep';
 import MasteryTest from '@/components/prompt-lab/MasteryTest';
-import LivePreviewPanel from '@/components/prompt-lab/LivePreviewPanel';
+import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePreviewPanel';
 import CompletionModal from '@/components/prompt-lab/CompletionModal';
+import '../styles/prompt-lab.css';
 
 interface PromptData {
   role: string;
@@ -21,13 +24,16 @@ interface PromptData {
   tone: { formal: number; empathy: number };
   outputFormat: string[];
   qualityScore: number;
-  // New educational fields
+  taskComplexity: number;
+  aiTestScore: number;
+  freeWrittenPrompt: string;
+  // Educational fields
   foundationComplete: boolean;
   disasterUnderstood: boolean;
 }
 
 const PromptEngineeringLab = () => {
-  const [currentStep, setCurrentStep] = useState(0); // Start from 0 now
+  const [currentStep, setCurrentStep] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [promptData, setPromptData] = useState<PromptData>({
     role: '',
@@ -38,6 +44,9 @@ const PromptEngineeringLab = () => {
     tone: { formal: 60, empathy: 40 },
     outputFormat: [],
     qualityScore: 0,
+    taskComplexity: 0,
+    aiTestScore: 0,
+    freeWrittenPrompt: '',
     foundationComplete: false,
     disasterUnderstood: false
   });
@@ -50,7 +59,7 @@ const PromptEngineeringLab = () => {
   };
 
   const handleStepComplete = () => {
-    if (currentStep < 7) { // Now goes to step 7
+    if (currentStep < 9) { // Now goes to step 9 (0-9 = 10 steps)
       setCurrentStep(currentStep + 1);
     } else {
       setIsCompleted(true);
@@ -59,14 +68,16 @@ const PromptEngineeringLab = () => {
 
   const getStepTitle = () => {
     const titles = [
-      "🤔 STEP 0/7: Cos'è un Prompt?",
-      "💥 STEP 1/7: Il Prompt Generico (Disaster Demo)",
-      "🎭 STEP 2/7: Definisci Ruolo AI",
-      "🌍 STEP 3/7: Contesto Business",
-      "🎯 STEP 4/7: Task Specifici",
-      "⚖️ STEP 5/7: Style & Constraints",
-      "📤 STEP 6/7: Output Format",
-      "🎓 STEP 7/7: Test di Mastery"
+      "🤔 STEP 0/9: Cos'è un Prompt?",
+      "💥 STEP 1/9: Il Prompt Generico (Disaster Demo)",
+      "🎭 STEP 2/9: Definisci Ruolo AI",
+      "🌍 STEP 3/9: Contesto Business",
+      "🎯 STEP 4/9: Task Specifici e Misurabili",
+      "⚖️ STEP 5/9: Style & Constraints",
+      "📤 STEP 6/9: Output Format",
+      "✍️ STEP 7/9: Free Writing Challenge",
+      "🧪 STEP 8/9: Test Reale con AI",
+      "🎓 STEP 9/9: Mastery Finale"
     ];
     return titles[currentStep] || "Prompt Engineering Lab";
   };
@@ -81,7 +92,7 @@ const PromptEngineeringLab = () => {
       <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl" />
       <div className="absolute top-3/4 left-1/3 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl" />
 
-      <div className="max-w-6xl mx-auto px-6 py-16 relative z-10">
+      <div className="prompt-lab-container">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-white leading-tight mb-4">
@@ -95,23 +106,45 @@ const PromptEngineeringLab = () => {
 
         {/* Progress indicator */}
         <div className="mb-8">
-          <div className="bg-slate-900/90 border border-white/30 rounded-2xl p-4 shadow-xl shadow-black/20">
-            <div className="flex items-center justify-between mb-2">
+          <div className="step-card glassmorphism-base">
+            <div className="flex items-center justify-between sub-element-spacing relative z-10">
               <span className="text-white/70 text-sm">{getStepTitle()}</span>
-              <span className="text-white font-semibold">{currentStep + 1}/8</span>
+              <span className="text-white font-semibold">{currentStep + 1}/10</span>
             </div>
-            <div className="bg-slate-700 rounded-full h-3">
+            <div className="bg-slate-700 rounded-full h-3 relative z-10">
               <div 
                 className="bg-gradient-to-r from-blue-500 to-green-400 h-3 rounded-full transition-all duration-1000"
-                style={{ width: `${((currentStep + 1) / 8) * 100}%` }}
+                style={{ width: `${((currentStep + 1) / 10) * 100}%` }}
               />
             </div>
-            {promptData.qualityScore > 0 && (
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-white/60 text-xs">Quality Score:</span>
-                <span className="text-green-400 font-bold">{promptData.qualityScore}/10</span>
-              </div>
-            )}
+            <div className="mt-2 flex items-center justify-between relative z-10">
+              <span className="text-white/60 text-xs">Progress</span>
+              {promptData.qualityScore > 0 && (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-white/60 text-xs">Quality:</span>
+                    <span className="text-green-400 font-bold text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
+                  </div>
+                  {promptData.taskComplexity > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-white/60 text-xs">Complexity:</span>
+                      <span className={`font-bold text-sm ${
+                        promptData.taskComplexity <= 6 ? 'text-green-400' : 
+                        promptData.taskComplexity <= 10 ? 'text-amber-400' : 'text-red-400'
+                      }`}>
+                        {promptData.taskComplexity}/15
+                      </span>
+                    </div>
+                  )}
+                  {promptData.aiTestScore > 0 && (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-white/60 text-xs">AI Test:</span>
+                      <span className="text-blue-400 font-bold text-sm">{promptData.aiTestScore}/10</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -148,7 +181,7 @@ const PromptEngineeringLab = () => {
               />
             )}
             {currentStep === 4 && (
-              <TaskDefinitionStep 
+              <EnhancedTaskDefinitionStep 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
                 onComplete={handleStepComplete}
@@ -169,6 +202,20 @@ const PromptEngineeringLab = () => {
               />
             )}
             {currentStep === 7 && (
+              <FreeWritingStep 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
+            {currentStep === 8 && (
+              <AITestingStep 
+                promptData={promptData}
+                updatePromptData={updatePromptData}
+                onComplete={handleStepComplete}
+              />
+            )}
+            {currentStep === 9 && (
               <MasteryTest 
                 promptData={promptData}
                 updatePromptData={updatePromptData}
@@ -180,7 +227,7 @@ const PromptEngineeringLab = () => {
           {/* Right column - Live Preview (only show from step 2 onwards) */}
           {currentStep >= 2 && (
             <div className="lg:col-span-1">
-              <LivePreviewPanel promptData={promptData} />
+              <EnhancedLivePreviewPanel promptData={promptData} />
             </div>
           )}
         </div>

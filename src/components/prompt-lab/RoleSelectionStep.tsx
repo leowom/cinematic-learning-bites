@@ -261,7 +261,8 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
         </div>
       </div>
 
-      <style jsx>{`
+      <style>
+        {`
         .slider::-webkit-slider-thumb {
           appearance: none;
           height: 16px;
@@ -287,7 +288,8 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
           cursor: pointer;
           transition: all 0.2s;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

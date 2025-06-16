@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import GlassmorphismCard from './GlassmorphismCard';
 import ProgressRing3D from './ProgressRing3D';
@@ -187,7 +186,7 @@ const CurrentCourseSection = () => {
                 
                 {/* Progress Ring */}
                 <div className="flex justify-center items-center h-full">
-                  <ProgressRing3D progress={currentCourse.progress} size={240} />
+                  <ProgressRing3D progress={currentCourse.progress} size={200} />
                 </div>
               </div>
             </GlassmorphismCard>

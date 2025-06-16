@@ -116,7 +116,7 @@ const ProfileBuilderStep: React.FC<ProfileBuilderStepProps> = ({ onComplete, isA
         size="medium"
       >
         <div className="text-center">
-          <h3 className="text-2xl font-semibold text-white mb-6">Anni di esperienza professionale</h3>
+          <h3 className="text-2xl font-semibold text-white mb-12">Anni di esperienza professionale</h3>
           <div className="flex items-center space-x-6">
             <span className="text-white/70">0</span>
             <div className="flex-1 relative">

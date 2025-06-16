@@ -24,23 +24,22 @@ const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
   };
 
   const minHeights = {
-    small: '120px',
-    medium: '180px',
-    large: '240px'
+    small: '80px',
+    medium: '120px',
+    large: '160px'
   };
 
   return (
     <div
       className={cn(
-        // Performance optimized base styles with better contrast
+        // Performance optimized base styles
         'relative rounded-2xl border border-white/30',
-        // Semi-transparent dark background for better text readability
         'bg-slate-900/85',
-        'shadow-2xl shadow-black/20',
-        'transition-all duration-100 ease-out',
+        'shadow-xl shadow-black/20',
+        'transition-all duration-200 ease-out',
         'stable-card',
-        // Fast hover effects - box-shadow only
-        'hover:shadow-3xl hover:shadow-black/30',
+        // Simplified hover effects for better performance
+        'hover:shadow-2xl hover:shadow-black/30',
         'hover:bg-slate-900/90',
         // Size classes
         sizeClasses[size],

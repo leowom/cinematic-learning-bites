@@ -101,17 +101,17 @@ const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, u
     const newAnswers = { ...answers, [questionId]: answerId };
     setAnswers(newAnswers);
     
-    // Auto-advance to next question after selection
+    // Reduced delay for better performance
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(prev => prev + 1);
-        // Smooth scroll to next question
+        // Optimized scroll to next question
         const nextQuestionElement = document.getElementById(`question-${currentQuestion + 1}`);
         if (nextQuestionElement) {
           nextQuestionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
-    }, 800);
+    }, 400);
   };
 
   const handleComplete = () => {
@@ -141,23 +141,23 @@ const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, u
         </div>
         <div className="w-full bg-white/10 rounded-full h-2">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-amber-500 h-2 rounded-full transition-all duration-500"
+            className="bg-gradient-to-r from-blue-500 to-amber-500 h-2 rounded-full transition-all duration-300"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </GlassmorphismCard>
 
-      {/* Questions Vertical Stack */}
+      {/* Questions Vertical Stack - Performance optimized */}
       <div className="space-y-8">
         {questions.map((question, index) => (
           <div 
             key={question.id}
             id={`question-${index}`}
-            className={`transform transition-all duration-1000 ${
+            className={`transform transition-all duration-500 ${
               index <= currentQuestion && isActive 
                 ? 'translate-y-0 opacity-100' 
                 : index > currentQuestion 
-                  ? 'translate-y-20 opacity-50' 
+                  ? 'translate-y-10 opacity-50' 
                   : 'opacity-70'
             }`}
           >
@@ -183,14 +183,14 @@ const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, u
                       key={option.id}
                       onClick={() => handleAnswer(question.id, option.id)}
                       disabled={index > currentQuestion}
-                      className={`answer-option p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 text-left transform hover:scale-102 ${
+                      className={`p-4 rounded-xl border backdrop-blur-sm transition-all duration-200 text-left ${
                         isSelected
-                          ? 'answer-selected bg-amber-500/15 border-amber-400/50 shadow-lg translate-z-10'
+                          ? 'bg-amber-500/15 border-amber-400/50 shadow-lg'
                           : 'bg-white/5 border-white/10 hover:bg-blue-500/10 hover:border-blue-400/30'
-                      } ${index > currentQuestion ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      } ${index > currentQuestion ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'}`}
                     >
                       <div className="flex items-center space-x-4">
-                        <div className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
+                        <div className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
                           isSelected 
                             ? 'bg-amber-400 border-amber-400' 
                             : 'border-white/30'
@@ -213,7 +213,7 @@ const AssessmentStep: React.FC<AssessmentStepProps> = ({ onComplete, isActive, u
             <Button 
               onClick={handleComplete}
               size="lg"
-              className="text-xl px-12 py-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 border-0 shadow-2xl transform hover:scale-105 transition-all duration-300"
+              className="text-xl px-12 py-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 border-0 shadow-xl transition-colors duration-200"
             >
               Analizza con AI →
             </Button>

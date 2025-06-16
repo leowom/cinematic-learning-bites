@@ -186,7 +186,7 @@ const CurrentCourseSection = () => {
                 
                 {/* Progress Ring */}
                 <div className="flex justify-center items-center h-full">
-                  <ProgressRing3D progress={currentCourse.progress} size={200} />
+                  <ProgressRing3D progress={currentCourse.progress} size={240} />
                 </div>
               </div>
             </GlassmorphismCard>

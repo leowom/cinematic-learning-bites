@@ -6,8 +6,8 @@ interface ProgressRing3DProps {
   size?: number;
 }
 
-const ProgressRing3D: React.FC<ProgressRing3DProps> = ({ progress, size = 200 }) => {
-  const circumference = 2 * Math.PI * 35;
+const ProgressRing3D: React.FC<ProgressRing3DProps> = ({ progress, size = 240 }) => {
+  const circumference = 2 * Math.PI * 45;
   const strokeDasharray = circumference;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
@@ -34,9 +34,9 @@ const ProgressRing3D: React.FC<ProgressRing3DProps> = ({ progress, size = 200 })
         <circle
           cx={size / 2}
           cy={size / 2}
-          r="35"
+          r="45"
           stroke="rgba(255, 255, 255, 0.1)"
-          strokeWidth="6"
+          strokeWidth="8"
           fill="none"
         />
         
@@ -44,9 +44,9 @@ const ProgressRing3D: React.FC<ProgressRing3DProps> = ({ progress, size = 200 })
         <circle
           cx={size / 2}
           cy={size / 2}
-          r="35"
+          r="45"
           stroke="url(#progressGradient)"
-          strokeWidth="6"
+          strokeWidth="8"
           fill="none"
           strokeLinecap="round"
           strokeDasharray={strokeDasharray}
@@ -64,16 +64,16 @@ const ProgressRing3D: React.FC<ProgressRing3DProps> = ({ progress, size = 200 })
         </defs>
       </svg>
       
-      {/* Center content */}
+      {/* Center content with better background */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center transform translate-z-10">
-          <div className="text-3xl font-bold text-white mb-1">{progress}%</div>
-          <div className="text-xs text-white/60 font-medium">Completato</div>
+        <div className="text-center transform translate-z-10 bg-black/30 backdrop-blur-sm rounded-full px-4 py-2">
+          <div className="text-4xl font-bold text-white mb-1 drop-shadow-lg">{progress}%</div>
+          <div className="text-sm text-white/80 font-medium drop-shadow-sm">Completato</div>
         </div>
       </div>
       
       {/* Floating accent */}
-      <div className="absolute top-4 right-6 w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
+      <div className="absolute top-6 right-10 w-4 h-4 bg-blue-400 rounded-full animate-pulse" />
     </div>
   );
 };

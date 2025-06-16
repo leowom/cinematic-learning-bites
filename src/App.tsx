@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
+import PromptEngineeringLab from "./pages/PromptEngineeringLab";
 import { LazyAdminDashboard, LazyAnalytics, LazyDashboard } from "./components/LazyComponents";
 import "./styles/animations.css";
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/dashboard" element={<LazyDashboard />} />
             <Route path="/landing" element={<Landing />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/prompt-lab" element={<PromptEngineeringLab />} />
             <Route path="/admin" element={<LazyAdminDashboard />} />
             <Route path="/analytics" element={<LazyAnalytics />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -90,7 +90,7 @@ const CurrentCourseSection = () => {
   };
 
   const currentCourse = courses[currentIndex];
-  const descriptionLimit = 120;
+  const descriptionLimit = 100;
   const shouldTruncate = currentCourse.description.length > descriptionLimit;
 
   return (
@@ -123,46 +123,50 @@ const CurrentCourseSection = () => {
                 transformStyle: 'preserve-3d'
               }}
             >
-              <div className="grid md:grid-cols-2 gap-8 items-center h-full">
+              <div className="grid md:grid-cols-2 gap-6 items-stretch h-full">
                 {/* Course Info */}
-                <div className="space-y-6 flex flex-col justify-center">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${currentCourse.color} flex items-center justify-center transform transition-all duration-500`}>
-                      <BookOpen className="w-6 h-6 text-white" />
+                <div className="flex flex-col justify-between h-full py-2">
+                  {/* Header Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${currentCourse.color} flex items-center justify-center transform transition-all duration-500`}>
+                        <BookOpen className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-white/60 font-medium">IN CORSO</div>
+                        <div className="text-lg font-bold text-white">{currentCourse.category}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-sm text-white/60 font-medium">IN CORSO</div>
-                      <div className="text-xl font-bold text-white">{currentCourse.category}</div>
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-3xl font-bold text-white leading-tight">
-                    {currentCourse.title}
-                  </h3>
-                  
-                  <div className="text-white/70 text-lg leading-relaxed">
-                    <p>
-                      {shouldTruncate && !expandedDescription
-                        ? `${currentCourse.description.slice(0, descriptionLimit)}...`
-                        : currentCourse.description
-                      }
-                    </p>
-                    {shouldTruncate && (
-                      <button
-                        onClick={() => setExpandedDescription(!expandedDescription)}
-                        className="flex items-center space-x-1 text-blue-300 hover:text-blue-200 text-sm mt-2 transition-colors"
-                      >
-                        <span>{expandedDescription ? 'Mostra meno' : 'Leggi di più'}</span>
-                        {expandedDescription ? 
-                          <ChevronUp className="w-4 h-4" /> : 
-                          <ChevronDown className="w-4 h-4" />
+                    
+                    <h3 className="text-2xl font-bold text-white leading-tight">
+                      {currentCourse.title}
+                    </h3>
+                    
+                    <div className="text-white/70 text-sm leading-relaxed">
+                      <p>
+                        {shouldTruncate && !expandedDescription
+                          ? `${currentCourse.description.slice(0, descriptionLimit)}...`
+                          : currentCourse.description
                         }
-                      </button>
-                    )}
+                      </p>
+                      {shouldTruncate && (
+                        <button
+                          onClick={() => setExpandedDescription(!expandedDescription)}
+                          className="flex items-center space-x-1 text-blue-300 hover:text-blue-200 text-xs mt-1 transition-colors"
+                        >
+                          <span>{expandedDescription ? 'Mostra meno' : 'Leggi di più'}</span>
+                          {expandedDescription ? 
+                            <ChevronUp className="w-3 h-3" /> : 
+                            <ChevronDown className="w-3 h-3" />
+                          }
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
+                  {/* Progress Section */}
                   <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs">
                       <span className="text-white/60">Progresso del corso</span>
                       <span className="text-white font-medium">{currentCourse.progress}%</span>
                     </div>
@@ -174,15 +178,16 @@ const CurrentCourseSection = () => {
                     </div>
                   </div>
                   
-                  <button className={`group flex items-center space-x-3 bg-gradient-to-r ${currentCourse.color} hover:shadow-xl px-6 py-4 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-105`}>
-                    <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    <span>Continua: {currentCourse.nextLesson}</span>
+                  {/* Action Button - Always Visible */}
+                  <button className={`group flex items-center space-x-3 bg-gradient-to-r ${currentCourse.color} hover:shadow-xl px-5 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-105 mt-4`}>
+                    <Play className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <span className="text-sm">Continua: {currentCourse.nextLesson}</span>
                   </button>
                 </div>
                 
                 {/* Progress Ring */}
                 <div className="flex justify-center items-center h-full">
-                  <ProgressRing3D progress={currentCourse.progress} />
+                  <ProgressRing3D progress={currentCourse.progress} size={240} />
                 </div>
               </div>
             </GlassmorphismCard>

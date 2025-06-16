@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '../GlassmorphismCard';
@@ -140,7 +139,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
 
   if (processing) {
     return (
-      <div className="max-w-4xl mx-auto text-center">
+      <div className="max-w-4xl mx-auto text-center pt-20 lg:pt-32">
         <GlassmorphismCard 
           className={`transform transition-all duration-1000 ${
             isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-70'
@@ -187,7 +186,7 @@ const PersonalizationStep: React.FC<PersonalizationStepProps> = ({ onComplete, i
   const workflowDetails = getWorkflowDetails(assignedWorkflow);
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto pt-20 lg:pt-32">
       {/* Results Header */}
       <div className="text-center mb-12">
         <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">

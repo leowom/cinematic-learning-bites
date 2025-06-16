@@ -8,7 +8,6 @@ import { Suspense } from "react";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
-import MicroLessons from "./pages/MicroLessons";
 import NotFound from "./pages/NotFound";
 import { LazyAdminDashboard, LazyAnalytics, LazyDashboard } from "./components/LazyComponents";
 import "./styles/animations.css";
@@ -41,7 +40,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<LazyDashboard />} />
-            <Route path="/micro-lessons" element={<MicroLessons />} />
             <Route path="/landing" element={<Landing />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/admin" element={<LazyAdminDashboard />} />

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Target, ArrowRight, Lightbulb, CheckCircle, AlertTriangle, Edit3, Copy, Check } from 'lucide-react';
@@ -53,8 +54,9 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
 
   const handleExerciseQuality = (score: number) => {
     setExerciseQuality(score);
-    setCanProceedExercise(score >= 7);
-    console.log('Exercise quality score:', score, 'Can proceed:', score >= 7);
+    // Riduco la soglia da 7 a 5 per rendere più facile proseguire
+    setCanProceedExercise(score >= 5);
+    console.log('Exercise quality score:', score, 'Can proceed:', score >= 5);
   };
 
   const handleUseExample = () => {
@@ -181,7 +183,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
           </div>
         </div>
 
-        {/* Pulsante per proseguire - sempre visibile se può procedere */}
+        {/* Pulsante per proseguire - sempre visibile */}
         <div className="flex justify-end section-spacing">
           <Button
             onClick={onComplete}

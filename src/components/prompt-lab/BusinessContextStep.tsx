@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Building, TrendingUp, AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
+import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -11,6 +11,7 @@ interface Props {
 
 const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [showProgression, setShowProgression] = useState(false);
+  const [contextMicroprompt, setContextMicroprompt] = useState(promptData.contextMicroprompt || '');
 
   const businessTypes = [
     { id: 'ecommerce', label: 'E-commerce', active: false },
@@ -39,6 +40,26 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
     };
     
     updatePromptData('context', contexts[businessType as keyof typeof contexts] || '');
+  };
+
+  const handleMicropromptChange = (text: string) => {
+    setContextMicroprompt(text);
+    updatePromptData('contextMicroprompt', text);
+  };
+
+  const getContextExample = () => {
+    if (!promptData.businessType) return '';
+    
+    const examples = {
+      'ecommerce': 'Lavori per un e-commerce di abbigliamento con 200 email al giorno. Policy: resi entro 30 giorni, spedizione gratuita sopra 50€.',
+      'saas': 'Lavori per una azienda SaaS B2B con clienti internazionali. Focus su retention e supporto tecnico avanzato.',
+      'consulting': 'Lavori per una agenzia di consulenza strategica con clienti C-level che richiedono massima personalizzazione.',
+      'healthcare': 'Lavori per una clinica privata. Richiesta massima privacy, compliance e comunicazione sensibile.',
+      'education': 'Lavori per un istituto formativo online con focus su supporto studenti e certificazioni.',
+      'finance': 'Lavori per una consulenza finanziaria. Richiesta massima precisione e compliance normativa.'
+    };
+    
+    return examples[promptData.businessType as keyof typeof examples] || '';
   };
 
   const progressionLevels = [
@@ -143,72 +164,86 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
           </div>
         )}
 
-        {showProgression && (
-          <div className="space-y-4 animate-fade-in section-spacing">
-            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
-              <h4 className="text-emerald-300 font-medium mb-3 flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4" />
-                <span>Risultati della Costruzione Progressiva:</span>
-              </h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300">Solo ruolo:</span>
-                  <span className="text-orange-300">Generico ma professionale</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300">Con tipo di business:</span>
-                  <span className="text-emerald-300">Conoscenza settoriale</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300">Con contesto completo:</span>
-                  <span className="text-emerald-300">Risposte policy-aware</span>
-                </div>
-              </div>
-            </div>
+        {promptData.businessType && (
+          <>
+            <MicropromptWriter
+              title="Pratica: Scrivi il Contesto Aziendale"
+              instruction="Ora aggiungi il contesto aziendale al tuo prompt. Includi dettagli specifici del business:"
+              placeholder="Lavori per [tipo azienda] che [caratteristiche specifiche]. Policy principali: [dettagli operativi]..."
+              example={getContextExample()}
+              context="context"
+              onTextChange={handleMicropromptChange}
+              value={contextMicroprompt}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
-                <label className="text-slate-300 text-sm element-spacing block">Volume email giornaliero:</label>
-                <select 
-                  className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
-                  onChange={(e) => updatePromptData('emailVolume', e.target.value)}
-                >
-                  <option value="">Seleziona volume</option>
-                  <option value="low">1-50 (Basso)</option>
-                  <option value="medium">51-200 (Medio)</option>
-                  <option value="high">201-500 (Alto)</option>
-                  <option value="enterprise">500+ (Enterprise)</option>
-                </select>
-              </div>
-              
-              <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
-                <label className="text-slate-300 text-sm element-spacing block">Livello di urgenza medio:</label>
-                <select 
-                  className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
-                  onChange={(e) => updatePromptData('urgencyLevel', e.target.value)}
-                >
-                  <option value="">Seleziona urgenza</option>
-                  <option value="low">Bassa (risposta in 24h)</option>
-                  <option value="medium">Media (risposta in 4h)</option>
-                  <option value="high">Alta (risposta in 1h)</option>
-                  <option value="critical">Critica (risposta immediata)</option>
-                </select>
-              </div>
-            </div>
+            {showProgression && (
+              <div className="space-y-4 animate-fade-in section-spacing">
+                <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
+                  <h4 className="text-emerald-300 font-medium mb-3 flex items-center space-x-2">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Risultati della Costruzione Progressiva:</span>
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-300">Solo ruolo:</span>
+                      <span className="text-orange-300">Generico ma professionale</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-300">Con tipo di business:</span>
+                      <span className="text-emerald-300">Conoscenza settoriale</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-300">Con contesto completo:</span>
+                      <span className="text-emerald-300">Risposte policy-aware</span>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-3">
-              <span className="text-emerald-300 font-medium">Punteggio Qualità: +2 punti!</span>
-              <span className="text-slate-300 text-sm ml-2">
-                Il contesto specifico trasforma risposte generiche in soluzioni business-aware.
-              </span>
-            </div>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
+                    <label className="text-slate-300 text-sm element-spacing block">Volume email giornaliero:</label>
+                    <select 
+                      className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
+                      onChange={(e) => updatePromptData('emailVolume', e.target.value)}
+                    >
+                      <option value="">Seleziona volume</option>
+                      <option value="low">1-50 (Basso)</option>
+                      <option value="medium">51-200 (Medio)</option>
+                      <option value="high">201-500 (Alto)</option>
+                      <option value="enterprise">500+ (Enterprise)</option>
+                    </select>
+                  </div>
+                  
+                  <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
+                    <label className="text-slate-300 text-sm element-spacing block">Livello di urgenza medio:</label>
+                    <select 
+                      className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
+                      onChange={(e) => updatePromptData('urgencyLevel', e.target.value)}
+                    >
+                      <option value="">Seleziona urgenza</option>
+                      <option value="low">Bassa (risposta in 24h)</option>
+                      <option value="medium">Media (risposta in 4h)</option>
+                      <option value="high">Alta (risposta in 1h)</option>
+                      <option value="critical">Critica (risposta immediata)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-3">
+                  <span className="text-emerald-300 font-medium">Punteggio Qualità: +2 punti!</span>
+                  <span className="text-slate-300 text-sm ml-2">
+                    Il contesto specifico trasforma risposte generiche in soluzioni business-aware.
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <div className="flex justify-end">
           <Button
             onClick={onComplete}
-            disabled={!promptData.businessType}
+            disabled={!promptData.businessType || !contextMicroprompt.trim()}
             className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 border border-slate-600 flex items-center space-x-2"
           >
             <span>Continua con la Definizione dei Task</span>

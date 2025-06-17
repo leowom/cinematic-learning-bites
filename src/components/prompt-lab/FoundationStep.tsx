@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Brain, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -12,10 +13,16 @@ interface Props {
 const FoundationStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [userPrompt, setUserPrompt] = useState('');
   const [showDemo, setShowDemo] = useState(false);
+  const [microprompt, setMicroprompt] = useState(promptData.microprompt1 || '');
 
   const handleUserPromptSubmit = () => {
     setShowDemo(true);
     updatePromptData('foundationComplete', true);
+  };
+
+  const handleMicropromptChange = (text: string) => {
+    setMicroprompt(text);
+    updatePromptData('microprompt1', text);
   };
 
   const getAIResponse = (prompt: string) => {
@@ -147,15 +154,28 @@ const FoundationStep: React.FC<Props> = ({ promptData, updatePromptData, onCompl
         )}
 
         {showDemo && (
-          <div className="flex justify-end">
-            <Button
-              onClick={onComplete}
-              className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 border border-slate-600"
-            >
-              <span>Procedi al Modulo Successivo</span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
+          <>
+            <MicropromptWriter
+              title="Pratica: Crea un Prompt Specifico"
+              instruction="Ora prova tu! Scrivi un prompt più specifico e strutturato per lo stesso obiettivo:"
+              placeholder="Sei un [ruolo] con [esperienza]. Il tuo compito è [obiettivo specifico]..."
+              example="Sei un responsabile customer service con 5 anni di esperienza. Redigi una risposta professionale per un cliente che richiede supporto tecnico per un prodotto difettoso."
+              context="role"
+              onTextChange={handleMicropromptChange}
+              value={microprompt}
+            />
+
+            <div className="flex justify-end">
+              <Button
+                onClick={onComplete}
+                disabled={!microprompt.trim()}
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 flex items-center space-x-2 border border-slate-600"
+              >
+                <span>Procedi al Modulo Successivo</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </div>

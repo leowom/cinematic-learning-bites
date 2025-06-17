@@ -20,36 +20,111 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
 
   const examples = [
     {
-      title: "Esempio 1: Prompt Vago",
+      title: "Categoria 1: Prompt Vaghi (Customer Service)",
       prompt: "Rispondi alle email dei clienti",
       response: "Ok, risponderò alle email.",
+      context: "E-commerce",
       problems: [
-        "❌ Nessun contesto specifico",
-        "❌ Ruolo non definito", 
+        "❌ Nessun contesto specifico del business",
+        "❌ Ruolo e competenze non definiti", 
         "❌ Tone non specificato",
         "❌ Nessuna indicazione su formato o lunghezza"
       ]
     },
     {
-      title: "Esempio 2: Troppo Generico",
-      prompt: "Sei un assistente che aiuta i clienti con i loro problemi",
-      response: "Ciao! Come posso aiutarti oggi?",
+      title: "Categoria 1: Prompt Vaghi (Marketing)",
+      prompt: "Scrivi contenuti per i social media",
+      response: "Certo, scriverò dei post interessanti per voi.",
+      context: "Azienda Tech",
       problems: [
-        "❌ Non specifica il tipo di business",
-        "❌ Mancano procedure specifiche",
-        "❌ Nessun constraint comunicativo",
-        "❌ Non include escalation o limiti"
+        "❌ Non specifica quali piattaforme social",
+        "❌ Target audience non definito",
+        "❌ Brand voice e tone mancanti",
+        "❌ Obiettivi di marketing non chiari"
       ]
     },
     {
-      title: "Esempio 3: Senza Struttura",
+      title: "Categoria 1: Prompt Vaghi (HR)",
+      prompt: "Aiuta con le risorse umane",
+      response: "Sono qui per assistere con le questioni HR.",
+      context: "Startup",
+      problems: [
+        "❌ Compiti specifici non definiti",
+        "❌ Policy aziendali non menzionate",
+        "❌ Livello di confidenzialità non specificato",
+        "❌ Processo decisionale non strutturato"
+      ]
+    },
+    {
+      title: "Categoria 2: Troppo Generico (Vendite B2B)",
+      prompt: "Sei un assistente che aiuta i clienti con i loro problemi di vendita",
+      response: "Ciao! Come posso aiutarti con le vendite oggi?",
+      context: "Software Enterprise",
+      problems: [
+        "❌ Non specifica il tipo di prodotto venduto",
+        "❌ Processo di vendita non definito",
+        "❌ Target customer non specificato",
+        "❌ Metriche di successo mancanti"
+      ]
+    },
+    {
+      title: "Categoria 2: Troppo Generico (Supporto Tecnico)",
+      prompt: "Sei un tecnico che risolve problemi informatici",
+      response: "Salve, sono qui per risolvere i vostri problemi tecnici.",
+      context: "SaaS Company",
+      problems: [
+        "❌ Tecnologie specifiche non menzionate",
+        "❌ Livelli di supporto non definiti",
+        "❌ Procedure di escalation assenti",
+        "❌ Knowledge base non referenziata"
+      ]
+    },
+    {
+      title: "Categoria 2: Troppo Generico (Consulenza)",
+      prompt: "Fornisci consigli di business ai clienti",
+      response: "Sono qui per darvi consigli utili per il vostro business.",
+      context: "Consulenza Strategica",
+      problems: [
+        "❌ Settori di specializzazione non definiti",
+        "❌ Metodologie di analisi mancanti",
+        "❌ Deliverable non specificati",
+        "❌ Framework di valutazione assenti"
+      ]
+    },
+    {
+      title: "Categoria 3: Senza Struttura (E-commerce)",
       prompt: "Rispondi educatamente ai clienti dell'azienda tech che hanno problemi con abbonamenti e fatturazione",
       response: "Mi dispiace per il problema. Ti aiuterò volentieri.",
+      context: "Piattaforma SaaS",
       problems: [
-        "❌ Mancano task specifici",
-        "❌ Non include informazioni sui sistemi",
-        "❌ Formato output non definito",
-        "❌ Nessuna procedura step-by-step"
+        "❌ Step di troubleshooting non definiti",
+        "❌ Accesso ai sistemi non specificato",
+        "❌ Autorizzazioni per rimborsi mancanti",
+        "❌ Template di risposta non strutturati"
+      ]
+    },
+    {
+      title: "Categoria 3: Senza Struttura (Servizi Finanziari)",
+      prompt: "Aiuta i clienti della banca con domande sui loro conti e transazioni",
+      response: "Buongiorno, sarò felice di assisterla con il suo conto.",
+      context: "Digital Banking",
+      problems: [
+        "❌ Protocolli di sicurezza non definiti",
+        "❌ Verifiche di identità mancanti",
+        "❌ Limiti di informazione non specificati",
+        "❌ Compliance regulations non menzionate"
+      ]
+    },
+    {
+      title: "Categoria 3: Senza Struttura (Educazione)",
+      prompt: "Spiega argomenti di matematica agli studenti che fanno domande",
+      response: "Certo! Sono qui per aiutarti con la matematica.",
+      context: "Piattaforma E-learning",
+      problems: [
+        "❌ Livello scolastico non specificato",
+        "❌ Metodologie didattiche non definite",
+        "❌ Stile di spiegazione non strutturato",
+        "❌ Sistema di valutazione progresso assente"
       ]
     }
   ];
@@ -59,11 +134,18 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
     setViewedExamples(prev => new Set(prev).add(index));
   };
 
-  const canProceed = viewedExamples.size === 3;
+  const canProceed = viewedExamples.size === examples.length;
 
   const handleComplete = () => {
     updatePromptData('disasterUnderstood', true);
     onComplete();
+  };
+
+  const getCategoryColor = (title: string) => {
+    if (title.includes("Categoria 1")) return "border-red-700/40 bg-red-900/20";
+    if (title.includes("Categoria 2")) return "border-orange-700/40 bg-orange-900/20";
+    if (title.includes("Categoria 3")) return "border-yellow-700/40 bg-yellow-900/20";
+    return "border-slate-700/40 bg-slate-800/60";
   };
 
   return (
@@ -75,18 +157,18 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
           <h2 className="text-3xl font-bold text-white">Esempi di Prompt Disastrosi</h2>
         </div>
         <p className="text-slate-300 text-lg">
-          Prima di creare prompt efficaci, vediamo cosa NON funziona. 
-          <span className="text-orange-400 font-medium"> Devi visualizzare tutti e 3 gli esempi per continuare.</span>
+          Prima di creare prompt efficaci, vediamo cosa NON funziona in diversi contesti aziendali. 
+          <span className="text-orange-400 font-medium"> Devi visualizzare tutti i {examples.length} esempi per continuare.</span>
         </p>
       </div>
 
       {/* Progress indicator */}
-      <div className="flex justify-center space-x-4 mb-6">
+      <div className="flex justify-center flex-wrap gap-2 mb-6">
         {examples.map((_, index) => (
           <button
             key={index}
             onClick={() => handleViewExample(index)}
-            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
+            className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all text-xs font-medium ${
               viewedExamples.has(index)
                 ? 'bg-emerald-500 border-emerald-500 text-white'
                 : currentExample === index
@@ -95,27 +177,32 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
             }`}
           >
             {viewedExamples.has(index) ? (
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle className="w-4 h-4" />
             ) : (
-              <Eye className="w-5 h-5" />
+              index + 1
             )}
           </button>
         ))}
       </div>
 
       {/* Current Example */}
-      <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-6">
+      <div className={`border rounded-xl p-6 ${getCategoryColor(examples[currentExample].title)}`}>
         <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-orange-300">
-            {examples[currentExample].title}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-white">
+              {examples[currentExample].title}
+            </h3>
+            <span className="text-xs bg-slate-700/60 px-3 py-1 rounded-full text-slate-300">
+              Contesto: {examples[currentExample].context}
+            </span>
+          </div>
 
           {/* Prompt Section */}
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
               Prompt Utilizzato:
             </h4>
-            <div className="bg-red-900/20 border border-red-700/40 rounded-lg p-4">
+            <div className="bg-red-900/30 border border-red-700/50 rounded-lg p-4">
               <p className="text-red-200 font-mono text-sm">
                 "{examples[currentExample].prompt}"
               </p>
@@ -127,7 +214,7 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
             <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
               Risposta AI Risultante:
             </h4>
-            <div className="bg-orange-900/20 border border-orange-700/40 rounded-lg p-4">
+            <div className="bg-orange-900/30 border border-orange-700/50 rounded-lg p-4">
               <p className="text-orange-200">
                 "{examples[currentExample].response}"
               </p>

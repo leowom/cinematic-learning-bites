@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle, Eye } from 'lucide-react';
 
@@ -11,7 +11,12 @@ interface Props {
 
 const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [currentExample, setCurrentExample] = useState(0);
-  const [viewedExamples, setViewedExamples] = useState<Set<number>>(new Set());
+  const [viewedExamples, setViewedExamples] = useState<Set<number>>(new Set([0])); // Inizializza con il primo esempio già visto
+
+  // Assicurati che l'esempio corrente sia sempre marcato come visto
+  useEffect(() => {
+    setViewedExamples(prev => new Set(prev).add(currentExample));
+  }, [currentExample]);
 
   const examples = [
     {

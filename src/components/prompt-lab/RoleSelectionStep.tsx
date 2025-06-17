@@ -11,13 +11,13 @@ interface Props {
 }
 
 const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [roleText, setRoleText] = useState(promptData.role || '');
+  const [roleText, setRoleText] = useState(promptData.userWrittenRole || '');
   const [qualityScore, setQualityScore] = useState(0);
   const [canProceed, setCanProceed] = useState(false);
 
   const handleRoleChange = (text: string) => {
     setRoleText(text);
-    updatePromptData('role', text);
+    updatePromptData('userWrittenRole', text);
   };
 
   const handleQualityChange = (score: number, canProceedValue: boolean) => {

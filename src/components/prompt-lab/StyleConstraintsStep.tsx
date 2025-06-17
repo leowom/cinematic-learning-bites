@@ -11,7 +11,7 @@ interface Props {
 }
 
 const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [microprompt, setMicroprompt] = useState(promptData.microprompt6 || '');
+  const [microprompt, setMicroprompt] = useState(promptData.userWrittenTone || '');
   const [exerciseQuality, setExerciseQuality] = useState(0);
   const [canProceedExercise, setCanProceedExercise] = useState(false);
 
@@ -24,7 +24,7 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
 
   const handleMicropromptChange = (text: string) => {
     setMicroprompt(text);
-    updatePromptData('microprompt6', text);
+    updatePromptData('userWrittenTone', text);
   };
 
   const handleExerciseQuality = (score: number, canProceed: boolean) => {
@@ -182,6 +182,7 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
           onTextChange={handleMicropromptChange}
           value={microprompt}
           onQualityChange={handleExerciseQuality}
+          updatePromptData={updatePromptData}
         />
 
         {canProceed && (

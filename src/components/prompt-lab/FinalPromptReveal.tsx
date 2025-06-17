@@ -12,27 +12,32 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
   const generateFinalPrompt = () => {
     let prompt = '';
     
+    // Ruolo
     if (promptData.userWrittenRole) {
       prompt += `${promptData.userWrittenRole}\n\n`;
     }
     
+    // Contesto
     if (promptData.userWrittenContext) {
       prompt += `CONTESTO:\n${promptData.userWrittenContext}\n\n`;
     }
     
+    // Task
     if (promptData.userWrittenTasks) {
       prompt += `TASK:\n${promptData.userWrittenTasks}\n\n`;
     }
     
+    // Vincoli
     if (promptData.userWrittenTone) {
-      prompt += `CONSTRAINTS:\n${promptData.userWrittenTone}\n\n`;
+      prompt += `VINCOLI:\n${promptData.userWrittenTone}\n\n`;
     }
     
+    // Formato
     if (promptData.userWrittenFormat) {
-      prompt += `OUTPUT FORMAT:\n${promptData.userWrittenFormat}`;
+      prompt += `FORMATO OUTPUT:\n${promptData.userWrittenFormat}`;
     }
     
-    return prompt;
+    return prompt || 'Nessun prompt generato - completa tutti i passaggi precedenti.';
   };
 
   const handleCopyPrompt = () => {
@@ -50,9 +55,9 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="step-card glassmorphism-base">
       {/* Header */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 mb-6">
         <div className="flex justify-center">
           <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center border border-emerald-700/50">
             <Eye className="w-8 h-8 text-emerald-400" />
@@ -70,7 +75,7 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
       </div>
 
       {/* Final Prompt Display */}
-      <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-6">
+      <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-emerald-300 font-medium flex items-center">
             <CheckCircle className="w-4 h-4 mr-2" />
@@ -121,7 +126,7 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
       </div>
 
       {/* Key Elements Summary */}
-      <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-6">
+      <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-6 mb-6">
         <h3 className="text-slate-200 font-medium mb-4">✅ Elementi Chiave Inclusi</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -146,7 +151,7 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
           {promptData.userWrittenTone && (
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-4 h-4 text-emerald-400" />
-              <span className="text-slate-300 text-sm">Tone e constraints chiari</span>
+              <span className="text-slate-300 text-sm">Vincoli e constraints chiari</span>
             </div>
           )}
           {promptData.userWrittenFormat && (
@@ -159,7 +164,7 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
       </div>
 
       {/* Next Steps */}
-      <div className="bg-blue-900/20 border border-blue-700/30 rounded-xl p-6">
+      <div className="bg-blue-900/20 border border-blue-700/30 rounded-xl p-6 mb-6">
         <h3 className="text-blue-300 font-medium mb-3">🚀 Prossimi Passi</h3>
         <ul className="text-slate-300 space-y-2 text-sm">
           <li>• Testa il prompt con diversi scenari aziendali</li>
@@ -176,7 +181,7 @@ const FinalPromptReveal: React.FC<Props> = ({ promptData, onComplete }) => {
           className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3"
         >
           <CheckCircle className="w-5 h-5 mr-2" />
-          Completa la Lezione
+          Procedi al Test con AI
         </Button>
       </div>
     </div>

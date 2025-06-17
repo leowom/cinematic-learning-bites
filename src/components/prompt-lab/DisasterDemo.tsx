@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle, Eye } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Play, CheckCircle } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -11,203 +11,188 @@ interface Props {
 
 const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [currentExample, setCurrentExample] = useState(0);
-  const [viewedExamples, setViewedExamples] = useState<Set<number>>(new Set([0]));
-
-  useEffect(() => {
-    setViewedExamples(prev => new Set(prev).add(currentExample));
-  }, [currentExample]);
+  const [showingResults, setShowingResults] = useState(false);
+  const [allExamplesViewed, setAllExamplesViewed] = useState(false);
 
   const examples = [
     {
-      title: "Categoria 1: Prompt Vaghi",
-      prompt: "Rispondi alle email dei clienti",
-      response: "Ok, risponderò alle email.",
-      context: "E-commerce",
+      title: "❌ Prompt Generico",
+      prompt: "Aiutami con l'email del cliente",
+      result: "Certo! Come posso aiutarti con l'email? Puoi fornirmi più dettagli?",
       problems: [
-        "❌ Nessun contesto specifico del business",
-        "❌ Ruolo e competenze non definiti", 
-        "❌ Tone non specificato",
-        "❌ Nessuna indicazione su formato o lunghezza"
+        "Troppo vago e inutile",
+        "Non sa cosa fare",
+        "Richiede input aggiuntivi"
       ]
     },
     {
-      title: "Categoria 2: Troppo Generico",
-      prompt: "Sei un assistente che aiuta i clienti con i loro problemi di vendita",
-      response: "Ciao! Come posso aiutarti con le vendite oggi?",
-      context: "Software Enterprise",
+      title: "❌ Prompt Incompleto", 
+      prompt: "Rispondi al cliente che ha fatto un reclamo",
+      result: "Gentile Cliente, abbiamo ricevuto il suo reclamo. Cordiali saluti.",
       problems: [
-        "❌ Non specifica il tipo di prodotto venduto",
-        "❌ Processo di vendita non definito",
-        "❌ Target customer non specificato",
-        "❌ Metriche di successo mancanti"
+        "Non analizza il contenuto",
+        "Risposta generica",
+        "Nessuna soluzione proposta"
       ]
     },
     {
-      title: "Categoria 3: Senza Struttura",
-      prompt: "Rispondi educatamente ai clienti dell'azienda tech che hanno problemi con abbonamenti e fatturazione",
-      response: "Mi dispiace per il problema. Ti aiuterò volentieri.",
-      context: "Piattaforma SaaS",
+      title: "❌ Prompt Senza Vincoli",
+      prompt: "Sei un customer service agent. Analizza questa email e rispondi.",
+      result: "Grazie per la sua email. Il nostro team tecnico risolverà tutto entro 6 mesi. Nel frattempo può provare a spegnere e riaccendere il dispositivo 847 volte.",
       problems: [
-        "❌ Step di troubleshooting non definiti",
-        "❌ Accesso ai sistemi non specificato",
-        "❌ Autorizzazioni per rimborsi mancanti",
-        "❌ Template di risposta non strutturati"
+        "Promesse irrealistiche",
+        "Tono inappropriato", 
+        "Nessun controllo qualità"
       ]
     }
   ];
 
-  const handleViewExample = (index: number) => {
-    setCurrentExample(index);
-    setViewedExamples(prev => new Set(prev).add(index));
+  const handleNext = () => {
+    if (currentExample < examples.length - 1) {
+      setCurrentExample(currentExample + 1);
+      setShowingResults(false);
+    } else {
+      setAllExamplesViewed(true);
+    }
   };
 
-  const canProceed = viewedExamples.size === examples.length;
+  const handleShowResult = () => {
+    setShowingResults(true);
+  };
 
-  const handleComplete = () => {
+  const markComplete = () => {
     updatePromptData('disasterUnderstood', true);
     onComplete();
   };
 
-  const getCategoryColor = (title: string) => {
-    if (title.includes("Categoria 1")) return "border-red-700/40 bg-red-900/20";
-    if (title.includes("Categoria 2")) return "border-orange-700/40 bg-orange-900/20";
-    if (title.includes("Categoria 3")) return "border-yellow-700/40 bg-yellow-900/20";
-    return "border-slate-700/40 bg-slate-800/60";
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center space-x-3">
-          <AlertTriangle className="w-8 h-8 text-orange-400" />
-          <h2 className="text-3xl font-bold text-white">Esempi di Prompt Disastrosi</h2>
-        </div>
-        <p className="text-slate-300 text-lg">
-          Prima di creare prompt efficaci, vediamo cosa NON funziona in diversi contesti aziendali. 
-          <span className="text-orange-400 font-medium"> Devi visualizzare tutti i {examples.length} esempi per continuare.</span>
-        </p>
+    <div className="step-card glassmorphism-base">
+      <div className="flex items-center space-x-3 mb-6 relative z-10">
+        <AlertTriangle className="w-6 h-6 text-amber-400" />
+        <h2 className="text-xl font-medium text-slate-200">
+          Demo: Cosa NON Fare
+        </h2>
       </div>
 
-      {/* Progress indicator */}
-      <div className="flex justify-center flex-wrap gap-2 mb-6">
-        {examples.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => handleViewExample(index)}
-            className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all text-xs font-medium ${
-              viewedExamples.has(index)
-                ? 'bg-emerald-500 border-emerald-500 text-white'
-                : currentExample === index
-                ? 'border-blue-500 bg-blue-500/20 text-blue-300'
-                : 'border-slate-600 bg-slate-700/50 text-slate-400 hover:border-slate-500'
-            }`}
-          >
-            {viewedExamples.has(index) ? (
-              <CheckCircle className="w-4 h-4" />
-            ) : (
-              index + 1
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Current Example */}
-      <div className={`border rounded-xl p-6 ${getCategoryColor(examples[currentExample].title)}`}>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-white">
-              {examples[currentExample].title}
-            </h3>
-            <span className="text-xs bg-slate-700/60 px-3 py-1 rounded-full text-slate-300">
-              Contesto: {examples[currentExample].context}
-            </span>
-          </div>
-
-          {/* Prompt Section */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
-              Prompt Utilizzato:
-            </h4>
-            <div className="bg-red-900/30 border border-red-700/50 rounded-lg p-4">
-              <p className="text-red-200 font-mono text-sm">
-                "{examples[currentExample].prompt}"
-              </p>
-            </div>
-          </div>
-
-          {/* Response Section */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
-              Risposta AI Risultante:
-            </h4>
-            <div className="bg-orange-900/30 border border-orange-700/50 rounded-lg p-4">
-              <p className="text-orange-200">
-                "{examples[currentExample].response}"
-              </p>
-            </div>
-          </div>
-
-          {/* Problems Section */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
-              Problemi Identificati:
-            </h4>
-            <div className="space-y-2">
-              {examples[currentExample].problems.map((problem, index) => (
-                <div key={index} className="flex items-start space-x-2">
-                  <span className="text-red-400 text-sm">{problem}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center">
-        <Button
-          onClick={() => handleViewExample(Math.max(0, currentExample - 1))}
-          disabled={currentExample === 0}
-          className="bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Precedente
-        </Button>
-
-        <div className="text-center">
-          <p className="text-slate-400 text-sm">
-            Esempio {currentExample + 1} di {examples.length}
+      <div className="relative z-10 space-y-6">
+        <div className="section-spacing">
+          <p className="text-slate-300 leading-relaxed">
+            Prima di imparare come creare prompt efficaci, vediamo alcuni esempi di prompt che NON funzionano 
+            e i problemi che causano nel mondo reale.
           </p>
-          {!canProceed && (
-            <p className="text-orange-400 text-xs mt-1">
-              Visualizza tutti gli esempi per continuare
-            </p>
-          )}
         </div>
 
-        <Button
-          onClick={() => handleViewExample(Math.min(examples.length - 1, currentExample + 1))}
-          disabled={currentExample === examples.length - 1}
-          className="bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600"
-        >
-          Successivo
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </Button>
+        {!allExamplesViewed ? (
+          <div className="bg-red-900/20 border border-red-700/30 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-red-300 font-medium">
+                {examples[currentExample].title}
+              </h3>
+              <span className="text-sm text-slate-400">
+                Esempio {currentExample + 1} di {examples.length}
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-slate-800/60 border border-red-600/30 rounded-lg p-4">
+                <h4 className="text-slate-300 text-sm font-medium mb-2">📝 Prompt utilizzato:</h4>
+                <p className="text-red-200 italic font-mono text-sm">
+                  "{examples[currentExample].prompt}"
+                </p>
+              </div>
+
+              {!showingResults ? (
+                <div className="text-center">
+                  <Button
+                    onClick={handleShowResult}
+                    className="bg-red-700/60 hover:bg-red-600/80 text-red-200 border border-red-600/50"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Vedi il Risultato Disastroso
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="bg-slate-800/60 border border-red-600/30 rounded-lg p-4">
+                    <h4 className="text-slate-300 text-sm font-medium mb-2">🤖 Risposta AI:</h4>
+                    <p className="text-slate-200 text-sm">
+                      {examples[currentExample].result}
+                    </p>
+                  </div>
+
+                  <div className="bg-red-900/30 border border-red-700/50 rounded-lg p-4">
+                    <h4 className="text-red-300 text-sm font-medium mb-2">⚠️ Problemi identificati:</h4>
+                    <ul className="space-y-1">
+                      {examples[currentExample].problems.map((problem, index) => (
+                        <li key={index} className="text-red-200 text-sm flex items-start">
+                          <span className="text-red-400 mr-2">•</span>
+                          {problem}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="text-center">
+                    <Button
+                      onClick={handleNext}
+                      className="bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600"
+                    >
+                      {currentExample < examples.length - 1 ? (
+                        <>
+                          <ArrowRight className="w-4 h-4 mr-2" />
+                          Prossimo Esempio
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Ho Capito i Problemi
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-xl p-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-emerald-300 font-medium">
+                  ✅ Lezione Appresa
+                </h3>
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-emerald-200 text-sm">
+                  Hai visto come prompt mal costruiti portano a risultati inaffidabili e potenzialmente dannosi per il business.
+                </p>
+                
+                <div className="bg-emerald-900/30 border border-emerald-700/50 rounded-lg p-4">
+                  <h4 className="text-emerald-300 text-sm font-medium mb-2">🎯 Cosa abbiamo imparato:</h4>
+                  <ul className="space-y-1 text-emerald-200 text-sm">
+                    <li>• I prompt vaghi generano risposte inutili</li>
+                    <li>• Senza contesto, l'AI non può dare risposte specifiche</li>
+                    <li>• Senza vincoli, l'AI può fare promesse irrealistiche</li>
+                    <li>• La qualità del prompt determina la qualità del risultato</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Button
+                onClick={markComplete}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 text-lg"
+              >
+                <ArrowRight className="w-5 h-5 mr-2" />
+                Iniziamo a Costruire Prompt Efficaci
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Continue Button */}
-      {canProceed && (
-        <div className="text-center pt-6">
-          <Button
-            onClick={handleComplete}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white text-lg px-8 py-3"
-          >
-            <CheckCircle className="w-5 h-5 mr-2" />
-            Ho Capito i Problemi - Continua
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

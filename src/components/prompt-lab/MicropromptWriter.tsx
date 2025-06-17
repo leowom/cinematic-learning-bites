@@ -105,12 +105,15 @@ const MicropromptWriter: React.FC<Props> = ({
         rows={4}
       />
       
-      <OpenAICoach 
-        userInput={value} 
-        context={context}
-        onScoreChange={handleScoreChange}
-        onRetryRequest={handleRetry}
-      />
+      {/* Solo per contesti diversi da 'tone' per evitare loop */}
+      {context !== 'tone' && (
+        <OpenAICoach 
+          userInput={value} 
+          context={context}
+          onScoreChange={handleScoreChange}
+          onRetryRequest={handleRetry}
+        />
+      )}
     </div>
   );
 };

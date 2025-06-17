@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Brain, Target, Users, Building, Settings, FileText, Edit3, TestTube, Award, Zap, Eye } from 'lucide-react';
@@ -8,14 +9,11 @@ import BusinessContextStep from '@/components/prompt-lab/BusinessContextStep';
 import EnhancedTaskDefinitionStep from '@/components/prompt-lab/EnhancedTaskDefinitionStep';
 import StyleConstraintsStep from '@/components/prompt-lab/StyleConstraintsStep';
 import OutputFormatStep from '@/components/prompt-lab/OutputFormatStep';
-import FreeWritingStep from '@/components/prompt-lab/FreeWritingStep';
 import AITestingStep from '@/components/prompt-lab/AITestingStep';
-import MasteryTest from '@/components/prompt-lab/MasteryTest';
 import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePreviewPanel';
 import FinalScoring from '@/components/prompt-lab/FinalScoring';
 import PromptLabHeader from '@/components/prompt-lab/PromptLabHeader';
 import { useAutoSave } from '@/hooks/useAutoSave';
-import FinalPromptReveal from '@/components/prompt-lab/FinalPromptReveal';
 import '../styles/prompt-lab.css';
 
 interface PromptData {
@@ -105,7 +103,7 @@ const PromptEngineeringLab = () => {
     // Scroll to top when changing lesson
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    if (currentStep < 9) {
+    if (currentStep < 7) {
       setCurrentStep(currentStep + 1);
     } else {
       setShowFinalScoring(true);
@@ -136,9 +134,7 @@ const PromptEngineeringLab = () => {
       { icon: Target, title: "Task Specification", subtitle: "Defining measurable objectives" },
       { icon: Settings, title: "Communication Style", subtitle: "Establishing tone and constraints" },
       { icon: FileText, title: "Output Format", subtitle: "Structuring response templates" },
-      { icon: Eye, title: "Final Prompt Reveal", subtitle: "Your complete professional prompt" },
-      { icon: TestTube, title: "AI Testing", subtitle: "Validation and optimization" },
-      { icon: Award, title: "Mastery Assessment", subtitle: "Final evaluation and certification" }
+      { icon: TestTube, title: "Final Test & Mastery", subtitle: "Complete prompt validation" }
     ];
     return steps[currentStep] || { icon: Brain, title: "Prompt Engineering Lab", subtitle: "Professional prompt development" };
   };
@@ -159,7 +155,7 @@ const PromptEngineeringLab = () => {
         {/* New Navigation Header */}
         <PromptLabHeader 
           currentStep={currentStep}
-          totalSteps={10}
+          totalSteps={8}
           onPreviousStep={handlePreviousStep}
           canGoBack={currentStep > 0}
         />
@@ -224,20 +220,7 @@ const PromptEngineeringLab = () => {
                 />
               )}
               {currentStep === 7 && (
-                <FinalPromptReveal 
-                  promptData={promptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 8 && (
                 <AITestingStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 9 && (
-                <MasteryTest 
                   promptData={promptData}
                   updatePromptData={updatePromptData}
                   onComplete={handleStepComplete}

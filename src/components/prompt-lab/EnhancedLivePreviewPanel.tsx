@@ -26,29 +26,11 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
   const styleComplete = isFieldCompleted(promptData.userWrittenTone) || (promptData.tone?.formal && promptData.tone?.empathy);
   const formatComplete = isFieldCompleted(promptData.userWrittenFormat) || isFieldCompleted(promptData.outputFormat);
 
-  console.log('🔍 EnhancedLivePreviewPanel DEBUG:', {
-    roleComplete,
-    contextComplete,
-    tasksComplete,
-    styleComplete,
-    formatComplete,
-    outputFormat: promptData.outputFormat,
-    userWrittenFormat: promptData.userWrittenFormat
-  });
-
   const getStatusIcon = (isComplete: boolean) => {
     return isComplete ? (
       <CheckCircle className="w-4 h-4 text-emerald-400" />
     ) : (
       <Clock className="w-4 h-4 text-orange-400" />
-    );
-  };
-
-  const getStatusText = (isComplete: boolean) => {
-    return isComplete ? (
-      <span className="text-emerald-400">✅ Completato</span>
-    ) : (
-      <span className="text-orange-400">⏳ Da completare</span>
     );
   };
 
@@ -68,12 +50,12 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
     
     if (tasksComplete) {
       const tasksText = promptData.userWrittenTasks || (Array.isArray(promptData.tasks) ? promptData.tasks.join(", ") : promptData.tasks);
-      preview += "COMPITI:\n" + tasksText + "\n\n";
+      preview += "TASK:\n" + tasksText + "\n\n";
     }
     
     if (styleComplete) {
       const styleText = promptData.userWrittenTone || `Mantieni un tono ${promptData.tone?.formal > 70 ? 'formale' : 'informale'} e ${promptData.tone?.empathy > 70 ? 'empatico' : 'diretto'}.`;
-      preview += "STILE:\n" + styleText + "\n\n";
+      preview += "VINCOLI:\n" + styleText + "\n\n";
     }
     
     if (formatComplete) {

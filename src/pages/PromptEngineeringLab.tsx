@@ -76,7 +76,16 @@ const PromptEngineeringLab = () => {
   useEffect(() => {
     const saved = loadSavedData();
     if (saved) {
-      setPromptData(saved.data);
+      // Aggiungi i campi mancanti se non presenti
+      const completeData = {
+        ...saved.data,
+        userWrittenRole: saved.data.userWrittenRole || '',
+        userWrittenContext: saved.data.userWrittenContext || '',
+        userWrittenTasks: saved.data.userWrittenTasks || '',
+        userWrittenTone: saved.data.userWrittenTone || '',
+        userWrittenFormat: saved.data.userWrittenFormat || ''
+      };
+      setPromptData(completeData);
       setCurrentStep(saved.step);
     }
   }, []);
@@ -93,6 +102,9 @@ const PromptEngineeringLab = () => {
   };
 
   const handleStepComplete = () => {
+    // Scroll to top when changing lesson
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     if (currentStep < 9) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -107,6 +119,9 @@ const PromptEngineeringLab = () => {
   };
 
   const handlePreviousStep = () => {
+    // Scroll to top when going back
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }

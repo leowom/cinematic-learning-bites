@@ -15,6 +15,11 @@ interface PromptData {
   freeWrittenPrompt: string;
   foundationComplete: boolean;
   disasterUnderstood: boolean;
+  userWrittenRole: string;
+  userWrittenContext: string;
+  userWrittenTasks: string;
+  userWrittenTone: string;
+  userWrittenFormat: string;
 }
 
 export const useAutoSave = (promptData: PromptData, currentStep: number) => {

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Target, ArrowRight, Lightbulb, CheckCircle, AlertTriangle, Edit3, Copy, Check } from 'lucide-react';
@@ -45,7 +44,9 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     }
   ];
 
-  const exampleTask = "Analizza il sentiment dell'email del cliente su scala 1-5, identifica la categoria della richiesta (reclamo/info/supporto) e genera una risposta professionale di massimo 150 parole con timeline specifiche.";
+  const exampleTask = `1. Analizza il sentiment dell'email del cliente (positivo/neutro/negativo) su scala 1-5, identifica la categoria principale della richiesta (reclamo/informazione/supporto tecnico/rimborso) con confidence score, poi genera una risposta professionale ed empatica di massimo 150 parole che riconosca il problema e offra una soluzione concreta con timeline realistiche entro 24-48 ore.
+2. Classifica la richiesta in: reclamo, informazione prodotto, supporto tecnico, rimborso o altro, con confidence score
+3. Redigi risposta professionale ed empatica che riconosca il problema e offra soluzione concreta con timeline`;
 
   const handleUserTaskChange = (text: string) => {
     setUserTask(text);
@@ -166,9 +167,9 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
             <textarea
               value={userTask}
               onChange={(e) => handleUserTaskChange(e.target.value)}
-              placeholder="Esempio: Analizza il sentiment dell'email del cliente e identifica la categoria principale della richiesta..."
-              className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-24 focus:border-emerald-500 focus:outline-none text-sm"
-              rows={4}
+              placeholder="Esempio: 1. Analizza il sentiment dell'email del cliente su scala 1-5... 2. Classifica la richiesta... 3. Redigi risposta professionale..."
+              className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-32 focus:border-emerald-500 focus:outline-none text-sm"
+              rows={6}
             />
             
             <EnhancedAICoach 

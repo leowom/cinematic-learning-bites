@@ -85,19 +85,23 @@ Sofia`,
   const generateCurrentPrompt = () => {
     let prompt = '';
     
-    if (promptData.role) {
-      prompt += `Sei un ${promptData.role}`;
+    if (promptData.userWrittenRole || promptData.role) {
+      const role = promptData.userWrittenRole || promptData.role;
+      prompt += `Sei un ${role}`;
       if (promptData.experience) {
         prompt += ` con ${promptData.experience} anni di esperienza`;
       }
       prompt += '.\n\n';
     }
     
-    if (promptData.context) {
-      prompt += `CONTESTO:\n${promptData.context}\n\n`;
+    if (promptData.userWrittenContext || promptData.context) {
+      const context = promptData.userWrittenContext || promptData.context;
+      prompt += `CONTESTO:\n${context}\n\n`;
     }
     
-    if (promptData.tasks?.length > 0) {
+    if (promptData.userWrittenTasks) {
+      prompt += `TASK:\n${promptData.userWrittenTasks}\n\n`;
+    } else if (promptData.tasks?.length > 0) {
       prompt += 'TASK:\n';
       promptData.tasks.forEach((task: string, index: number) => {
         prompt += `${index + 1}. ${task}\n`;
@@ -105,12 +109,16 @@ Sofia`,
       prompt += '\n';
     }
     
-    if (promptData.tone) {
+    if (promptData.userWrittenTone) {
+      prompt += `CONSTRAINTS:\n${promptData.userWrittenTone}\n\n`;
+    } else if (promptData.tone) {
       prompt += 'CONSTRAINTS:\n';
       prompt += `- Tone: ${promptData.tone.formal > 60 ? 'Professionale' : 'Casual'} ${promptData.tone.empathy > 60 ? 'ed empatico' : 'e diretto'}\n\n`;
     }
     
-    if (promptData.outputFormat?.length > 0) {
+    if (promptData.userWrittenFormat) {
+      prompt += `OUTPUT FORMAT:\n${promptData.userWrittenFormat}`;
+    } else if (promptData.outputFormat?.length > 0) {
       prompt += 'OUTPUT FORMAT:\n';
       promptData.outputFormat.forEach((format: string) => {
         prompt += `${format}\n`;
@@ -132,33 +140,9 @@ Sofia`,
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
           <p className="text-white/70 leading-relaxed element-spacing">
-            Ora testiamo il tuo prompt con GPT-4o reale tramite Supabase! L'AI analizzerà il tuo prompt e genererà una risposta, 
+            Ora testiamo il tuo prompt con GPT-4o reale! L'AI analizzerà il tuo prompt e genererà una risposta, 
             poi valuterà automaticamente la qualità su 5 criteri specifici.
           </p>
-
-          <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4 element-spacing">
-            <h3 className="text-green-400 font-medium sub-element-spacing flex items-center">
-              <Zap className="w-4 h-4 mr-2" />
-              🎯 Test con AI Reale tramite Supabase:
-            </h3>
-            <p className="text-white/80 text-sm leading-relaxed">
-              Usiamo GPT-4o per generare la risposta e poi un secondo GPT-4o per analizzare oggettivamente 
-              la qualità su completeness, accuracy, tone, specificity e actionability.
-            </p>
-          </div>
-
-          {/* Supabase Status */}
-          <div className="bg-green-600/20 border border-green-400/30 rounded-lg p-4">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-white font-medium">
-                ✅ Connesso a Supabase - API Key gestita in sicurezza
-              </span>
-            </div>
-            <p className="text-white/70 text-sm mt-2">
-              La tua OpenAI API key è configurata nelle secrets di Supabase
-            </p>
-          </div>
         </div>
 
         {/* Error Display */}
@@ -249,7 +233,7 @@ Sofia`,
               </div>
             </div>
 
-            {/* Detailed Analysis */}
+            {/* Detailed Analysis - Fixed Layout */}
             <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-400/30 rounded-lg p-6">
               <div className="flex items-center justify-between sub-element-spacing">
                 <h3 className="text-blue-400 font-medium">📊 Analisi Dettagliata:</h3>
@@ -267,18 +251,18 @@ Sofia`,
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   {Object.entries(testResult.analysis).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between">
-                      <span className="text-white/70 capitalize">{key}:</span>
-                      <div className="flex items-center space-x-2">
-                        <div className="bg-slate-700 rounded-full h-2 w-24">
-                          <div 
-                            className={`h-2 rounded-full transition-all duration-500 ${
-                              value >= 80 ? 'bg-green-400' : value >= 60 ? 'bg-amber-400' : 'bg-red-400'
-                            }`}
-                            style={{ width: `${value}%` }}
-                          />
-                        </div>
-                        <span className="text-white font-medium w-8">{value}%</span>
+                    <div key={key} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/70 capitalize text-sm">{key}:</span>
+                        <span className="text-white font-medium text-sm">{value}%</span>
+                      </div>
+                      <div className="bg-slate-700 rounded-full h-2 w-full">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            value >= 80 ? 'bg-green-400' : value >= 60 ? 'bg-amber-400' : 'bg-red-400'
+                          }`}
+                          style={{ width: `${value}%` }}
+                        />
                       </div>
                     </div>
                   ))}
@@ -325,9 +309,16 @@ Sofia`,
           <Button
             onClick={onComplete}
             disabled={!testResult}
-            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-6 py-2 rounded-xl font-medium transition-all duration-300 disabled:opacity-50"
+            className={`px-6 py-2 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 ${
+              testResult 
+                ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white' 
+                : 'bg-slate-800/50 text-slate-500 border border-slate-700/50 cursor-not-allowed'
+            }`}
           >
-            Vai al Test Finale →
+            <span>Vai al Test Finale</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </Button>
         </div>
       </div>

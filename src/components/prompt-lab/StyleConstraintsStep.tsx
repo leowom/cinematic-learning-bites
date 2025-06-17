@@ -32,6 +32,22 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
     setCanProceedExercise(canProceed);
   };
 
+  // Genera esempio dinamico basato sui valori dei tone
+  const generateToneExample = () => {
+    const formal = promptData.tone?.formal || 60;
+    const empathy = promptData.tone?.empathy || 40;
+
+    if (formal > 70 && empathy > 70) {
+      return "Gentile Cliente, comprendo perfettamente la sua preoccupazione e mi dispiace sinceramente per l'inconveniente causato. Procederemo immediatamente con una soluzione personalizzata per risolvere la sua situazione nel migliore dei modi.";
+    } else if (formal > 70 && empathy <= 40) {
+      return "Egregio Cliente, abbiamo ricevuto la sua segnalazione e procederemo secondo le procedure standard per la risoluzione del caso. La contatteremo entro 48 ore lavorative con gli aggiornamenti.";
+    } else if (formal <= 40 && empathy > 70) {
+      return "Ciao! Capisco quanto possa essere frustrante questa situazione e voglio davvero aiutarti a risolverla. Facciamo così: ti seguo personalmente e troviamo insieme la soluzione migliore per te.";
+    } else {
+      return "Ciao, ho visto la tua segnalazione. Ti ricontatto entro domani con la soluzione. Se hai altre domande, scrivimi pure.";
+    }
+  };
+
   const canProceed = canProceedExercise;
 
   return (
@@ -138,6 +154,22 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
                 <span>Empatico</span>
               </div>
             </div>
+          </div>
+
+          {/* Esempio dinamico del tone */}
+          <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-4 mt-4">
+            <h4 className="text-blue-300 font-medium mb-2 flex items-center">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              💬 Esempio Output con i Tuoi Parametri:
+            </h4>
+            <div className="bg-slate-800/40 rounded-lg p-3">
+              <p className="text-slate-200 text-sm italic leading-relaxed">
+                "{generateToneExample()}"
+              </p>
+            </div>
+            <p className="text-blue-200 text-xs mt-2">
+              ↑ Questo esempio cambia automaticamente quando modifichi i parametri sopra
+            </p>
           </div>
         </div>
 

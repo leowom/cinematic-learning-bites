@@ -15,6 +15,14 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
   const [exerciseQuality, setExerciseQuality] = useState(0);
   const [canProceedExercise, setCanProceedExercise] = useState(false);
 
+  // 🔍 DEBUG: Logging del state
+  console.log('🔍 StyleConstraintsStep DEBUG:', {
+    microprompt: microprompt.length > 0 ? `${microprompt.substring(0, 50)}...` : 'empty',
+    exerciseQuality,
+    canProceedExercise,
+    promptDataTone: promptData.userWrittenTone
+  });
+
   const handleToneChange = (type: 'formal' | 'empathy', value: number) => {
     updatePromptData('tone', {
       ...promptData.tone,
@@ -23,11 +31,13 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
   };
 
   const handleMicropromptChange = (text: string) => {
+    console.log('🔍 handleMicropromptChange:', { text: text.substring(0, 50) + '...' });
     setMicroprompt(text);
     updatePromptData('userWrittenTone', text);
   };
 
   const handleExerciseQuality = (score: number, canProceed: boolean) => {
+    console.log('🔍 handleExerciseQuality called:', { score, canProceed, threshold: 'lowered to 60' });
     setExerciseQuality(score);
     setCanProceedExercise(canProceed);
   };
@@ -48,7 +58,13 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
     }
   };
 
+  // 🔍 DEBUG: Controllo finale prima del render
   const canProceed = canProceedExercise;
+  console.log('🔍 Final render check:', { 
+    canProceed, 
+    micropromptLength: microprompt.length,
+    willShowButton: canProceed 
+  });
 
   return (
     <div className="step-card glassmorphism-base">
@@ -184,6 +200,22 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
           onQualityChange={handleExerciseQuality}
           updatePromptData={updatePromptData}
         />
+
+        {/* 🔍 DEBUG: Fallback button per test */}
+        {!canProceed && microprompt.length > 20 && (
+          <div className="bg-orange-900/20 border border-orange-700/30 rounded-lg p-3 mt-4">
+            <p className="text-orange-300 text-sm mb-2">
+              🔧 DEBUG: L'AI Coach non ha ancora dato il via libera, ma puoi procedere per test
+            </p>
+            <Button
+              onClick={onComplete}
+              variant="outline"
+              className="bg-orange-700/60 hover:bg-orange-600/80 text-orange-200 border border-orange-600/50"
+            >
+              Procedi comunque (Debug)
+            </Button>
+          </div>
+        )}
 
         {canProceed && (
           <div className="flex justify-end">

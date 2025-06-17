@@ -28,59 +28,110 @@ const OpenAICoach: React.FC<Props> = ({ userInput, context, onScoreChange, onRet
 
   const getContextPrompt = (context: string) => {
     const prompts = {
-      role: `Valuta questo testo che dovrebbe definire il ruolo di un AI assistant per il customer service.
-Criteri di valutazione:
-- Chiarezza del ruolo (inizia con "Sei un...")
-- Specificità dell'esperienza (anni, competenze)
-- Autorità e credibilità
-- Completezza della definizione
+      role: `Analizza questo testo che dovrebbe definire il ruolo di un AI assistant.
 
-Punteggio: 1-5 (5=eccellente, 4=buono, 3=sufficiente, 2=insufficiente, 1=molto insufficiente)
-Soglia minima per procedere: 4/5`,
+CRITERI DI VALUTAZIONE (1-100 per criterio):
+1. CHIAREZZA RUOLO: Inizia con "Sei un..." e definisce chiaramente l'identità (0-100)
+2. ESPERIENZA: Specifica anni di esperienza o competenze (0-100)  
+3. AUTORITÀ: Stabilisce credibilità e competenza nel settore (0-100)
+4. COMPLETEZZA: Include tutti gli elementi necessari per il ruolo (0-100)
+5. SPECIFICITÀ: Dettagli concreti invece di descrizioni vaghe (0-100)
 
-      context: `Valuta questo testo che dovrebbe fornire il contesto aziendale per un AI assistant.
-Criteri di valutazione:
-- Dettaglio del settore/business
-- Informazioni sui clienti
-- Situazioni operative tipiche
-- Vincoli e limitazioni aziendali
-- Chiarezza del contesto
+SOGLIA MINIMA: 70/100 per procedere
 
-Punteggio: 1-5 (5=eccellente, 4=buono, 3=sufficiente, 2=insufficiente, 1=molto insufficiente)
-Soglia minima per procedere: 4/5`,
+Rispondi SOLO in formato JSON con questa struttura esatta:
+{
+  "score": numero_da_1_a_100,
+  "message": "messaggio_principale_breve",
+  "suggestions": ["suggerimento1", "suggerimento2"],
+  "strengths": ["punto_di_forza1", "punto_di_forza2"],
+  "improvements": ["miglioramento1", "miglioramento2"],
+  "canProceed": true_se_score_maggiore_uguale_70
+}`,
 
-      tasks: `Valuta questo testo che dovrebbe definire task specifici per un AI assistant.
-Criteri di valutazione:
-- Numero di task (almeno 3)
-- Specificità e chiarezza
-- Verbi d'azione (analizza, identifica, proponi, redigi)
-- Misurabilità dei risultati
-- Strutturazione (numerazione, bullet points)
+      context: `Analizza questo testo che dovrebbe fornire il contesto aziendale.
 
-Punteggio: 1-5 (5=eccellente, 4=buono, 3=sufficiente, 2=insufficiente, 1=molto insufficiente)
-Soglia minima per procedere: 4/5`,
+CRITERI DI VALUTAZIONE (1-100 per criterio):
+1. SETTORE/BUSINESS: Descrive chiaramente il tipo di azienda (0-100)
+2. CLIENTI: Identifica chi sono i clienti target (0-100)
+3. SITUAZIONI: Include problematiche o situazioni tipiche (0-100)
+4. VINCOLI: Specifica policy o limitazioni aziendali (0-100)
+5. DETTAGLIO: Fornisce informazioni concrete e specifiche (0-100)
 
-      tone: `Valuta questo testo che dovrebbe definire lo stile e i vincoli per un AI assistant.
-Criteri di valutazione:
-- Definizione chiara del tone (professionale, empatico, etc.)
-- Specificazione di vincoli e limitazioni
-- Indicazioni su cosa evitare
-- Requisiti di lunghezza/formato
-- Coerenza con il contesto aziendale
+SOGLIA MINIMA: 70/100 per procedere
 
-Punteggio: 1-5 (5=eccellente, 4=buono, 3=sufficiente, 2=insufficiente, 1=molto insufficiente)
-Soglia minima per procedere: 4/5`,
+Rispondi SOLO in formato JSON con questa struttura esatta:
+{
+  "score": numero_da_1_a_100,
+  "message": "messaggio_principale_breve",
+  "suggestions": ["suggerimento1", "suggerimento2"],
+  "strengths": ["punto_di_forza1", "punto_di_forza2"],
+  "improvements": ["miglioramento1", "miglioramento2"],
+  "canProceed": true_se_score_maggiore_uguale_70
+}`,
 
-      format: `Valuta questo testo che dovrebbe definire il formato output per un AI assistant.
-Criteri di valutazione:
-- Struttura chiara e logica
-- Sezioni ben definite (oggetto, saluto, corpo, chiusura)
-- Completezza del formato
-- Professionalità della struttura
-- Facilità di implementazione
+      tasks: `Analizza questo testo che dovrebbe definire task specifici.
 
-Punteggio: 1-5 (5=eccellente, 4=buono, 3=sufficiente, 2=insufficiente, 1=molto insufficiente)
-Soglia minima per procedere: 4/5`
+CRITERI DI VALUTAZIONE (1-100 per criterio):
+1. NUMERO TASK: Almeno 3 task definiti chiaramente (0-100)
+2. VERBI AZIONE: Usa verbi specifici (analizza, identifica, proponi) (0-100)
+3. STRUTTURA: Ben organizzato con numerazione o bullet (0-100)
+4. MISURABILITÀ: Task con risultati verificabili (0-100)
+5. SPECIFICITÀ: Dettagli concreti, non vaghi (0-100)
+
+SOGLIA MINIMA: 70/100 per procedere
+
+Rispondi SOLO in formato JSON con questa struttura esatta:
+{
+  "score": numero_da_1_a_100,
+  "message": "messaggio_principale_breve",
+  "suggestions": ["suggerimento1", "suggerimento2"],
+  "strengths": ["punto_di_forza1", "punto_di_forza2"],
+  "improvements": ["miglioramento1", "miglioramento2"],
+  "canProceed": true_se_score_maggiore_uguale_70
+}`,
+
+      tone: `Analizza questo testo che dovrebbe definire stile e vincoli comunicativi.
+
+CRITERI DI VALUTAZIONE (1-100 per criterio):
+1. TONE DEFINITO: Specifica chiaramente lo stile (professionale, empatico) (0-100)
+2. VINCOLI: Include limitazioni e cosa evitare (0-100)
+3. LUNGHEZZA: Specifica requisiti di formato/lunghezza (0-100)
+4. COERENZA: Allineato con contesto aziendale (0-100)
+5. APPLICABILITÀ: Facile da implementare e seguire (0-100)
+
+SOGLIA MINIMA: 70/100 per procedere
+
+Rispondi SOLO in formato JSON con questa struttura esatta:
+{
+  "score": numero_da_1_a_100,
+  "message": "messaggio_principale_breve",
+  "suggestions": ["suggerimento1", "suggerimento2"],
+  "strengths": ["punto_di_forza1", "punto_di_forza2"],
+  "improvements": ["miglioramento1", "miglioramento2"],
+  "canProceed": true_se_score_maggiore_uguale_70
+}`,
+
+      format: `Analizza questo testo che dovrebbe definire il formato output.
+
+CRITERI DI VALUTAZIONE (1-100 per criterio):
+1. STRUTTURA: Definisce sezioni chiare (oggetto, saluto, corpo, chiusura) (0-100)
+2. COMPLETEZZA: Include tutti gli elementi necessari (0-100)
+3. PROFESSIONALITÀ: Formato appropriato e professionale (0-100)
+4. IMPLEMENTABILITÀ: Facile da seguire e replicare (0-100)
+5. DETTAGLIO: Specifico sui requisiti di formattazione (0-100)
+
+SOGLIA MINIMA: 70/100 per procedere
+
+Rispondi SOLO in formato JSON con questa struttura esatta:
+{
+  "score": numero_da_1_a_100,
+  "message": "messaggio_principale_breve",
+  "suggestions": ["suggerimento1", "suggerimento2"],
+  "strengths": ["punto_di_forza1", "punto_di_forza2"],
+  "improvements": ["miglioramento1", "miglioramento2"],
+  "canProceed": true_se_score_maggiore_uguale_70
+}`
     };
     return prompts[context] || prompts.role;
   };
@@ -97,63 +148,75 @@ Soglia minima per procedere: 4/5`
       setError(null);
 
       try {
-        const contextPrompt = getContextPrompt(context);
+        console.log('🤖 Starting AI analysis for context:', context);
         
+        const analysisPrompt = `${getContextPrompt(context)}
+
+TESTO DA ANALIZZARE:
+"${userInput}"`;
+
+        console.log('📝 Sending prompt to AI:', analysisPrompt.substring(0, 200) + '...');
+
         const { data, error } = await supabase.functions.invoke('test-prompt-gpt', {
           body: {
-            prompt: `${contextPrompt}
-
-TESTO DA VALUTARE:
-"${userInput}"
-
-Rispondi SOLO in formato JSON con questa struttura:
-{
-  "score": numero_da_1_a_5,
-  "message": "messaggio_principale_breve",
-  "suggestions": ["suggerimento1", "suggerimento2"],
-  "strengths": ["punto_di_forza1", "punto_di_forza2"],
-  "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": boolean_se_score_maggiore_uguale_4
-}`,
-            testCase: { type: 'coaching_evaluation' }
+            prompt: analysisPrompt,
+            testCase: {
+              type: 'educational_evaluation',
+              context: context,
+              userInput: userInput
+            }
           }
         });
 
         if (error) {
+          console.error('❌ Supabase function error:', error);
           throw new Error(`Errore API: ${error.message}`);
         }
 
         if (data.error) {
+          console.error('❌ AI API error:', data.error);
           throw new Error(data.error);
         }
+
+        console.log('✅ Raw AI response:', data.response);
 
         // Parse della risposta JSON
         let parsedFeedback;
         try {
-          parsedFeedback = JSON.parse(data.response);
+          // Pulisci la risposta da eventuali backticks markdown
+          const cleanResponse = data.response.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+          parsedFeedback = JSON.parse(cleanResponse);
+          console.log('📊 Parsed feedback:', parsedFeedback);
         } catch (parseError) {
-          throw new Error('Risposta AI non valida');
+          console.error('❌ JSON parse error:', parseError);
+          throw new Error('Risposta AI non in formato valido');
         }
 
+        // Converti score da 1-100 a 1-5 per compatibilità UI
+        const normalizedScore = Math.round((parsedFeedback.score / 100) * 5);
+        const canProceed = parsedFeedback.score >= 70; // Soglia 70/100
+
         const aiFeedback: AIFeedback = {
-          score: parsedFeedback.score || 1,
+          score: normalizedScore,
           message: parsedFeedback.message || 'Valutazione completata',
           suggestions: parsedFeedback.suggestions || [],
           strengths: parsedFeedback.strengths || [],
           improvements: parsedFeedback.improvements || [],
-          canProceed: parsedFeedback.canProceed || false,
-          type: parsedFeedback.score >= 4 ? 'success' : parsedFeedback.score >= 2 ? 'warning' : 'info'
+          canProceed: canProceed,
+          type: canProceed ? 'success' : parsedFeedback.score >= 50 ? 'warning' : 'info'
         };
 
+        console.log('🎯 Final feedback:', aiFeedback);
         setFeedback(aiFeedback);
-        onScoreChange?.(aiFeedback.score, aiFeedback.canProceed);
+        onScoreChange?.(normalizedScore, canProceed);
 
       } catch (error) {
-        console.error('Errore analisi AI:', error);
-        setError('Errore durante l\'analisi. Riprova.');
+        console.error('💥 AI analysis error:', error);
+        setError(error.message || 'Errore durante l\'analisi');
+        
         // Fallback a valutazione locale semplice
         const fallbackScore = userInput.length > 50 ? 3 : 1;
-        setFeedback({
+        const fallbackFeedback: AIFeedback = {
           score: fallbackScore,
           message: 'Valutazione offline (errore connessione AI)',
           suggestions: ['Espandi il contenuto con più dettagli'],
@@ -161,7 +224,8 @@ Rispondi SOLO in formato JSON con questa struttura:
           improvements: ['Aggiungi più specificità'],
           canProceed: false,
           type: 'warning'
-        });
+        };
+        setFeedback(fallbackFeedback);
         onScoreChange?.(fallbackScore, false);
       } finally {
         setIsAnalyzing(false);
@@ -179,7 +243,7 @@ Rispondi SOLO in formato JSON con questa struttura:
       <div className="mt-3 p-3 rounded-lg border bg-blue-900/20 border-blue-700/40">
         <div className="flex items-center space-x-2">
           <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-          <span className="text-blue-300 text-sm">AI Coach sta analizzando...</span>
+          <span className="text-blue-300 text-sm">🤖 AI Coach sta analizzando...</span>
         </div>
       </div>
     );
@@ -188,7 +252,15 @@ Rispondi SOLO in formato JSON con questa struttura:
   if (error) {
     return (
       <div className="mt-3 p-3 rounded-lg border bg-red-900/20 border-red-700/40">
-        <div className="text-red-300 text-sm">{error}</div>
+        <div className="text-red-300 text-sm">❌ {error}</div>
+        <Button
+          onClick={() => window.location.reload()}
+          size="sm"
+          className="mt-2 bg-red-700/60 hover:bg-red-600/80 text-red-200 text-xs"
+        >
+          <RotateCcw className="w-3 h-3 mr-1" />
+          Riprova
+        </Button>
       </div>
     );
   }
@@ -279,7 +351,7 @@ Rispondi SOLO in formato JSON con questa struttura:
 
           {!feedback.canProceed && (
             <div className="mt-2 p-2 bg-orange-900/30 border border-orange-700/50 rounded text-xs text-orange-200">
-              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 4/5
+              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 70/100
             </div>
           )}
         </div>

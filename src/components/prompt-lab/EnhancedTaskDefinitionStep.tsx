@@ -11,8 +11,7 @@ interface Props {
 }
 
 const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [firstTask, setFirstTask] = useState('');
-  const [secondTask, setSecondTask] = useState('');
+  const [userTask, setUserTask] = useState('');
   const [exerciseQuality, setExerciseQuality] = useState(0);
   const [canProceedExercise, setCanProceedExercise] = useState(false);
 
@@ -45,13 +44,8 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     }
   ];
 
-  const handleFirstTaskChange = (text: string) => {
-    setFirstTask(text);
-    updatePromptData('firstTaskAttempt', text);
-  };
-
-  const handleSecondTaskChange = (text: string) => {
-    setSecondTask(text);
+  const handleUserTaskChange = (text: string) => {
+    setUserTask(text);
     updatePromptData('userWrittenTasks', text);
   };
 
@@ -60,7 +54,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     setCanProceedExercise(score >= 7);
   };
 
-  const canProceed = firstTask.length > 20 && secondTask.length > 20 && canProceedExercise;
+  const canProceed = userTask.length > 20 && canProceedExercise;
 
   return (
     <div className="step-card glassmorphism-base">
@@ -131,79 +125,35 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
           </div>
         </div>
 
-        {/* Primo Esercizio - Senza Feedback */}
+        {/* Esercizio Pratico - Con Feedback */}
         <div className="section-spacing">
-          <div className="bg-orange-900/15 border border-orange-700/30 rounded-xl p-4">
-            <h4 className="text-orange-300 font-medium flex items-center mb-3">
+          <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-xl p-4">
+            <h4 className="text-emerald-300 font-medium flex items-center mb-3">
               <Edit3 className="w-4 h-4 mr-2" />
-              📝 Esercizio 1: Prima Prova (Senza Feedback)
+              ✅ Esercizio Pratico: Scrivi il Tuo Task Specifico
             </h4>
-            <p className="text-orange-200 text-sm mb-3">
-              Scrivi il tuo primo task specifico per il customer service. Non riceverai feedback per questo esercizio.
+            <p className="text-emerald-200 text-sm mb-3">
+              Scrivi un task specifico per il customer service. Riceverai feedback dall'AI Coach per migliorare la qualità.
             </p>
             <textarea
-              value={firstTask}
-              onChange={(e) => handleFirstTaskChange(e.target.value)}
-              placeholder="Esempio: Analizza il sentiment dell'email del cliente e identifica..."
-              className="w-full bg-slate-800/60 border border-orange-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-20 focus:border-orange-500 focus:outline-none text-sm"
-              rows={3}
+              value={userTask}
+              onChange={(e) => handleUserTaskChange(e.target.value)}
+              placeholder="Esempio: Analizza il sentiment dell'email del cliente e identifica la categoria principale della richiesta (reclamo/info/supporto) con confidence score da 1 a 10..."
+              className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-24 focus:border-emerald-500 focus:outline-none text-sm"
+              rows={4}
+            />
+            
+            <EnhancedAICoach 
+              userInput={userTask} 
+              context="tasks"
+              onScoreChange={handleExerciseQuality}
+              onRetryRequest={() => {
+                const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+                if (textarea) textarea.focus();
+              }}
             />
           </div>
         </div>
-
-        {/* Secondo Esercizio - Con Feedback */}
-        {firstTask.length > 20 && (
-          <div className="section-spacing">
-            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-xl p-4">
-              <h4 className="text-emerald-300 font-medium flex items-center mb-3">
-                <Edit3 className="w-4 h-4 mr-2" />
-                ✅ Esercizio 2: Seconda Prova (Con Feedback AI)
-              </h4>
-              <p className="text-emerald-200 text-sm mb-3">
-                Ora scrivi un secondo task specifico. Questa volta riceverai feedback dall'AI Coach per migliorare la qualità.
-              </p>
-              <textarea
-                value={secondTask}
-                onChange={(e) => handleSecondTaskChange(e.target.value)}
-                placeholder="Esempio: Identifica la categoria principale della richiesta (reclamo/info/supporto) e proponi..."
-                className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-20 focus:border-emerald-500 focus:outline-none text-sm"
-                rows={3}
-              />
-              
-              <EnhancedAICoach 
-                userInput={secondTask} 
-                context="tasks"
-                onScoreChange={handleExerciseQuality}
-                onRetryRequest={() => {
-                  const textarea = document.querySelector('textarea:last-of-type') as HTMLTextAreaElement;
-                  if (textarea) textarea.focus();
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Confronto e Apprendimento */}
-        {firstTask.length > 20 && secondTask.length > 20 && (
-          <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4 element-spacing">
-            <h4 className="text-slate-200 font-medium mb-3">🔍 Confronto tra i Tuoi Task</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-700/40 rounded-lg p-3">
-                <div className="text-slate-300 text-xs mb-2">Primo Task (senza feedback):</div>
-                <div className="text-slate-200 text-sm">{firstTask}</div>
-              </div>
-              <div className="bg-slate-700/40 rounded-lg p-3">
-                <div className="text-slate-300 text-xs mb-2">Secondo Task (con feedback):</div>
-                <div className="text-slate-200 text-sm">{secondTask}</div>
-              </div>
-            </div>
-            <div className="mt-3 p-2 bg-blue-900/20 rounded">
-              <p className="text-blue-200 text-xs">
-                💡 Nota la differenza: il feedback AI ti ha aiutato a rendere il secondo task più specifico e actionable!
-              </p>
-            </div>
-          </div>
-        )}
 
         {canProceed && (
           <div className="flex justify-end">

@@ -77,6 +77,9 @@ Cliente #: 45892`,
     return reference;
   };
 
+  // Score minimo richiesto è 4/5 (equivalente a 70/100)
+  const minimumScore = 4;
+
   return (
     <div className="step-card glassmorphism-base">
       {/* Header */}
@@ -89,11 +92,11 @@ Cliente #: 45892`,
         
         <div>
           <h2 className="text-2xl font-bold text-slate-100 mb-2">
-            ✍️ STEP 7/8: Pratica di Scrittura Completa
+            ✍️ STEP 7/9: Pratica di Scrittura Completa
           </h2>
           <p className="text-slate-300 max-w-2xl mx-auto">
             Ora metti tutto insieme! Scrivi un prompt completo da zero per gestire la situazione qui sotto. 
-            Serve almeno <strong>7/10</strong> per procedere al test finale.
+            Serve almeno <strong>{minimumScore}/5</strong> per procedere al test finale.
           </p>
         </div>
       </div>
@@ -157,10 +160,10 @@ Cliente #: 45892`,
           <div className="text-right">
             <div className="text-purple-400 text-xs">Score Attuale</div>
             <div className={`text-lg font-bold ${
-              currentScore >= 7 ? 'text-emerald-400' : 
-              currentScore >= 5 ? 'text-orange-400' : 'text-red-400'
+              currentScore >= minimumScore ? 'text-emerald-400' : 
+              currentScore >= 3 ? 'text-orange-400' : 'text-red-400'
             }`}>
-              {currentScore}/10
+              {currentScore}/5
             </div>
           </div>
         </div>
@@ -205,7 +208,7 @@ Ricorda: deve essere specifico per gestire il reclamo di Francesca!"
               <p className="text-slate-300 text-sm">
                 {canProceed 
                   ? 'Hai raggiunto il punteggio minimo! Puoi procedere al test finale con GPT-4o.' 
-                  : `Ti serve almeno 7/10 per procedere. Attuale: ${currentScore}/10`}
+                  : `Ti serve almeno ${minimumScore}/5 per procedere. Attuale: ${currentScore}/5`}
               </p>
             </div>
             {canProceed ? (
@@ -234,7 +237,7 @@ Ricorda: deve essere specifico per gestire il reclamo di Francesca!"
               Procedi al Test Finale con GPT-4o
             </>
           ) : (
-            `Serve almeno 7/10 per procedere (${currentScore}/10)`
+            `Serve almeno ${minimumScore}/5 per procedere (${currentScore}/5)`
           )}
         </Button>
       </div>

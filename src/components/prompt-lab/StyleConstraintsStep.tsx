@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Settings, ArrowRight, Palette, MessageSquare, Clock } from 'lucide-react';
-import MicropromptWriter from './MicropromptWriter';
+import OpenAICoach from './OpenAICoach';
 
 interface Props {
   promptData: any;
@@ -15,7 +15,6 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
   const [exerciseQuality, setExerciseQuality] = useState(0);
   const [canProceedExercise, setCanProceedExercise] = useState(false);
 
-  // 🔍 DEBUG: Logging del state
   console.log('🔍 StyleConstraintsStep DEBUG:', {
     microprompt: microprompt.length > 0 ? `${microprompt.substring(0, 50)}...` : 'empty',
     exerciseQuality,
@@ -37,7 +36,7 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
   };
 
   const handleExerciseQuality = (score: number, canProceed: boolean) => {
-    console.log('🔍 handleExerciseQuality called:', { score, canProceed, threshold: 'lowered to 60' });
+    console.log('🔍 handleExerciseQuality called:', { score, canProceed });
     setExerciseQuality(score);
     setCanProceedExercise(canProceed);
   };
@@ -58,13 +57,7 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
     }
   };
 
-  // 🔍 DEBUG: Controllo finale prima del render
   const canProceed = canProceedExercise;
-  console.log('🔍 Final render check:', { 
-    canProceed, 
-    micropromptLength: microprompt.length,
-    willShowButton: canProceed 
-  });
 
   return (
     <div className="step-card glassmorphism-base">
@@ -189,33 +182,30 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
           </div>
         </div>
 
-        <MicropromptWriter
-          title="Pratica: Definisci Stile e Vincoli"
-          instruction="Scrivi i vincoli specifici per il tuo scenario: tone, limitazioni, requisiti aziendali e stile comunicativo."
-          placeholder="VINCOLI:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
-          example="VINCOLI:&#10;- Tone: Professionale ma caloroso, riconoscendo la frustrazione del cliente&#10;- Lunghezza: 150-200 parole massimo&#10;- Evitare: Promesse di tempistiche che non possiamo garantire&#10;- Includere sempre: Riferimento al numero ordine e policy aziendale&#10;- Struttura: Scuse → Soluzione → Azione → Chiusura positiva"
-          context="tone"
-          onTextChange={handleMicropromptChange}
-          value={microprompt}
-          onQualityChange={handleExerciseQuality}
-          updatePromptData={updatePromptData}
-        />
-
-        {/* 🔍 DEBUG: Fallback button per test */}
-        {!canProceed && microprompt.length > 20 && (
-          <div className="bg-orange-900/20 border border-orange-700/30 rounded-lg p-3 mt-4">
-            <p className="text-orange-300 text-sm mb-2">
-              🔧 DEBUG: L'AI Coach non ha ancora dato il via libera, ma puoi procedere per test
+        {/* Esercizio Pratico con OpenAICoach */}
+        <div className="section-spacing">
+          <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-xl p-4">
+            <h4 className="text-emerald-300 font-medium mb-3 flex items-center">
+              ✅ Esercizio Pratico: Definisci Stile e Vincoli
+            </h4>
+            <p className="text-emerald-200 text-sm mb-3">
+              Scrivi i vincoli specifici per il customer service. Riceverai feedback dall'AI Coach per migliorare la qualità.
             </p>
-            <Button
-              onClick={onComplete}
-              variant="outline"
-              className="bg-orange-700/60 hover:bg-orange-600/80 text-orange-200 border border-orange-600/50"
-            >
-              Procedi comunque (Debug)
-            </Button>
+            <textarea
+              value={microprompt}
+              onChange={(e) => handleMicropromptChange(e.target.value)}
+              placeholder="VINCOLI:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
+              className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-32 focus:border-emerald-500 focus:outline-none text-sm"
+              rows={6}
+            />
+            
+            <OpenAICoach 
+              userInput={microprompt} 
+              context="tone"
+              onScoreChange={handleExerciseQuality}
+            />
           </div>
-        )}
+        </div>
 
         {canProceed && (
           <div className="flex justify-end">

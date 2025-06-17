@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
   userInput: string;
-  context: 'role' | 'context' | 'tasks' | 'tone' | 'format';
+  context: 'role' | 'context' | 'tasks' | 'tone' | 'format' | 'complete-prompt';
   onScoreChange?: (score: number, canProceed: boolean) => void;
   onRetryRequest?: () => void;
 }
@@ -28,7 +28,6 @@ const OpenAICoach: React.FC<Props> = ({ userInput, context, onScoreChange, onRet
   const lastAnalyzedInput = useRef<string>('');
   const analysisInProgress = useRef<boolean>(false);
 
-  // 🔍 DEBUG: Logging di stato
   console.log('🔍 OpenAICoach state:', {
     context,
     inputLength: userInput.length,
@@ -50,7 +49,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. COMPLETEZZA: Include tutti gli elementi necessari per il ruolo (0-100)
 5. SPECIFICITÀ: Dettagli concreti invece di descrizioni vaghe (0-100)
 
-SOGLIA MINIMA: 60/100 per procedere (abbassata per debug)
+SOGLIA MINIMA: 70/100 per procedere
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -59,7 +58,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_60
+  "canProceed": true_se_score_maggiore_uguale_70
 }`,
 
       context: `Analizza questo testo che dovrebbe fornire il contesto aziendale.
@@ -71,7 +70,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. VINCOLI: Specifica policy o limitazioni aziendali (0-100)
 5. DETTAGLIO: Fornisce informazioni concrete e specifiche (0-100)
 
-SOGLIA MINIMA: 60/100 per procedere (abbassata per debug)
+SOGLIA MINIMA: 70/100 per procedere
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -80,7 +79,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_60
+  "canProceed": true_se_score_maggiore_uguale_70
 }`,
 
       tasks: `Analizza questo testo che dovrebbe definire task specifici.
@@ -92,7 +91,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. MISURABILITÀ: Task con risultati verificabili (0-100)
 5. SPECIFICITÀ: Dettagli concreti, non vaghi (0-100)
 
-SOGLIA MINIMA: 60/100 per procedere (abbassata per debug)
+SOGLIA MINIMA: 70/100 per procedere
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -101,7 +100,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_60
+  "canProceed": true_se_score_maggiore_uguale_70
 }`,
 
       tone: `Analizza questo testo che dovrebbe definire stile e vincoli comunicativi.
@@ -113,7 +112,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. COERENZA: Allineato con contesto aziendale (0-100)
 5. APPLICABILITÀ: Facile da implementare e seguire (0-100)
 
-SOGLIA MINIMA: 60/100 per procedere (abbassata per debug)
+SOGLIA MINIMA: 70/100 per procedere
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -122,7 +121,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_60
+  "canProceed": true_se_score_maggiore_uguale_70
 }`,
 
       format: `Analizza questo testo che dovrebbe definire il formato output.
@@ -134,7 +133,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. IMPLEMENTABILITÀ: Facile da seguire e replicare (0-100)
 5. DETTAGLIO: Specifico sui requisiti di formattazione (0-100)
 
-SOGLIA MINIMA: 60/100 per procedere (abbassata per debug)
+SOGLIA MINIMA: 70/100 per procedere
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -143,7 +142,28 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_60
+  "canProceed": true_se_score_maggiore_uguale_70
+}`,
+
+      'complete-prompt': `Analizza questo prompt completo per customer service e-commerce.
+
+CRITERI DI VALUTAZIONE (1-100 per criterio):
+1. COMPLETEZZA: Include ruolo, contesto, task, stile e formato (0-100)
+2. CHIAREZZA: Istruzioni chiare e non ambigue (0-100)
+3. SPECIFICITÀ: Dettagli concreti e misurabili (0-100)
+4. COERENZA: Tutti gli elementi si integrano bene (0-100)
+5. USABILITÀ: Facile da implementare in scenario reale (0-100)
+
+SOGLIA MINIMA: 70/100 per procedere
+
+Rispondi SOLO in formato JSON con questa struttura esatta:
+{
+  "score": numero_da_1_a_100,
+  "message": "messaggio_principale_breve",
+  "suggestions": ["suggerimento1", "suggerimento2"],
+  "strengths": ["punto_di_forza1", "punto_di_forza2"],
+  "improvements": ["miglioramento1", "miglioramento2"],
+  "canProceed": true_se_score_maggiore_uguale_70
 }`
     };
     return prompts[context] || prompts.role;
@@ -159,7 +179,6 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
       analysisInProgress: analysisInProgress.current
     });
     
-    // Se l'input è vuoto, resetta tutto
     if (!trimmedInput) {
       console.log('🔍 Input vuoto, resetting...');
       setFeedback(null);
@@ -169,20 +188,17 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
       return;
     }
 
-    // Se l'input è identico all'ultimo analizzato, non fare nulla
     if (trimmedInput === lastAnalyzedInput.current) {
       console.log('🔍 Input identico, skipping analysis');
       return;
     }
 
-    // Se c'è già un'analisi in corso, non avviarne un'altra
     if (analysisInProgress.current) {
       console.log('🔍 Analysis already in progress, skipping');
       return;
     }
 
     const analyzeWithAI = async () => {
-      // Controlla di nuovo se l'input è cambiato mentre aspettavamo il debounce
       if (trimmedInput !== userInput.trim()) {
         console.log('🔍 Input changed during debounce, aborting');
         return;
@@ -223,7 +239,6 @@ TESTO DA ANALIZZARE:
 
         console.log('✅ Raw AI response:', data.response);
 
-        // Parse della risposta JSON
         let parsedFeedback;
         try {
           const cleanResponse = data.response.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
@@ -236,7 +251,7 @@ TESTO DA ANALIZZARE:
 
         // Converti score da 1-100 a 1-5 per compatibilità UI
         const normalizedScore = Math.round((parsedFeedback.score / 100) * 5);
-        const canProceed = parsedFeedback.score >= 60; // 🔍 Soglia abbassata per debug
+        const canProceed = parsedFeedback.score >= 70;
 
         const aiFeedback: AIFeedback = {
           score: normalizedScore,
@@ -245,12 +260,11 @@ TESTO DA ANALIZZARE:
           strengths: parsedFeedback.strengths || [],
           improvements: parsedFeedback.improvements || [],
           canProceed: canProceed,
-          type: canProceed ? 'success' : parsedFeedback.score >= 40 ? 'warning' : 'info'
+          type: canProceed ? 'success' : parsedFeedback.score >= 50 ? 'warning' : 'info'
         };
 
         console.log('🎯 Final feedback:', aiFeedback);
         
-        // Aggiorna solo se l'input non è cambiato nel frattempo
         if (trimmedInput === userInput.trim()) {
           setFeedback(aiFeedback);
           onScoreChange?.(normalizedScore, canProceed);
@@ -261,13 +275,11 @@ TESTO DA ANALIZZARE:
       } catch (error) {
         console.error('💥 AI analysis error:', error);
         
-        // Solo se l'input non è cambiato nel frattempo
         if (trimmedInput === userInput.trim()) {
           setError(error.message || 'Errore durante l\'analisi');
           
-          // 🔍 Fallback più generoso per il debug
-          const fallbackScore = trimmedInput.length > 30 ? 4 : 2;
-          const fallbackCanProceed = trimmedInput.length > 30; // Procedi se c'è contenuto sostanziale
+          const fallbackScore = trimmedInput.length > 50 ? 3 : 1;
+          const fallbackCanProceed = trimmedInput.length > 50;
           
           const fallbackFeedback: AIFeedback = {
             score: fallbackScore,
@@ -289,7 +301,6 @@ TESTO DA ANALIZZARE:
       }
     };
 
-    // Debounce ridotto per test più rapidi
     const timer = setTimeout(analyzeWithAI, 1500);
     return () => clearTimeout(timer);
   }, [userInput, context, onScoreChange]);
@@ -409,7 +420,7 @@ TESTO DA ANALIZZARE:
 
           {!feedback.canProceed && (
             <div className="mt-2 p-2 bg-orange-900/30 border border-orange-700/50 rounded text-xs text-orange-200">
-              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 60/100 (soglia debug abbassata)
+              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 70/100
             </div>
           )}
         </div>

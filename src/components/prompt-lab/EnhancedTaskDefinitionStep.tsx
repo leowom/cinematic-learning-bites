@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Target, ArrowRight, Lightbulb, CheckCircle, AlertTriangle, Edit3, Copy, Check } from 'lucide-react';
-import EnhancedAICoach from './EnhancedAICoach';
+import OpenAICoach from './OpenAICoach';
 
 interface Props {
   promptData: any;
@@ -53,11 +54,10 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     updatePromptData('userWrittenTasks', text);
   };
 
-  const handleExerciseQuality = (score: number) => {
+  const handleExerciseQuality = (score: number, canProceed: boolean) => {
     setExerciseQuality(score);
-    // Riduco la soglia da 7 a 5 per rendere più facile proseguire
-    setCanProceedExercise(score >= 5);
-    console.log('Exercise quality score:', score, 'Can proceed:', score >= 5);
+    setCanProceedExercise(canProceed);
+    console.log('Exercise quality score:', score, 'Can proceed:', canProceed);
   };
 
   const handleUseExample = () => {
@@ -172,14 +172,10 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
               rows={6}
             />
             
-            <EnhancedAICoach 
+            <OpenAICoach 
               userInput={userTask} 
               context="tasks"
               onScoreChange={handleExerciseQuality}
-              onRetryRequest={() => {
-                const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-                if (textarea) textarea.focus();
-              }}
             />
           </div>
         </div>

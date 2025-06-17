@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Target, ArrowRight, Lightbulb, CheckCircle, AlertTriangle, Edit3 } from 'lucide-react';
+import { Target, ArrowRight, Lightbulb, CheckCircle, AlertTriangle, Edit3, Copy, Check } from 'lucide-react';
 import EnhancedAICoach from './EnhancedAICoach';
 
 interface Props {
@@ -13,12 +13,13 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
   const [userTask, setUserTask] = useState('');
   const [exerciseQuality, setExerciseQuality] = useState(0);
   const [canProceedExercise, setCanProceedExercise] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Esempi di task specifici (non selezionabili)
   const taskExamples = [
     {
       title: "Analisi Sentiment Email",
-      description: "Analizza il sentiment dell'email del cliente (positivo/neutro/negativo) e identifica il livello di urgenza su scala 1-5",
+      description: "Analizza il sentiment dell'email del cliente (positivo/neutro/negativo) su scala 1-5, identifica la categoria principale della richiesta (reclamo/informazione/supporto tecnico/rimborso) con confidence score, poi genera una risposta professionale ed empatica di massimo 150 parole che riconosca il problema e offra una soluzione concreta con timeline realistiche entro 24-48 ore.",
       context: "Customer Service"
     },
     {
@@ -43,6 +44,8 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     }
   ];
 
+  const exampleTask = "Analizza il sentiment dell'email del cliente (positivo/neutro/negativo) su scala 1-5, identifica la categoria principale della richiesta (reclamo/informazione/supporto tecnico/rimborso) con confidence score, poi genera una risposta professionale ed empatica di massimo 150 parole che riconosca il problema e offra una soluzione concreta con timeline realistiche entro 24-48 ore.";
+
   const handleUserTaskChange = (text: string) => {
     setUserTask(text);
     updatePromptData('userWrittenTasks', text);
@@ -51,6 +54,13 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
   const handleExerciseQuality = (score: number) => {
     setExerciseQuality(score);
     setCanProceedExercise(score >= 7);
+  };
+
+  const handleUseExample = () => {
+    setUserTask(exampleTask);
+    updatePromptData('userWrittenTasks', exampleTask);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const canProceed = userTask.length > 20 && canProceedExercise;
@@ -127,10 +137,20 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
         {/* Esercizio Pratico - Con Feedback */}
         <div className="section-spacing">
           <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-xl p-4">
-            <h4 className="text-emerald-300 font-medium flex items-center mb-3">
-              <Edit3 className="w-4 h-4 mr-2" />
-              ✅ Esercizio Pratico: Scrivi il Tuo Task Specifico
-            </h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-emerald-300 font-medium flex items-center">
+                <Edit3 className="w-4 h-4 mr-2" />
+                ✅ Esercizio Pratico: Scrivi il Tuo Task Specifico
+              </h4>
+              <Button
+                onClick={handleUseExample}
+                size="sm"
+                className="bg-emerald-700/60 hover:bg-emerald-600/80 text-emerald-200 border border-emerald-600/50 text-xs px-3 py-1"
+              >
+                {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                {copied ? 'Copiato!' : 'Utilizza Esempio'}
+              </Button>
+            </div>
             <p className="text-emerald-200 text-sm mb-3">
               Scrivi un task specifico per il customer service. Riceverai feedback dall'AI Coach per migliorare la qualità.
             </p>

@@ -44,7 +44,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     }
   ];
 
-  const exampleTask = "Analizza il sentiment dell'email del cliente (positivo/neutro/negativo) su scala 1-5, identifica la categoria principale della richiesta (reclamo/informazione/supporto tecnico/rimborso) con confidence score, poi genera una risposta professionale ed empatica di massimo 150 parole che riconosca il problema e offra una soluzione concreta con timeline realistiche entro 24-48 ore.";
+  const exampleTask = "Analizza il sentiment dell'email del cliente su scala 1-5, identifica la categoria della richiesta (reclamo/info/supporto) e genera una risposta professionale di massimo 150 parole con timeline specifiche.";
 
   const handleUserTaskChange = (text: string) => {
     setUserTask(text);
@@ -54,6 +54,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
   const handleExerciseQuality = (score: number) => {
     setExerciseQuality(score);
     setCanProceedExercise(score >= 7);
+    console.log('Exercise quality score:', score, 'Can proceed:', score >= 7);
   };
 
   const handleUseExample = () => {
@@ -64,6 +65,12 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
   };
 
   const canProceed = userTask.length > 20 && canProceedExercise;
+  console.log('Can proceed check:', { 
+    userTaskLength: userTask.length, 
+    exerciseQuality, 
+    canProceedExercise, 
+    finalCanProceed: canProceed 
+  });
 
   return (
     <div className="step-card glassmorphism-base">
@@ -157,7 +164,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
             <textarea
               value={userTask}
               onChange={(e) => handleUserTaskChange(e.target.value)}
-              placeholder="Esempio: Analizza il sentiment dell'email del cliente e identifica la categoria principale della richiesta (reclamo/info/supporto) con confidence score da 1 a 10..."
+              placeholder="Esempio: Analizza il sentiment dell'email del cliente e identifica la categoria principale della richiesta..."
               className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-24 focus:border-emerald-500 focus:outline-none text-sm"
               rows={4}
             />
@@ -174,18 +181,21 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
           </div>
         </div>
 
-        {/* Pulsante per proseguire */}
-        {canProceed && (
-          <div className="flex justify-end section-spacing">
-            <Button
-              onClick={onComplete}
-              className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
-            >
-              <span>Procedi a Stile e Vincoli</span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
+        {/* Pulsante per proseguire - sempre visibile se può procedere */}
+        <div className="flex justify-end section-spacing">
+          <Button
+            onClick={onComplete}
+            disabled={!canProceed}
+            className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 border flex items-center space-x-2 ${
+              canProceed 
+                ? 'bg-slate-700 hover:bg-slate-600 text-slate-200 border-slate-600' 
+                : 'bg-slate-800/50 text-slate-500 border-slate-700/50 cursor-not-allowed'
+            }`}
+          >
+            <span>Procedi a Stile e Vincoli</span>
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

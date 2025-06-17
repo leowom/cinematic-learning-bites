@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Brain, CheckCircle, AlertTriangle, Lightbulb, RotateCcw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +24,8 @@ const OpenAICoach: React.FC<Props> = ({ userInput, context, onScoreChange, onRet
   const [feedback, setFeedback] = useState<AIFeedback | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastAnalyzedInput = useRef<string>('');
+  const analysisInProgress = useRef<boolean>(false);
 
   const getContextPrompt = (context: string) => {
     const prompts = {
@@ -136,25 +138,44 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   };
 
   useEffect(() => {
-    if (!userInput.trim()) {
+    const trimmedInput = userInput.trim();
+    
+    // Se l'input è vuoto, resetta tutto
+    if (!trimmedInput) {
       setFeedback(null);
+      setError(null);
       onScoreChange?.(0, false);
+      lastAnalyzedInput.current = '';
+      return;
+    }
+
+    // Se l'input è identico all'ultimo analizzato, non fare nulla
+    if (trimmedInput === lastAnalyzedInput.current) {
+      return;
+    }
+
+    // Se c'è già un'analisi in corso, non avviarne un'altra
+    if (analysisInProgress.current) {
       return;
     }
 
     const analyzeWithAI = async () => {
+      // Controlla di nuovo se l'input è cambiato mentre aspettavamo il debounce
+      if (trimmedInput !== userInput.trim()) {
+        return;
+      }
+
+      analysisInProgress.current = true;
       setIsAnalyzing(true);
       setError(null);
 
       try {
-        console.log('🤖 Starting AI analysis for context:', context);
+        console.log('🤖 Starting AI analysis for context:', context, 'Input:', trimmedInput.substring(0, 50) + '...');
         
         const analysisPrompt = `${getContextPrompt(context)}
 
 TESTO DA ANALIZZARE:
-"${userInput}"`;
-
-        console.log('📝 Sending prompt to AI:', analysisPrompt.substring(0, 200) + '...');
+"${trimmedInput}"`;
 
         const { data, error } = await supabase.functions.invoke('test-prompt-gpt', {
           body: {
@@ -162,7 +183,7 @@ TESTO DA ANALIZZARE:
             testCase: {
               type: 'educational_evaluation',
               context: context,
-              userInput: userInput
+              userInput: trimmedInput
             }
           }
         });
@@ -182,7 +203,6 @@ TESTO DA ANALIZZARE:
         // Parse della risposta JSON
         let parsedFeedback;
         try {
-          // Pulisci la risposta da eventuali backticks markdown
           const cleanResponse = data.response.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
           parsedFeedback = JSON.parse(cleanResponse);
           console.log('📊 Parsed feedback:', parsedFeedback);
@@ -193,7 +213,7 @@ TESTO DA ANALIZZARE:
 
         // Converti score da 1-100 a 1-5 per compatibilità UI
         const normalizedScore = Math.round((parsedFeedback.score / 100) * 5);
-        const canProceed = parsedFeedback.score >= 80; // Soglia 80/100 per 4/5 stelle
+        const canProceed = parsedFeedback.score >= 80;
 
         const aiFeedback: AIFeedback = {
           score: normalizedScore,
@@ -206,32 +226,42 @@ TESTO DA ANALIZZARE:
         };
 
         console.log('🎯 Final feedback:', aiFeedback);
-        setFeedback(aiFeedback);
-        onScoreChange?.(normalizedScore, canProceed);
+        
+        // Aggiorna solo se l'input non è cambiato nel frattempo
+        if (trimmedInput === userInput.trim()) {
+          setFeedback(aiFeedback);
+          onScoreChange?.(normalizedScore, canProceed);
+          lastAnalyzedInput.current = trimmedInput;
+        }
 
       } catch (error) {
         console.error('💥 AI analysis error:', error);
-        setError(error.message || 'Errore durante l\'analisi');
         
-        // Fallback a valutazione locale semplice
-        const fallbackScore = userInput.length > 50 ? 3 : 1;
-        const fallbackFeedback: AIFeedback = {
-          score: fallbackScore,
-          message: 'Valutazione offline (errore connessione AI)',
-          suggestions: ['Espandi il contenuto con più dettagli'],
-          strengths: [],
-          improvements: ['Aggiungi più specificità'],
-          canProceed: false,
-          type: 'warning'
-        };
-        setFeedback(fallbackFeedback);
-        onScoreChange?.(fallbackScore, false);
+        // Solo se l'input non è cambiato nel frattempo
+        if (trimmedInput === userInput.trim()) {
+          setError(error.message || 'Errore durante l\'analisi');
+          
+          const fallbackScore = trimmedInput.length > 50 ? 3 : 1;
+          const fallbackFeedback: AIFeedback = {
+            score: fallbackScore,
+            message: 'Valutazione offline (errore connessione AI)',
+            suggestions: ['Espandi il contenuto con più dettagli'],
+            strengths: [],
+            improvements: ['Aggiungi più specificità'],
+            canProceed: false,
+            type: 'warning'
+          };
+          setFeedback(fallbackFeedback);
+          onScoreChange?.(fallbackScore, false);
+        }
       } finally {
+        analysisInProgress.current = false;
         setIsAnalyzing(false);
       }
     };
 
-    const timer = setTimeout(analyzeWithAI, 1500);
+    // Debounce più lungo per evitare analisi multiple
+    const timer = setTimeout(analyzeWithAI, 2000);
     return () => clearTimeout(timer);
   }, [userInput, context, onScoreChange]);
 

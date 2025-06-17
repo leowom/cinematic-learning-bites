@@ -11,16 +11,15 @@ interface Props {
 
 const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [currentExample, setCurrentExample] = useState(0);
-  const [viewedExamples, setViewedExamples] = useState<Set<number>>(new Set([0])); // Inizializza con il primo esempio già visto
+  const [viewedExamples, setViewedExamples] = useState<Set<number>>(new Set([0]));
 
-  // Assicurati che l'esempio corrente sia sempre marcato come visto
   useEffect(() => {
     setViewedExamples(prev => new Set(prev).add(currentExample));
   }, [currentExample]);
 
   const examples = [
     {
-      title: "Categoria 1: Prompt Vaghi (Customer Service)",
+      title: "Categoria 1: Prompt Vaghi",
       prompt: "Rispondi alle email dei clienti",
       response: "Ok, risponderò alle email.",
       context: "E-commerce",
@@ -32,31 +31,7 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
       ]
     },
     {
-      title: "Categoria 1: Prompt Vaghi (Marketing)",
-      prompt: "Scrivi contenuti per i social media",
-      response: "Certo, scriverò dei post interessanti per voi.",
-      context: "Azienda Tech",
-      problems: [
-        "❌ Non specifica quali piattaforme social",
-        "❌ Target audience non definito",
-        "❌ Brand voice e tone mancanti",
-        "❌ Obiettivi di marketing non chiari"
-      ]
-    },
-    {
-      title: "Categoria 1: Prompt Vaghi (HR)",
-      prompt: "Aiuta con le risorse umane",
-      response: "Sono qui per assistere con le questioni HR.",
-      context: "Startup",
-      problems: [
-        "❌ Compiti specifici non definiti",
-        "❌ Policy aziendali non menzionate",
-        "❌ Livello di confidenzialità non specificato",
-        "❌ Processo decisionale non strutturato"
-      ]
-    },
-    {
-      title: "Categoria 2: Troppo Generico (Vendite B2B)",
+      title: "Categoria 2: Troppo Generico",
       prompt: "Sei un assistente che aiuta i clienti con i loro problemi di vendita",
       response: "Ciao! Come posso aiutarti con le vendite oggi?",
       context: "Software Enterprise",
@@ -68,31 +43,7 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
       ]
     },
     {
-      title: "Categoria 2: Troppo Generico (Supporto Tecnico)",
-      prompt: "Sei un tecnico che risolve problemi informatici",
-      response: "Salve, sono qui per risolvere i vostri problemi tecnici.",
-      context: "SaaS Company",
-      problems: [
-        "❌ Tecnologie specifiche non menzionate",
-        "❌ Livelli di supporto non definiti",
-        "❌ Procedure di escalation assenti",
-        "❌ Knowledge base non referenziata"
-      ]
-    },
-    {
-      title: "Categoria 2: Troppo Generico (Consulenza)",
-      prompt: "Fornisci consigli di business ai clienti",
-      response: "Sono qui per darvi consigli utili per il vostro business.",
-      context: "Consulenza Strategica",
-      problems: [
-        "❌ Settori di specializzazione non definiti",
-        "❌ Metodologie di analisi mancanti",
-        "❌ Deliverable non specificati",
-        "❌ Framework di valutazione assenti"
-      ]
-    },
-    {
-      title: "Categoria 3: Senza Struttura (E-commerce)",
+      title: "Categoria 3: Senza Struttura",
       prompt: "Rispondi educatamente ai clienti dell'azienda tech che hanno problemi con abbonamenti e fatturazione",
       response: "Mi dispiace per il problema. Ti aiuterò volentieri.",
       context: "Piattaforma SaaS",
@@ -101,30 +52,6 @@ const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplet
         "❌ Accesso ai sistemi non specificato",
         "❌ Autorizzazioni per rimborsi mancanti",
         "❌ Template di risposta non strutturati"
-      ]
-    },
-    {
-      title: "Categoria 3: Senza Struttura (Servizi Finanziari)",
-      prompt: "Aiuta i clienti della banca con domande sui loro conti e transazioni",
-      response: "Buongiorno, sarò felice di assisterla con il suo conto.",
-      context: "Digital Banking",
-      problems: [
-        "❌ Protocolli di sicurezza non definiti",
-        "❌ Verifiche di identità mancanti",
-        "❌ Limiti di informazione non specificati",
-        "❌ Compliance regulations non menzionate"
-      ]
-    },
-    {
-      title: "Categoria 3: Senza Struttura (Educazione)",
-      prompt: "Spiega argomenti di matematica agli studenti che fanno domande",
-      response: "Certo! Sono qui per aiutarti con la matematica.",
-      context: "Piattaforma E-learning",
-      problems: [
-        "❌ Livello scolastico non specificato",
-        "❌ Metodologie didattiche non definite",
-        "❌ Stile di spiegazione non strutturato",
-        "❌ Sistema di valutazione progresso assente"
       ]
     }
   ];

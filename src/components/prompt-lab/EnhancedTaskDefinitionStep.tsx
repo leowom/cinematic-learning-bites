@@ -55,9 +55,9 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     updatePromptData('userWrittenTasks', text);
   };
 
-  const handleExerciseQuality = (score: number, canProceed: boolean) => {
+  const handleExerciseQuality = (score: number) => {
     setExerciseQuality(score);
-    setCanProceedExercise(canProceed);
+    setCanProceedExercise(score >= 7);
   };
 
   const canProceed = firstTask.length > 20 && secondTask.length > 20 && canProceedExercise;

@@ -82,6 +82,7 @@ const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, on
         onTextChange={handleContextChange}
         value={contextText}
         onQualityChange={handleQualityChange}
+        updatePromptData={updatePromptData}
       />
 
       {/* Progress Indicator */}

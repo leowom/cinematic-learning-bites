@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Brain, Target, Users, Building, Settings, FileText, Edit3, TestTube, Award, Zap } from 'lucide-react';
+import { Brain, Target, Users, Building, Settings, FileText, Edit3, TestTube, Award, Zap, Eye } from 'lucide-react';
 import FoundationStep from '@/components/prompt-lab/FoundationStep';
 import DisasterDemo from '@/components/prompt-lab/DisasterDemo';
 import RoleSelectionStep from '@/components/prompt-lab/RoleSelectionStep';
@@ -15,6 +15,7 @@ import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePrevie
 import FinalScoring from '@/components/prompt-lab/FinalScoring';
 import PromptLabHeader from '@/components/prompt-lab/PromptLabHeader';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import FinalPromptReveal from '@/components/prompt-lab/FinalPromptReveal';
 import '../styles/prompt-lab.css';
 
 interface PromptData {
@@ -32,6 +33,12 @@ interface PromptData {
   // Educational fields
   foundationComplete: boolean;
   disasterUnderstood: boolean;
+  // User written fields
+  userWrittenRole: string;
+  userWrittenContext: string;
+  userWrittenTasks: string;
+  userWrittenTone: string;
+  userWrittenFormat: string;
 }
 
 const PromptEngineeringLab = () => {
@@ -54,7 +61,12 @@ const PromptEngineeringLab = () => {
     aiTestScore: 0,
     freeWrittenPrompt: '',
     foundationComplete: false,
-    disasterUnderstood: false
+    disasterUnderstood: false,
+    userWrittenRole: '',
+    userWrittenContext: '',
+    userWrittenTasks: '',
+    userWrittenTone: '',
+    userWrittenFormat: ''
   });
 
   // Auto-save functionality
@@ -109,7 +121,7 @@ const PromptEngineeringLab = () => {
       { icon: Target, title: "Task Specification", subtitle: "Defining measurable objectives" },
       { icon: Settings, title: "Communication Style", subtitle: "Establishing tone and constraints" },
       { icon: FileText, title: "Output Format", subtitle: "Structuring response templates" },
-      { icon: Edit3, title: "Free Writing Challenge", subtitle: "Independent prompt construction" },
+      { icon: Eye, title: "Final Prompt Reveal", subtitle: "Your complete professional prompt" },
       { icon: TestTube, title: "AI Testing", subtitle: "Validation and optimization" },
       { icon: Award, title: "Mastery Assessment", subtitle: "Final evaluation and certification" }
     ];
@@ -197,9 +209,8 @@ const PromptEngineeringLab = () => {
                 />
               )}
               {currentStep === 7 && (
-                <FreeWritingStep 
+                <FinalPromptReveal 
                   promptData={promptData}
-                  updatePromptData={updatePromptData}
                   onComplete={handleStepComplete}
                 />
               )}

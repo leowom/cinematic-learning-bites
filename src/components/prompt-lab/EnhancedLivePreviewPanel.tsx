@@ -34,56 +34,48 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
   const generatePromptPreview = () => {
     let prompt = '';
     
-    if (promptData.role) {
-      prompt += `Sei un ${promptData.role}`;
-      if (promptData.experience) {
-        prompt += ` con ${promptData.experience} anni di esperienza`;
-      }
-      prompt += '.\n\n';
+    // Solo se l'utente ha scritto il ruolo manualmente
+    if (promptData.userWrittenRole) {
+      prompt += `${promptData.userWrittenRole}\n\n`;
     }
     
-    if (promptData.context) {
-      prompt += `CONTESTO:\n${promptData.context}\n\n`;
+    // Solo se l'utente ha scritto il contesto manualmente
+    if (promptData.userWrittenContext) {
+      prompt += `CONTESTO:\n${promptData.userWrittenContext}\n\n`;
     }
     
-    if (promptData.tasks?.length > 0) {
-      prompt += 'TASK:\n';
-      promptData.tasks.forEach((task: string, index: number) => {
-        prompt += `${index + 1}. ${task}\n`;
-      });
-      prompt += '\n';
+    // Solo se l'utente ha scritto i task manualmente
+    if (promptData.userWrittenTasks) {
+      prompt += `TASK:\n${promptData.userWrittenTasks}\n\n`;
     }
     
-    if (promptData.tone) {
-      prompt += 'CONSTRAINTS:\n';
-      prompt += `- Tone: ${promptData.tone.formal > 60 ? 'Professionale' : 'Casual'} ${promptData.tone.empathy > 60 ? 'ed empatico' : 'e diretto'}\n`;
-      prompt += '- Lunghezza: Concisa ma completa\n\n';
+    // Solo se l'utente ha scritto il tone manualmente
+    if (promptData.userWrittenTone) {
+      prompt += `CONSTRAINTS:\n${promptData.userWrittenTone}\n\n`;
     }
     
-    if (promptData.outputFormat?.length > 0) {
-      prompt += 'OUTPUT FORMAT:\n';
-      promptData.outputFormat.forEach((format: string) => {
-        prompt += `${format}\n`;
-      });
+    // Solo se l'utente ha scritto il formato manualmente
+    if (promptData.userWrittenFormat) {
+      prompt += `OUTPUT FORMAT:\n${promptData.userWrittenFormat}\n`;
     }
     
-    return prompt || 'Il tuo prompt apparirà qui mentre completi i step...';
+    return prompt || 'Il tuo prompt apparirà qui mentre completi gli esercizi di scrittura...';
   };
 
   const getQualityInsights = () => {
     const insights = [];
     
-    if (promptData.role && promptData.businessType) {
+    if (promptData.userWrittenRole && promptData.userWrittenContext) {
       insights.push({
         type: 'success',
-        message: 'Role specifico migliora accuracy del 40%'
+        message: 'Ruolo e contesto definiti chiaramente'
       });
     }
     
-    if (promptData.context) {
+    if (promptData.userWrittenContext && promptData.userWrittenContext.length > 50) {
       insights.push({
         type: 'success',
-        message: 'Context business ben definito'
+        message: 'Contesto dettagliato e specifico'
       });
     }
     
@@ -97,14 +89,14 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
     if (efficiency < 60) {
       insights.push({
         type: 'warning',
-        message: 'Considera di ridurre il numero di task'
+        message: 'Considera di semplificare i task'
       });
     }
     
-    if (promptData.tasks?.length >= 3 && complexity <= 8) {
+    if (promptData.userWrittenTasks && promptData.userWrittenFormat) {
       insights.push({
         type: 'tip',
-        message: 'Bilanciamento ottimale funzionalità/performance'
+        message: 'Task e formato ben definiti migliorano le risposte'
       });
     }
     
@@ -186,7 +178,7 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
           )}
         </div>
         
-        {/* Live prompt preview */}
+        {/* Live prompt preview - solo quello scritto dall'utente */}
         <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4 prompt-preview relative z-10">
           <pre className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">
             {generatePromptPreview()}
@@ -223,7 +215,7 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
           {getQualityInsights().length === 0 && (
             <div className="text-center py-4">
               <p className="text-white/50 text-sm">
-                Completa i step per vedere insights personalizzati
+                Completa gli esercizi di scrittura per vedere il tuo prompt
               </p>
             </div>
           )}
@@ -231,13 +223,14 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
         
         {/* Progress hint */}
         <div className="mt-4 p-3 bg-slate-800/40 rounded-lg border border-white/10 relative z-10">
-          <div className="text-white/60 text-xs sub-element-spacing">Prossimo miglioramento:</div>
+          <div className="text-white/60 text-xs sub-element-spacing">Prossimo esercizio:</div>
           <div className="text-white/80 text-sm">
-            {qualityScore < 3 ? 'Definisci il ruolo dell\'AI' :
-             qualityScore < 5 ? 'Aggiungi contesto business specifico' :
-             qualityScore < 7 ? 'Specifica task misurabili' :
-             qualityScore < 8.5 ? 'Ottimizza tone e constraints' :
-             'Prompt professionale pronto per uso aziendale!'}
+            {!promptData.userWrittenRole ? 'Scrivi la definizione del ruolo' :
+             !promptData.userWrittenContext ? 'Descrivi il contesto aziendale' :
+             !promptData.userWrittenTasks ? 'Elenca i task specifici' :
+             !promptData.userWrittenTone ? 'Definisci tone e constraints' :
+             !promptData.userWrittenFormat ? 'Specifica il formato output' :
+             'Prompt completo! Pronto per il testing'}
           </div>
         </div>
 

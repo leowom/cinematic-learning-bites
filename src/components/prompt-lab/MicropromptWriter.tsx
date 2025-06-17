@@ -13,6 +13,7 @@ interface Props {
   onTextChange: (text: string) => void;
   value: string;
   onQualityChange?: (score: number, canProceed: boolean) => void;
+  updatePromptData?: (field: string, value: any) => void;
 }
 
 const MicropromptWriter: React.FC<Props> = ({ 
@@ -23,15 +24,30 @@ const MicropromptWriter: React.FC<Props> = ({
   context, 
   onTextChange, 
   value,
-  onQualityChange
+  onQualityChange,
+  updatePromptData
 }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyExample = () => {
     if (example) {
       onTextChange(example);
+      // Salva anche nel campo userWritten appropriato
+      if (updatePromptData) {
+        const fieldName = `userWritten${context.charAt(0).toUpperCase() + context.slice(1)}`;
+        updatePromptData(fieldName, example);
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleTextChange = (text: string) => {
+    onTextChange(text);
+    // Salva nel campo userWritten appropriato
+    if (updatePromptData) {
+      const fieldName = `userWritten${context.charAt(0).toUpperCase() + context.slice(1)}`;
+      updatePromptData(fieldName, text);
     }
   };
 
@@ -83,7 +99,7 @@ const MicropromptWriter: React.FC<Props> = ({
 
       <textarea
         value={value}
-        onChange={(e) => onTextChange(e.target.value)}
+        onChange={(e) => handleTextChange(e.target.value)}
         placeholder={placeholder}
         className="w-full bg-slate-800/60 border border-blue-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-24 focus:border-blue-500 focus:outline-none text-sm"
         rows={4}

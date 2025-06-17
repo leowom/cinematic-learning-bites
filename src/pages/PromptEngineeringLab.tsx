@@ -94,7 +94,7 @@ const PromptEngineeringLab = () => {
       { icon: Users, title: "Role Definition", subtitle: "Establishing AI identity and expertise" },
       { icon: Building, title: "Business Context", subtitle: "Setting operational framework" },
       { icon: Target, title: "Task Specification", subtitle: "Defining measurable objectives" },
-      { icon: Settings, title: "Style & Constraints", subtitle: "Establishing communication parameters" },
+      { icon: Settings, title: "Communication Style", subtitle: "Establishing tone and constraints" },
       { icon: FileText, title: "Output Format", subtitle: "Structuring response templates" },
       { icon: Edit3, title: "Free Writing Challenge", subtitle: "Independent prompt construction" },
       { icon: TestTube, title: "AI Testing", subtitle: "Validation and optimization" },

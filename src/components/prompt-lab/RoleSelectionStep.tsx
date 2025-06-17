@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, CheckCircle, ArrowRight, Brain, Building, Headphones, Briefcase, TrendingUp } from 'lucide-react';
-import HandsOnWriter from './HandsOnWriter';
+import { Users, Star, Award, Brain } from 'lucide-react';
+import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -10,321 +11,134 @@ interface Props {
 }
 
 const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [selectedRole, setSelectedRole] = useState(promptData.role || '');
-  const [experience, setExperience] = useState(promptData.experience || 5);
-  const [handwrittenRole, setHandwrittenRole] = useState(promptData.handwrittenRole || '');
+  const [roleText, setRoleText] = useState(promptData.role || '');
+  const [qualityScore, setQualityScore] = useState(0);
+  const [canProceed, setCanProceed] = useState(false);
 
-  const roles = [
-    {
-      id: 'customer-service',
-      title: 'Responsabile Customer Service',
-      icon: Headphones,
-      description: 'Gestione completa del servizio clienti e risoluzione problematiche',
-      qualities: ['Empatia', 'Problem-solving', 'Comunicazione efficace'],
-      impact: 'Migliora customer satisfaction del 40%'
-    },
-    {
-      id: 'business-analyst',
-      title: 'Business Analyst',
-      icon: TrendingUp,
-      description: 'Analisi processi aziendali e ottimizzazione workflow operativi',
-      qualities: ['Analisi dati', 'Miglioramento processi', 'Pensiero strategico'],
-      impact: 'Ottimizza efficienza operativa del 35%'
-    },
-    {
-      id: 'project-manager',
-      title: 'Project Manager',
-      icon: Briefcase,
-      description: 'Coordinamento progetti e gestione team multidisciplinari',
-      qualities: ['Leadership', 'Pianificazione', 'Gestione rischi'],
-      impact: 'Accelera consegna progetti del 30%'
-    },
-    {
-      id: 'sales-director',
-      title: 'Direttore Vendite',
-      icon: Building,
-      description: 'Sviluppo strategie commerciali e gestione pipeline vendite',
-      qualities: ['Negoziazione', 'Pianificazione strategica', 'Team building'],
-      impact: 'Incrementa conversioni del 45%'
+  const handleRoleChange = (text: string) => {
+    setRoleText(text);
+    updatePromptData('role', text);
+  };
+
+  const handleQualityChange = (score: number, canProceedValue: boolean) => {
+    setQualityScore(score);
+    setCanProceed(canProceedValue);
+    updatePromptData('qualityScore', score);
+  };
+
+  const handleComplete = () => {
+    if (canProceed) {
+      onComplete();
     }
-  ];
-
-  const handleRoleSelect = (roleId: string) => {
-    setSelectedRole(roleId);
-    updatePromptData('role', roleId);
-    
-    const baseScore = 3;
-    updatePromptData('qualityScore', baseScore);
   };
-
-  const handleExperienceChange = (value: number) => {
-    setExperience(value);
-    updatePromptData('experience', value);
-    
-    const experienceBonus = Math.min(value * 0.3, 2);
-    updatePromptData('qualityScore', (promptData.qualityScore || 3) + experienceBonus);
-  };
-
-  const handleHandwrittenRoleChange = (text: string) => {
-    setHandwrittenRole(text);
-    updatePromptData('handwrittenRole', text);
-  };
-
-  const getSelectedRole = () => {
-    return roles.find(role => role.id === selectedRole);
-  };
-
-  const getExperienceLevel = () => {
-    if (experience <= 2) return { label: 'Junior', color: 'text-orange-300' };
-    if (experience <= 5) return { label: 'Intermedio', color: 'text-slate-300' };
-    if (experience <= 8) return { label: 'Senior', color: 'text-emerald-300' };
-    return { label: 'Esperto', color: 'text-blue-300' };
-  };
-
-  const roleTemplate = `Sei un ${selectedRole ? roles.find(r => r.id === selectedRole)?.title : '[RUOLO]'} con ${experience} anni di esperienza.
-
-Specializzazioni:
-- [Prima specializzazione]
-- [Seconda specializzazione]
-- [Terza specializzazione]`;
 
   return (
-    <div className="step-card glassmorphism-base">
-      <div className="flex items-center space-x-3 mb-6 relative z-10">
-        <div className="p-2 bg-slate-800/60 rounded-lg border border-slate-700/50">
-          <Users className="w-5 h-5 text-slate-300" />
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex justify-center">
+          <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center border border-blue-700/50">
+            <Users className="w-8 h-8 text-blue-400" />
+          </div>
         </div>
+        
         <div>
-          <h2 className="text-slate-200 font-medium text-lg">
-            Definizione del Ruolo Professionale
+          <h2 className="text-2xl font-bold text-slate-100 mb-2">
+            🎭 Definizione del Ruolo
           </h2>
-          <p className="text-slate-400 text-sm">Stabilisce autorità e competenza specifica dell'AI</p>
+          <p className="text-slate-300 max-w-2xl mx-auto">
+            Definisci chi è l'AI assistant e qual è il suo livello di expertise. Un ruolo ben definito stabilisce autorità e competenza.
+          </p>
         </div>
       </div>
-      
-      <div className="relative z-10 space-y-6">
-        <div className="section-spacing">
-          <p className="text-slate-300 leading-relaxed element-spacing">
-            L'assegnazione di un ruolo specifico all'AI stabilisce il contesto di competenza e autorità per le risposte. 
-            Un ruolo ben definito trasforma l'AI da assistente generico a consulente specializzato.
-          </p>
-          
-          <div className="bg-blue-900/20 border border-blue-700/40 rounded-xl p-4 element-spacing">
-            <div className="flex items-center space-x-2 sub-element-spacing">
-              <Brain className="w-4 h-4 text-blue-300" />
-              <span className="text-blue-300 text-sm font-medium">Impatto della Specificità del Ruolo:</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
-                <div className="text-slate-400 sub-element-spacing">Senza Ruolo:</div>
-                <div className="text-slate-300 italic">"Come gestisco questa situazione?"</div>
-                <div className="text-red-400 text-xs">Risposta generica senza autorità</div>
-              </div>
-              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
-                <div className="text-slate-400 sub-element-spacing">Con Ruolo:</div>
-                <div className="text-slate-300 italic">"Come responsabile customer service..."</div>
-                <div className="text-emerald-400 text-xs">Risposta esperta e attuabile</div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="section-spacing">
-          <h3 className="text-slate-200 font-medium element-spacing">1. Seleziona il Ruolo Base:</h3>
-          <div className="grid grid-cols-1 gap-3">
-            {roles.map((role) => {
-              const Icon = role.icon;
-              const isSelected = selectedRole === role.id;
-              
-              return (
-                <div
-                  key={role.id}
-                  className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? 'bg-slate-700/60 border-slate-600/50 ring-1 ring-slate-500/50'
-                      : 'bg-slate-800/50 border-slate-700/40 hover:bg-slate-700/50'
-                  }`}
-                  onClick={() => handleRoleSelect(role.id)}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className={`p-2 rounded-lg border ${
-                      isSelected ? 'bg-slate-600/60 border-slate-500/50' : 'bg-slate-800/60 border-slate-700/50'
-                    }`}>
-                      <Icon className="w-5 h-5 text-slate-300" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between sub-element-spacing">
-                        <h4 className="text-slate-200 font-medium">{role.title}</h4>
-                        {isSelected && <CheckCircle className="w-5 h-5 text-emerald-300" />}
-                      </div>
-                      <p className="text-slate-400 text-sm sub-element-spacing">{role.description}</p>
-                      <div className="flex flex-wrap gap-2 sub-element-spacing">
-                        {role.qualities.map((quality) => (
-                          <span
-                            key={quality}
-                            className="text-xs px-2 py-1 bg-slate-700/50 text-slate-300 rounded-lg border border-slate-600/50"
-                          >
-                            {quality}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-emerald-400/80 text-xs">{role.impact}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+      {/* Theory Box */}
+      <div className="bg-blue-900/20 border border-blue-700/30 rounded-xl p-6">
+        <h3 className="text-blue-300 font-medium mb-3 flex items-center">
+          <Brain className="w-4 h-4 mr-2" />
+          📚 Concetti Chiave
+        </h3>
+        
+        <div className="space-y-4 text-sm">
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h4 className="text-slate-200 font-medium mb-2">🎯 Elementi del Ruolo Perfetto:</h4>
+            <ul className="text-slate-300 space-y-1 ml-4">
+              <li>• <strong>Identità chiara:</strong> "Sei un..." seguito dal ruolo specifico</li>
+              <li>• <strong>Esperienza quantificata:</strong> Numero di anni nel settore</li>
+              <li>• <strong>Competenze specifiche:</strong> Aree di expertise rilevanti</li>
+              <li>• <strong>Autorità:</strong> Credenziali che giustificano la competenza</li>
+            </ul>
           </div>
-        </div>
 
-        {selectedRole && (
-          <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-5 section-spacing">
-            <h3 className="text-slate-200 font-medium element-spacing">Livello di Esperienza:</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400 text-sm">Anni di esperienza:</span>
-                <div className="flex items-center space-x-3">
-                  <span className="text-slate-300 font-medium">{experience} anni</span>
-                  <span className={`text-sm font-medium px-3 py-1 rounded-lg bg-slate-700/60 border border-slate-600/50 ${getExperienceLevel().color}`}>
-                    {getExperienceLevel().label}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={experience}
-                  onChange={(e) => handleExperienceChange(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-700/60 rounded-lg appearance-none cursor-pointer slider border border-slate-600/30"
-                />
-                <div className="flex justify-between text-xs text-slate-500">
-                  <span>1 anno</span>
-                  <span>5 anni</span>
-                  <span>10+ anni</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedRole && (
-          <div className="section-spacing">
-            <h3 className="text-slate-200 font-medium element-spacing">2. 🖊️ Scrivi la TUA Definizione del Ruolo:</h3>
-            <p className="text-slate-400 text-sm element-spacing">
-              Ora prova tu! Scrivi come definiresti questo ruolo in un prompt. Usa il template come guida o scrivilo completamente da zero.
+          <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-lg p-4">
+            <h4 className="text-emerald-300 font-medium mb-2">✅ Esempio Efficace:</h4>
+            <p className="text-slate-300 font-mono text-xs">
+              "Sei un responsabile customer service con 8 anni di esperienza nel settore e-commerce, 
+              specializzato nella risoluzione di problematiche complesse e nella gestione di reclami di alto valore."
             </p>
-            
-            <HandsOnWriter
-              title="Definizione del Ruolo"
-              placeholder="Inizia con: Sei un... e continua definendo il ruolo con le tue parole"
-              template={roleTemplate}
-              context="role"
-              onTextChange={handleHandwrittenRoleChange}
-              value={handwrittenRole}
-            />
           </div>
-        )}
+        </div>
+      </div>
 
-        {selectedRole && handwrittenRole && (
-          <div className="space-y-4 animate-fade-in section-spacing">
-            <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-xl p-5">
-              <h4 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
-                <Brain className="w-4 h-4" />
-                <span>Analisi dell'Autorità del Ruolo:</span>
-              </h4>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="text-center bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
-                  <div className="text-slate-400 sub-element-spacing">Ruolo</div>
-                  <div className="text-slate-200 text-lg font-medium">{getSelectedRole()?.title}</div>
-                </div>
-                <div className="text-center bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
-                  <div className="text-slate-400 sub-element-spacing">Esperienza</div>
-                  <div className={`text-lg font-medium ${getExperienceLevel().color}`}>
-                    {experience} anni
-                  </div>
-                </div>
-                <div className="text-center bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
-                  <div className="text-slate-400 sub-element-spacing">Livello</div>
-                  <div className={`text-lg font-medium ${getExperienceLevel().color}`}>
-                    {getExperienceLevel().label}
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Writing Exercise */}
+      <MicropromptWriter
+        title="Scrivi il Ruolo del tuo AI Assistant"
+        instruction="Definisci chi è l'AI assistant, quanti anni di esperienza ha e in cosa è specializzato. Inizia sempre con 'Sei un...' per stabilire chiaramente l'identità."
+        placeholder="Sei un responsabile customer service con..."
+        example="Sei un responsabile customer service con 8 anni di esperienza nel settore e-commerce, specializzato nella risoluzione di problematiche complesse e nella gestione di reclami di alto valore."
+        context="role"
+        onTextChange={handleRoleChange}
+        value={roleText}
+        onQualityChange={handleQualityChange}
+      />
 
-            <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4">
-              <div className="text-slate-200 font-medium sub-element-spacing">Esempio di Trasformazione:</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-3">
-                  <div className="text-red-300 font-medium sub-element-spacing">Prima:</div>
-                  <div className="text-slate-400 italic">"Aiutami con questo problema"</div>
-                </div>
-                <div className="bg-emerald-900/20 border border-emerald-700/30 rounded-lg p-3">
-                  <div className="text-emerald-300 font-medium sub-element-spacing">Dopo:</div>
-                  <div className="text-slate-300 italic">
-                    "Sei {getSelectedRole()?.title} con {experience} anni di esperienza. 
-                    Fornisci una soluzione professionale per..."
-                  </div>
-                </div>
-              </div>
+      {/* Progress Indicator */}
+      <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex space-x-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-4 h-4 ${
+                    star <= qualityScore ? 'text-emerald-400 fill-emerald-400' : 'text-slate-600'
+                  }`}
+                />
+              ))}
             </div>
-
-            <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-xl p-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-emerald-300 font-medium">Punteggio Qualità: +{(3 + Math.min(experience * 0.3, 2)).toFixed(1)} punti!</span>
-                <span className="text-slate-300 text-sm">
-                  Ruolo definito stabilisce autorità e competenza specifica.
-                </span>
-              </div>
-            </div>
+            <span className="text-slate-300 text-sm">
+              Qualità: {qualityScore}/5 {canProceed ? '✅' : '⏳'}
+            </span>
           </div>
-        )}
-
-        <div className="flex justify-end">
-          <Button
-            onClick={onComplete}
-            disabled={!selectedRole || !handwrittenRole.trim()}
-            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 border border-slate-600 flex items-center space-x-2"
+          
+          <Button 
+            onClick={handleComplete}
+            disabled={!canProceed}
+            className={`${
+              canProceed 
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
           >
-            <span>Procedi al Contesto Aziendale</span>
-            <ArrowRight className="w-4 h-4" />
+            {canProceed ? (
+              <>
+                <Award className="w-4 h-4 mr-2" />
+                Continua
+              </>
+            ) : (
+              'Migliora per Continuare'
+            )}
           </Button>
         </div>
+        
+        {!canProceed && qualityScore > 0 && (
+          <div className="mt-3 p-3 bg-orange-900/30 border border-orange-700/50 rounded-lg">
+            <p className="text-orange-200 text-sm">
+              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 4/5
+            </p>
+          </div>
+        )}
       </div>
-
-      <style>
-        {`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: #64748b;
-          border: 2px solid #475569;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        
-        .slider::-webkit-slider-thumb:hover {
-          background: #94a3b8;
-          border-color: #64748b;
-        }
-        
-        .slider::-moz-range-thumb {
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: #64748b;
-          border: 2px solid #475569;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        `}
-      </style>
     </div>
   );
 };

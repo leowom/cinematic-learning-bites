@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Building, TrendingUp, AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
+import { Building, Star, Award, Brain } from 'lucide-react';
 import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
@@ -10,246 +11,125 @@ interface Props {
 }
 
 const BusinessContextStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [showProgression, setShowProgression] = useState(false);
-  const [contextMicroprompt, setContextMicroprompt] = useState(promptData.contextMicroprompt || '');
+  const [contextText, setContextText] = useState(promptData.context || '');
+  const [qualityScore, setQualityScore] = useState(0);
+  const [canProceed, setCanProceed] = useState(false);
 
-  const businessTypes = [
-    { id: 'ecommerce', label: 'E-commerce', active: false },
-    { id: 'saas', label: 'SaaS', active: false },
-    { id: 'consulting', label: 'Consulenza', active: false },
-    { id: 'healthcare', label: 'Sanitario', active: false },
-    { id: 'education', label: 'Formazione', active: false },
-    { id: 'finance', label: 'Finanziario', active: false }
-  ];
-
-  const handleBusinessTypeSelect = (type: string) => {
-    updatePromptData('businessType', type);
-    generateContext(type);
-    setShowProgression(true);
-    updatePromptData('qualityScore', 6);
+  const handleContextChange = (text: string) => {
+    setContextText(text);
+    updatePromptData('context', text);
   };
 
-  const generateContext = (businessType: string) => {
-    const contexts = {
-      'ecommerce': 'PMI di fashion e lifestyle con 50-200 email al giorno che richiede tempi di risposta rapidi e automazione per gestire resi, tracking ordini e supporto clienti.',
-      'saas': 'Azienda software B2B con customer base internazionale che gestisce richieste tecniche, onboarding utenti e rinnovi subscription con focus sulla retention.',
-      'consulting': 'Agenzia di consulenza strategica che gestisce comunicazioni con clienti C-level, follow-up di proposte e programmazione meeting con alta personalizzazione.',
-      'healthcare': 'Clinica privata che gestisce prenotazioni, promemoria pazienti, risultati esami e comunicazioni mediche con massima privacy e compliance.',
-      'education': 'Istituto formativo online che gestisce iscrizioni corsi, supporto studenti, certificazioni e comunicazioni docenti con approccio educativo.',
-      'finance': 'Consulenza finanziaria che gestisce richieste investimenti, aggiornamenti portfolio e compliance normativa con massima precisione.'
-    };
-    
-    updatePromptData('context', contexts[businessType as keyof typeof contexts] || '');
+  const handleQualityChange = (score: number, canProceedValue: boolean) => {
+    setQualityScore(score);
+    setCanProceed(canProceedValue);
+    updatePromptData('qualityScore', score);
   };
 
-  const handleMicropromptChange = (text: string) => {
-    setContextMicroprompt(text);
-    updatePromptData('contextMicroprompt', text);
-  };
-
-  const getContextExample = () => {
-    if (!promptData.businessType) return '';
-    
-    const examples = {
-      'ecommerce': 'Lavori per un e-commerce di abbigliamento con 200 email al giorno. Policy: resi entro 30 giorni, spedizione gratuita sopra 50€.',
-      'saas': 'Lavori per una azienda SaaS B2B con clienti internazionali. Focus su retention e supporto tecnico avanzato.',
-      'consulting': 'Lavori per una agenzia di consulenza strategica con clienti C-level che richiedono massima personalizzazione.',
-      'healthcare': 'Lavori per una clinica privata. Richiesta massima privacy, compliance e comunicazione sensibile.',
-      'education': 'Lavori per un istituto formativo online con focus su supporto studenti e certificazioni.',
-      'finance': 'Lavori per una consulenza finanziaria. Richiesta massima precisione e compliance normativa.'
-    };
-    
-    return examples[promptData.businessType as keyof typeof examples] || '';
-  };
-
-  const progressionLevels = [
-    {
-      level: "Livello 1 - Solo ruolo",
-      description: '"Sei un customer service manager con esperienza"',
-      result: "→ Risposta professionale ma generica"
-    },
-    {
-      level: "Livello 2 - Informazioni azienda",
-      description: '+ "per azienda e-commerce di abbigliamento"',
-      result: "→ Menziona policy tessuti e istruzioni di cura"
-    },
-    {
-      level: "Livello 3 - Policy specifiche",
-      description: '+ "Rimborsi entro 30 giorni, spedizione gratuita sopra 50€"',
-      result: "→ Applica policy corrette, offre spedizione"
-    },
-    {
-      level: "Livello 4 - Volume e pressione",
-      description: '+ "500 email al giorno, clienti spesso frustrati"',
-      result: "→ Tono più empatico, gestione de-escalation"
+  const handleComplete = () => {
+    if (canProceed) {
+      onComplete();
     }
-  ];
+  };
 
   return (
-    <div className="step-card glassmorphism-base">
-      <div className="flex items-center space-x-3 mb-6 relative z-10">
-        <Building className="w-6 h-6 text-slate-300" />
-        <h2 className="text-xl font-medium text-slate-200">
-          Definizione del Contesto Business
-        </h2>
-      </div>
-      
-      <div className="relative z-10 space-y-6">
-        <div className="section-spacing">
-          <p className="text-slate-300 leading-relaxed element-spacing">
-            L'AI necessita di comprendere il contesto aziendale specifico per fornire risposte appropriate e contestuali.
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex justify-center">
+          <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center border border-blue-700/50">
+            <Building className="w-8 h-8 text-blue-400" />
+          </div>
+        </div>
+        
+        <div>
+          <h2 className="text-2xl font-bold text-slate-100 mb-2">
+            🏢 Contesto Aziendale
+          </h2>
+          <p className="text-slate-300 max-w-2xl mx-auto">
+            Fornisci il contesto operativo in cui l'AI assistant dovrà lavorare. Questo include settore, clienti, e situazioni tipiche.
           </p>
+        </div>
+      </div>
+
+      {/* Theory Box */}
+      <div className="bg-blue-900/20 border border-blue-700/30 rounded-xl p-6">
+        <h3 className="text-blue-300 font-medium mb-3 flex items-center">
+          <Brain className="w-4 h-4 mr-2" />
+          📚 Contesto Efficace
+        </h3>
+        
+        <div className="space-y-4 text-sm">
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h4 className="text-slate-200 font-medium mb-2">🎯 Informazioni Essenziali:</h4>
+            <ul className="text-slate-300 space-y-1 ml-4">
+              <li>• <strong>Settore/Business:</strong> Tipo di azienda e mercato</li>
+              <li>• <strong>Clienti:</strong> Chi sono e cosa si aspettano</li>
+              <li>• <strong>Situazioni tipiche:</strong> Problemi ricorrenti</li>
+              <li>• <strong>Vincoli aziendali:</strong> Policy e limitazioni</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Writing Exercise */}
+      <MicropromptWriter
+        title="Descrivi il Contesto Aziendale"
+        instruction="Fornisci dettagli sul settore, tipo di clienti, situazioni operative tipiche e eventuali vincoli o policy aziendali specifiche."
+        placeholder="La tua azienda opera nel settore..."
+        example="La tua azienda è un e-commerce di elettronica con oltre 50.000 clienti attivi. I clienti sono principalmente privati e piccole aziende che acquistano dispositivi tech. Le problematiche più frequenti riguardano spedizioni, resi entro 30 giorni, e supporto tecnico post-vendita. L'azienda ha una policy di rimborso flessibile e punta sulla soddisfazione del cliente."
+        context="context"
+        onTextChange={handleContextChange}
+        value={contextText}
+        onQualityChange={handleQualityChange}
+      />
+
+      {/* Progress Indicator */}
+      <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex space-x-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-4 h-4 ${
+                    star <= qualityScore ? 'text-emerald-400 fill-emerald-400' : 'text-slate-600'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-slate-300 text-sm">
+              Qualità: {qualityScore}/5 {canProceed ? '✅' : '⏳'}
+            </span>
+          </div>
           
-          <div className="bg-orange-900/15 border border-orange-700/30 rounded-lg p-4 element-spacing">
-            <h3 className="text-orange-300 font-medium mb-3 flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4" />
-              <span>Problema Comune:</span>
-            </h3>
-            <p className="text-slate-300 text-sm leading-relaxed sub-element-spacing">
-              Anche con un ruolo professionale definito, l'AI produce risposte generiche perché manca il contesto del business specifico.
-            </p>
-            <div className="bg-slate-800/50 rounded-lg p-3">
-              <span className="text-orange-300 font-medium text-sm">Soluzione:</span>
-              <span className="text-slate-300 text-sm ml-2">Fornire informazioni dettagliate sull'azienda e il settore di riferimento.</span>
-            </div>
-          </div>
-
-          {!showProgression && (
-            <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4 element-spacing">
-              <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4" />
-                <span>Progressione della Qualità:</span>
-              </h3>
-              <div className="space-y-2">
-                {progressionLevels.map((level, index) => (
-                  <div key={index} className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/30">
-                    <div className="text-slate-200 text-sm font-medium sub-element-spacing">{level.level}</div>
-                    <div className="text-slate-400 text-xs sub-element-spacing">{level.description}</div>
-                    <div className="text-emerald-300 text-xs">{level.result}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <div className="section-spacing">
-          <label className="text-slate-200 font-medium element-spacing block">Seleziona il tipo di business:</label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {businessTypes.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => handleBusinessTypeSelect(type.id)}
-                className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm border ${
-                  promptData.businessType === type.id
-                    ? 'bg-slate-700 border border-slate-600 text-slate-200'
-                    : 'bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/80'
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {promptData.context && (
-          <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4 section-spacing">
-            <h4 className="text-slate-200 font-medium element-spacing flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 text-emerald-300" />
-              <span>Contesto Generato Automaticamente:</span>
-            </h4>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              "{promptData.context}"
-            </p>
-          </div>
-        )}
-
-        {promptData.businessType && (
-          <>
-            <MicropromptWriter
-              title="Pratica: Scrivi il Contesto Aziendale"
-              instruction="Ora aggiungi il contesto aziendale al tuo prompt. Includi dettagli specifici del business:"
-              placeholder="Lavori per [tipo azienda] che [caratteristiche specifiche]. Policy principali: [dettagli operativi]..."
-              example={getContextExample()}
-              context="context"
-              onTextChange={handleMicropromptChange}
-              value={contextMicroprompt}
-            />
-
-            {showProgression && (
-              <div className="space-y-4 animate-fade-in section-spacing">
-                <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
-                  <h4 className="text-emerald-300 font-medium mb-3 flex items-center space-x-2">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>Risultati della Costruzione Progressiva:</span>
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-300">Solo ruolo:</span>
-                      <span className="text-orange-300">Generico ma professionale</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-300">Con tipo di business:</span>
-                      <span className="text-emerald-300">Conoscenza settoriale</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-300">Con contesto completo:</span>
-                      <span className="text-emerald-300">Risposte policy-aware</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
-                    <label className="text-slate-300 text-sm element-spacing block">Volume email giornaliero:</label>
-                    <select 
-                      className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
-                      onChange={(e) => updatePromptData('emailVolume', e.target.value)}
-                    >
-                      <option value="">Seleziona volume</option>
-                      <option value="low">1-50 (Basso)</option>
-                      <option value="medium">51-200 (Medio)</option>
-                      <option value="high">201-500 (Alto)</option>
-                      <option value="enterprise">500+ (Enterprise)</option>
-                    </select>
-                  </div>
-                  
-                  <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40">
-                    <label className="text-slate-300 text-sm element-spacing block">Livello di urgenza medio:</label>
-                    <select 
-                      className="w-full bg-slate-700/60 border border-slate-700/50 rounded text-slate-200 p-2 text-sm"
-                      onChange={(e) => updatePromptData('urgencyLevel', e.target.value)}
-                    >
-                      <option value="">Seleziona urgenza</option>
-                      <option value="low">Bassa (risposta in 24h)</option>
-                      <option value="medium">Media (risposta in 4h)</option>
-                      <option value="high">Alta (risposta in 1h)</option>
-                      <option value="critical">Critica (risposta immediata)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-3">
-                  <span className="text-emerald-300 font-medium">Punteggio Qualità: +2 punti!</span>
-                  <span className="text-slate-300 text-sm ml-2">
-                    Il contesto specifico trasforma risposte generiche in soluzioni business-aware.
-                  </span>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        <div className="flex justify-end">
-          <Button
-            onClick={onComplete}
-            disabled={!promptData.businessType || !contextMicroprompt.trim()}
-            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 border border-slate-600 flex items-center space-x-2"
+          <Button 
+            onClick={handleComplete}
+            disabled={!canProceed}
+            className={`${
+              canProceed 
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
           >
-            <span>Continua con la Definizione dei Task</span>
-            <ArrowRight className="w-4 h-4" />
+            {canProceed ? (
+              <>
+                <Award className="w-4 h-4 mr-2" />
+                Continua
+              </>
+            ) : (
+              'Migliora per Continuare'
+            )}
           </Button>
         </div>
+        
+        {!canProceed && qualityScore > 0 && (
+          <div className="mt-3 p-3 bg-orange-900/30 border border-orange-700/50 rounded-lg">
+            <p className="text-orange-200 text-sm">
+              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 4/5
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

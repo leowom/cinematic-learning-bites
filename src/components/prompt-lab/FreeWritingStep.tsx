@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit3, TrendingUp, Target, Brain, CheckCircle, ArrowRight, Lightbulb } from 'lucide-react';
+import { Edit3, Star, Award, Brain, FileText } from 'lucide-react';
 
 interface Props {
   promptData: any;
@@ -9,453 +10,261 @@ interface Props {
 }
 
 const FreeWritingStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [freeWrittenPrompt, setFreeWrittenPrompt] = useState('');
-  const [showHints, setShowHints] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
+  const [freePrompt, setFreePrompt] = useState(promptData.freeWrittenPrompt || '');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    score: number;
+    canProceed: boolean;
+    message: string;
+    suggestions: string[];
+  } | null>(null);
 
-  const hints = [
-    "💡 Inizia definendo il ruolo: 'Sei un...'",
-    "🎯 Aggiungi contesto specifico del business",
-    "📋 Elenca task specifici e misurabili",
-    "⚖️ Definisci constraints e tone di voce",
-    "📤 Specifica formato output desiderato"
-  ];
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setFreePrompt(text);
+    updatePromptData('freeWrittenPrompt', text);
+    
+    // Reset feedback when user starts typing
+    if (feedback) {
+      setFeedback(null);
+    }
+  };
 
-  const generateGuidedPrompt = () => {
-    let prompt = '';
+  const analyzePrompt = async () => {
+    if (!freePrompt.trim()) return;
+
+    setIsAnalyzing(true);
     
-    if (promptData.role) {
-      prompt += `Sei un ${promptData.role}`;
-      if (promptData.experience) {
-        prompt += ` con ${promptData.experience} anni di esperienza`;
-      }
-      prompt += '.\n\n';
-    }
-    
-    if (promptData.context) {
-      prompt += `CONTESTO:\n${promptData.context}\n\n`;
-    }
-    
-    if (promptData.tasks?.length > 0) {
-      prompt += 'TASK:\n';
-      promptData.tasks.forEach((task: string, index: number) => {
-        prompt += `${index + 1}. ${task}\n`;
+    // Simulated AI analysis - replace with actual OpenAI call
+    setTimeout(() => {
+      const wordCount = freePrompt.trim().split(' ').length;
+      const hasRole = freePrompt.toLowerCase().includes('sei un') || freePrompt.toLowerCase().includes('you are');
+      const hasTasks = freePrompt.includes('1.') || freePrompt.includes('•') || freePrompt.includes('-');
+      const hasContext = wordCount > 100;
+      
+      let score = 0;
+      const suggestions = [];
+      
+      if (hasRole) score += 1;
+      else suggestions.push('Definisci chiaramente il ruolo con "Sei un..."');
+      
+      if (hasContext) score += 1;
+      else suggestions.push('Aggiungi più contesto aziendale');
+      
+      if (hasTasks) score += 1;
+      else suggestions.push('Includi task specifici numerati');
+      
+      if (wordCount > 200) score += 1;
+      else suggestions.push('Espandi con più dettagli (minimo 200 parole)');
+      
+      if (freePrompt.includes('tone') || freePrompt.includes('stile')) score += 1;
+      else suggestions.push('Specifica lo stile di comunicazione');
+
+      const canProceed = score >= 4;
+      
+      setFeedback({
+        score,
+        canProceed,
+        message: canProceed ? 'Ottimo prompt completo!' : 'Il prompt necessita di miglioramenti',
+        suggestions
       });
-      prompt += '\n';
-    }
-    
-    if (promptData.tone) {
-      prompt += 'CONSTRAINTS:\n';
-      prompt += `- Tone: ${promptData.tone.formal > 60 ? 'Professionale' : 'Casual'} ${promptData.tone.empathy > 60 ? 'ed empatico' : 'e diretto'}\n`;
-      prompt += '- Lunghezza: Concisa ma completa\n\n';
-    }
-    
-    if (promptData.outputFormat?.length > 0) {
-      prompt += 'OUTPUT FORMAT:\n';
-      promptData.outputFormat.forEach((format: string) => {
-        prompt += `${format}\n`;
-      });
-    }
-    
-    return prompt;
+      
+      updatePromptData('qualityScore', score);
+      setIsAnalyzing(false);
+    }, 2000);
   };
 
-  const handleFreeWritingSubmit = () => {
-    updatePromptData('freeWrittenPrompt', freeWrittenPrompt);
-    setShowComparison(true);
+  const handleComplete = () => {
+    if (feedback?.canProceed) {
+      onComplete();
+    }
   };
-
-  const analyzeFreePrompt = () => {
-    if (!freeWrittenPrompt.trim()) {
-      return {
-        hasRole: false,
-        hasContext: false,
-        hasTasks: false,
-        hasConstraints: false,
-        hasFormat: false,
-        length: 0,
-        score: 0,
-        qualityScore: 0,
-        feedback: ['Nessun prompt inserito']
-      };
-    }
-
-    const lowerPrompt = freeWrittenPrompt.toLowerCase();
-    
-    // Analisi più dettagliata
-    const analysis = {
-      hasRole: lowerPrompt.includes('sei un') || lowerPrompt.includes('you are') || lowerPrompt.includes('agisci come'),
-      hasContext: lowerPrompt.includes('contesto') || lowerPrompt.includes('context') || lowerPrompt.includes('scenario') || lowerPrompt.includes('situazione'),
-      hasTasks: lowerPrompt.includes('task') || lowerPrompt.includes('compito') || lowerPrompt.includes('devi') || lowerPrompt.includes('obiettivo'),
-      hasConstraints: lowerPrompt.includes('constraint') || lowerPrompt.includes('tone') || lowerPrompt.includes('stile') || lowerPrompt.includes('modalità'),
-      hasFormat: lowerPrompt.includes('format') || lowerPrompt.includes('struttura') || lowerPrompt.includes('output') || lowerPrompt.includes('risposta'),
-      length: freeWrittenPrompt.length
-    };
-
-    // Calcolo score base
-    const baseScore = (
-      (analysis.hasRole ? 2 : 0) +
-      (analysis.hasContext ? 2 : 0) +
-      (analysis.hasTasks ? 3 : 0) +
-      (analysis.hasConstraints ? 2 : 0) +
-      (analysis.hasFormat ? 1 : 0)
-    );
-
-    // Analisi qualitativa aggiuntiva
-    let qualityBonus = 0;
-    const feedback = [];
-
-    // Controllo specifico per customer service
-    if (lowerPrompt.includes('customer') || lowerPrompt.includes('cliente') || lowerPrompt.includes('assistenza')) {
-      qualityBonus += 0.5;
-      feedback.push('✅ Contesto customer service identificato');
-    }
-
-    // Controllo per dettagli specifici
-    if (lowerPrompt.includes('email') || lowerPrompt.includes('risposta') || lowerPrompt.includes('messaggio')) {
-      qualityBonus += 0.5;
-      feedback.push('✅ Tipo di comunicazione specificato');
-    }
-
-    // Controllo lunghezza appropriata
-    if (analysis.length > 100 && analysis.length < 800) {
-      qualityBonus += 0.5;
-      feedback.push('✅ Lunghezza appropriata');
-    } else if (analysis.length < 100) {
-      feedback.push('⚠️ Prompt troppo breve - aggiungi più dettagli');
-    } else {
-      feedback.push('⚠️ Prompt molto lungo - considera di semplificare');
-    }
-
-    // Controllo per istruzioni specifiche
-    if (lowerPrompt.includes('analizza') || lowerPrompt.includes('identifica') || lowerPrompt.includes('rispondi')) {
-      qualityBonus += 0.5;
-      feedback.push('✅ Istruzioni operative presenti');
-    }
-
-    // Feedback specifico per elementi mancanti
-    if (!analysis.hasRole) {
-      feedback.push('❌ Manca definizione del ruolo - inizia con "Sei un..."');
-    }
-    if (!analysis.hasContext) {
-      feedback.push('❌ Manca contesto specifico - aggiungi informazioni sul business');
-    }
-    if (!analysis.hasTasks) {
-      feedback.push('❌ Mancano task specifici - cosa deve fare esattamente l\'AI?');
-    }
-    if (!analysis.hasConstraints) {
-      feedback.push('❌ Mancano constraints - specifica tone di voce e stile');
-    }
-    if (!analysis.hasFormat) {
-      feedback.push('❌ Manca formato output - come deve strutturare la risposta?');
-    }
-
-    const finalScore = Math.min(10, baseScore + qualityBonus);
-    const qualityScore = Math.round((finalScore / 10) * 100);
-
-    return { 
-      ...analysis, 
-      score: finalScore, 
-      qualityScore,
-      feedback 
-    };
-  };
-
-  const freePromptAnalysis = analyzeFreePrompt();
-  const guidedPrompt = generateGuidedPrompt();
-
-  // Confronto intelligente tra i due prompt
-  const comparePrompts = () => {
-    const freeWords = freeWrittenPrompt.toLowerCase().split(/\s+/).length;
-    const guidedWords = guidedPrompt.toLowerCase().split(/\s+/).length;
-    
-    const comparison = {
-      lengthDiff: freeWords - guidedWords,
-      hasMoreDetail: freeWords > guidedWords * 1.2,
-      hasLessDetail: freeWords < guidedWords * 0.8,
-      similarLength: Math.abs(freeWords - guidedWords) < guidedWords * 0.2
-    };
-
-    return comparison;
-  };
-
-  const promptComparison = comparePrompts();
 
   return (
-    <div className="step-card glassmorphism-base">
-      <div className="flex items-center space-x-3 mb-6 relative z-10">
-        <Edit3 className="w-6 h-6 text-slate-300" />
-        <h2 className="text-xl font-medium text-slate-200">
-          STEP BONUS: Scrivi il TUO Prompt da Zero
-        </h2>
-      </div>
-      
-      <div className="relative z-10 space-y-6">
-        <div className="section-spacing">
-          <p className="text-slate-300 leading-relaxed element-spacing">
-            Ora prova a scrivere un prompt completo usando quello che hai imparato. 
-            Sperimentazione libera per consolidare l'apprendimento!
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex justify-center">
+          <div className="w-16 h-16 bg-purple-900/30 rounded-full flex items-center justify-center border border-purple-700/50">
+            <Edit3 className="w-8 h-8 text-purple-400" />
+          </div>
+        </div>
+        
+        <div>
+          <h2 className="text-2xl font-bold text-slate-100 mb-2">
+            ✍️ Scrittura Libera del Prompt
+          </h2>
+          <p className="text-slate-300 max-w-2xl mx-auto">
+            Ora è il momento di mettere insieme tutto quello che hai imparato. Scrivi un prompt completo da zero utilizzando tutti gli elementi appresi.
           </p>
-
-          <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4 element-spacing">
-            <h3 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
-              <Target className="w-4 h-4" />
-              <span>🎯 Sfida:</span>
-            </h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Scrivi un prompt per gestire email di customer service per un'azienda e-commerce. 
-              Includi tutti gli elementi che abbiamo visto nei step precedenti.
-            </p>
-          </div>
         </div>
+      </div>
 
-        {/* Free Writing Area */}
-        <div className="section-spacing">
-          <label className="text-slate-200 font-medium sub-element-spacing block">
-            Il tuo prompt personalizzato:
-          </label>
-          <textarea
-            value={freeWrittenPrompt}
-            onChange={(e) => setFreeWrittenPrompt(e.target.value)}
-            placeholder="Inizia scrivendo: 'Sei un...' e continua con il tuo prompt completo..."
-            className="w-full bg-slate-700/60 border border-slate-600/50 rounded-lg p-4 text-slate-200 placeholder-slate-400 resize-none h-64 focus:border-slate-500 focus:outline-none"
-            rows={12}
-          />
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-slate-400 text-xs">
-              Caratteri: {freeWrittenPrompt.length}
-            </span>
-            <div className="flex space-x-2">
-              <Button
-                onClick={() => setShowHints(!showHints)}
-                variant="outline"
-                size="sm"
-                className="text-slate-300 border-slate-600 hover:bg-slate-700/60"
-              >
-                {showHints ? 'Nascondi' : 'Mostra'} Hints
-              </Button>
-              <Button
-                onClick={handleFreeWritingSubmit}
-                disabled={freeWrittenPrompt.length < 50}
-                className="bg-emerald-700 hover:bg-emerald-600 text-slate-200 border border-emerald-600"
-              >
-                Analizza Prompt
-              </Button>
+      {/* Instructions */}
+      <div className="bg-purple-900/20 border border-purple-700/30 rounded-xl p-6">
+        <h3 className="text-purple-300 font-medium mb-3 flex items-center">
+          <Brain className="w-4 h-4 mr-2" />
+          📋 Checklist del Prompt Perfetto
+        </h3>
+        
+        <div className="grid md:grid-cols-2 gap-4 text-sm">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-slate-300">Ruolo definito chiaramente</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-slate-300">Contesto aziendale specifico</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-slate-300">Task numerati e misurabili</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-slate-300">Stile e vincoli comunicativi</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-slate-300">Formato output strutturato</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-slate-300">Almeno 200 parole di dettaglio</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Hints Section */}
-        {showHints && (
-          <div className="bg-slate-800/40 rounded-lg p-4 border border-slate-700/40 section-spacing">
-            <h4 className="text-slate-200 font-medium sub-element-spacing flex items-center space-x-2">
-              <Lightbulb className="w-4 h-4" />
-              <span>💡 Hints Progressivi:</span>
-            </h4>
-            <div className="space-y-2">
-              {hints.map((hint, index) => (
-                <div key={index} className="flex items-start">
-                  <span className="text-emerald-400 mr-2">•</span>
-                  <span className="text-slate-300 text-sm">{hint}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Writing Area */}
+      <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-slate-200 font-medium flex items-center space-x-2">
+            <FileText className="w-4 h-4" />
+            <span>🖊️ Il Tuo Prompt Completo</span>
+          </h3>
+          
+          <Button
+            onClick={analyzePrompt}
+            disabled={!freePrompt.trim() || isAnalyzing}
+            className="bg-purple-600 hover:bg-purple-700 text-white text-sm"
+          >
+            {isAnalyzing ? 'Analizzando...' : '🤖 Analizza con AI'}
+          </Button>
+        </div>
 
-        {/* Analysis and Comparison */}
-        {showComparison && (
-          <div className="space-y-6 section-spacing">
-            {/* Free Prompt Analysis - Enhanced */}
-            <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4">
-              <h4 className="text-slate-200 font-medium sub-element-spacing flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4" />
-                <span>📊 Analisi Dettagliata del Tuo Prompt:</span>
+        <textarea
+          value={freePrompt}
+          onChange={handlePromptChange}
+          placeholder="Scrivi qui il tuo prompt completo utilizzando tutti gli elementi appresi nei moduli precedenti..."
+          className="w-full bg-slate-700/60 border border-slate-600/50 rounded-lg p-4 text-slate-200 placeholder-slate-400 resize-none h-64 focus:border-slate-500 focus:outline-none text-sm"
+          rows={12}
+        />
+        
+        <div className="mt-2 text-xs text-slate-400">
+          Parole: {freePrompt.trim().split(' ').filter(word => word).length} / 200 minimo
+        </div>
+      </div>
+
+      {/* AI Feedback */}
+      {feedback && (
+        <div className={`rounded-xl p-6 border transition-all duration-300 ${
+          feedback.canProceed 
+            ? 'bg-emerald-900/20 border-emerald-700/40' 
+            : 'bg-orange-900/20 border-orange-700/40'
+        }`}>
+          <div className="flex items-start space-x-3">
+            <Brain className={`w-5 h-5 mt-0.5 ${
+              feedback.canProceed ? 'text-emerald-400' : 'text-orange-400'
+            }`} />
+            <div className="flex-1">
+              <h4 className={`font-medium mb-2 ${
+                feedback.canProceed ? 'text-emerald-300' : 'text-orange-300'
+              }`}>
+                🤖 AI Feedback: {feedback.message}
               </h4>
               
-              {/* Score principale */}
-              <div className="bg-slate-700/40 rounded-lg p-3 mb-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300 font-medium">Score Qualità Generale:</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="bg-slate-600 rounded-full h-3 w-32">
-                      <div 
-                        className={`h-3 rounded-full transition-all duration-1000 ${
-                          freePromptAnalysis.qualityScore >= 80 ? 'bg-emerald-400' : 
-                          freePromptAnalysis.qualityScore >= 60 ? 'bg-orange-400' : 'bg-rose-400'
-                        }`}
-                        style={{ width: `${freePromptAnalysis.qualityScore}%` }}
-                      />
-                    </div>
-                    <span className={`font-bold text-lg ${
-                      freePromptAnalysis.qualityScore >= 80 ? 'text-emerald-400' : 
-                      freePromptAnalysis.qualityScore >= 60 ? 'text-orange-400' : 'text-rose-400'
-                    }`}>
-                      {freePromptAnalysis.qualityScore}%
-                    </span>
-                  </div>
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="flex space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-4 h-4 ${
+                        star <= feedback.score ? 'text-emerald-400 fill-emerald-400' : 'text-slate-600'
+                      }`}
+                    />
+                  ))}
                 </div>
+                <span className="text-slate-300 text-sm">
+                  Punteggio: {feedback.score}/5
+                </span>
               </div>
 
-              {/* Analisi dettagliata componenti */}
-              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+              {feedback.suggestions.length > 0 && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Definizione Ruolo:</span>
-                    <span className={freePromptAnalysis.hasRole ? 'text-emerald-400' : 'text-rose-400'}>
-                      {freePromptAnalysis.hasRole ? '✅ Presente' : '❌ Mancante'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Contesto Business:</span>
-                    <span className={freePromptAnalysis.hasContext ? 'text-emerald-400' : 'text-rose-400'}>
-                      {freePromptAnalysis.hasContext ? '✅ Presente' : '❌ Mancante'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Task Specifici:</span>
-                    <span className={freePromptAnalysis.hasTasks ? 'text-emerald-400' : 'text-rose-400'}>
-                      {freePromptAnalysis.hasTasks ? '✅ Presente' : '❌ Mancante'}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Constraints/Tone:</span>
-                    <span className={freePromptAnalysis.hasConstraints ? 'text-emerald-400' : 'text-rose-400'}>
-                      {freePromptAnalysis.hasConstraints ? '✅ Presente' : '❌ Mancante'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Output Format:</span>
-                    <span className={freePromptAnalysis.hasFormat ? 'text-emerald-400' : 'text-rose-400'}>
-                      {freePromptAnalysis.hasFormat ? '✅ Presente' : '❌ Mancante'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Score Numerico:</span>
-                    <span className={`font-bold ${
-                      freePromptAnalysis.score >= 8 ? 'text-emerald-400' : 
-                      freePromptAnalysis.score >= 6 ? 'text-orange-400' : 'text-rose-400'
-                    }`}>
-                      {freePromptAnalysis.score.toFixed(1)}/10
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Feedback specifico */}
-              <div className="bg-slate-700/30 rounded-lg p-3">
-                <h5 className="text-slate-200 font-medium text-sm mb-2">Feedback Dettagliato:</h5>
-                <div className="space-y-1">
-                  {freePromptAnalysis.feedback.map((item, index) => (
-                    <div key={index} className="text-slate-300 text-xs leading-relaxed">
-                      {item}
+                  <h5 className="text-slate-300 text-sm font-medium">💡 Suggerimenti per migliorare:</h5>
+                  {feedback.suggestions.map((suggestion, index) => (
+                    <div key={index} className="text-slate-300 text-sm flex items-start">
+                      <span className="text-slate-500 mr-2">•</span>
+                      {suggestion}
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-
-            {/* Confronto Intelligente */}
-            <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4">
-              <h4 className="text-slate-200 font-medium sub-element-spacing">⚖️ Confronto Intelligente:</h4>
-              <div className="space-y-3 text-sm">
-                {promptComparison.hasMoreDetail && (
-                  <div className="flex items-start space-x-2">
-                    <span className="text-blue-400">💡</span>
-                    <span className="text-slate-300">Il tuo prompt è più dettagliato del modello guidato - ottimo approfondimento!</span>
-                  </div>
-                )}
-                {promptComparison.hasLessDetail && (
-                  <div className="flex items-start space-x-2">
-                    <span className="text-orange-400">⚠️</span>
-                    <span className="text-slate-300">Il tuo prompt è più conciso - considera di aggiungere più dettagli specifici.</span>
-                  </div>
-                )}
-                {promptComparison.similarLength && (
-                  <div className="flex items-start space-x-2">
-                    <span className="text-emerald-400">✅</span>
-                    <span className="text-slate-300">Lunghezza simile al modello guidato - buon bilanciamento!</span>
-                  </div>
-                )}
-                
-                <div className="flex items-start space-x-2">
-                  <span className="text-slate-400">📝</span>
-                  <span className="text-slate-300">
-                    Parole nel tuo prompt: <strong>{freeWrittenPrompt.split(/\s+/).length}</strong> | 
-                    Parole nel modello: <strong>{guidedPrompt.split(/\s+/).length}</strong>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Side by Side Comparison */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <h4 className="text-slate-200 font-medium sub-element-spacing">✍️ Il Tuo Prompt:</h4>
-                <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4 prompt-preview">
-                  <pre className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
-                    {freeWrittenPrompt || 'Nessun prompt scritto ancora...'}
-                  </pre>
-                </div>
-                <div className="mt-2 text-xs text-slate-400">
-                  Score: {freePromptAnalysis.qualityScore}% - {
-                    freePromptAnalysis.qualityScore >= 80 ? 'Eccellente!' :
-                    freePromptAnalysis.qualityScore >= 60 ? 'Buono' : 'Da migliorare'
-                  }
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-slate-200 font-medium sub-element-spacing">🎯 Versione Guidata:</h4>
-                <div className="bg-slate-800/50 border border-emerald-700/30 rounded-lg p-4 prompt-preview">
-                  <pre className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">
-                    {guidedPrompt || 'Completa gli step precedenti per vedere il prompt guidato...'}
-                  </pre>
-                </div>
-                <div className="mt-2 text-xs text-slate-400">
-                  Modello di riferimento basato sui tuoi input
-                </div>
-              </div>
-            </div>
-
-            {/* Learning Insights - Enhanced */}
-            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
-              <h4 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
-                <Brain className="w-4 h-4" />
-                <span>🧠 Learning Insights Personalizzati:</span>
-              </h4>
-              <div className="text-slate-300 text-sm space-y-2">
-                {freePromptAnalysis.qualityScore >= 80 && (
-                  <p>🎉 <strong>Eccellente!</strong> Hai assimilato perfettamente i concetti di prompt engineering. Il tuo prompt include tutti gli elementi chiave e dimostra una comprensione approfondita della struttura.</p>
-                )}
-                {freePromptAnalysis.qualityScore >= 60 && freePromptAnalysis.qualityScore < 80 && (
-                  <p>👍 <strong>Buon lavoro!</strong> Il tuo prompt ha una struttura solida e copre la maggior parte degli elementi essenziali. Considera di aggiungere più specifiche sui task o sul formato output.</p>
-                )}
-                {freePromptAnalysis.qualityScore < 60 && (
-                  <p>📚 <strong>Continua a sperimentare!</strong> Il prompt ha potenziale ma necessita di più struttura. Focus su: definizione del ruolo, contesto specifico e task misurabili.</p>
-                )}
-                
-                <p>💡 <strong>Osservazione:</strong> La sperimentazione libera consolida l'apprendimento e sviluppa intuizione per prompt engineering avanzato. Ogni tentativo migliora la tua capacità di strutturare istruzioni efficaci per l'AI.</p>
-                
-                {freePromptAnalysis.score > 7 && (
-                  <p>🚀 <strong>Pronto per il livello successivo:</strong> Potresti sperimentare con tecniche avanzate come few-shot prompting o chain-of-thought reasoning.</p>
-                )}
-              </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="flex justify-end">
-          <Button
-            onClick={onComplete}
-            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
+      {/* Progress Indicator */}
+      <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex space-x-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-4 h-4 ${
+                    star <= (feedback?.score || 0) ? 'text-emerald-400 fill-emerald-400' : 'text-slate-600'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-slate-300 text-sm">
+              Qualità: {feedback?.score || 0}/5 {feedback?.canProceed ? '✅' : '⏳'}
+            </span>
+          </div>
+          
+          <Button 
+            onClick={handleComplete}
+            disabled={!feedback?.canProceed}
+            className={`${
+              feedback?.canProceed
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
           >
-            <span>Continua al Test Finale</span>
-            <ArrowRight className="w-4 h-4" />
+            {feedback?.canProceed ? (
+              <>
+                <Award className="w-4 h-4 mr-2" />
+                Continua
+              </>
+            ) : (
+              'Migliora per Continuare'
+            )}
           </Button>
         </div>
+        
+        {feedback && !feedback.canProceed && (
+          <div className="mt-3 p-3 bg-orange-900/30 border border-orange-700/50 rounded-lg">
+            <p className="text-orange-200 text-sm">
+              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 4/5
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

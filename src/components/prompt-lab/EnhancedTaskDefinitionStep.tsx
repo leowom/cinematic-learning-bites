@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Target, ArrowRight, Lightbulb, CheckCircle, AlertTriangle, Edit3 } from 'lucide-react';
@@ -155,8 +154,9 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
           </div>
         </div>
 
+        {/* Pulsante per proseguire */}
         {canProceed && (
-          <div className="flex justify-end">
+          <div className="flex justify-end section-spacing">
             <Button
               onClick={onComplete}
               className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"

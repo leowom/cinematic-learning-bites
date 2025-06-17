@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Target, Plus, X, ArrowRight, Lightbulb, CheckCircle } from 'lucide-react';
@@ -12,6 +13,8 @@ interface Props {
 const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [newTask, setNewTask] = useState('');
   const [microprompt, setMicroprompt] = useState(promptData.microprompt5 || '');
+  const [exerciseQuality, setExerciseQuality] = useState(0);
+  const [canProceedExercise, setCanProceedExercise] = useState(false);
 
   const addTask = () => {
     if (newTask.trim()) {
@@ -37,7 +40,12 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
     updatePromptData('microprompt5', text);
   };
 
-  const canProceed = promptData.tasks?.length >= 2 && microprompt.trim().length > 0;
+  const handleExerciseQuality = (score: number, canProceed: boolean) => {
+    setExerciseQuality(score);
+    setCanProceedExercise(canProceed);
+  };
+
+  const canProceed = promptData.tasks?.length >= 2 && canProceedExercise;
 
   return (
     <div className="step-card glassmorphism-base">
@@ -141,6 +149,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
             context="tasks"
             onTextChange={handleMicropromptChange}
             value={microprompt}
+            onQualityChange={handleExerciseQuality}
           />
         )}
 
@@ -150,7 +159,7 @@ const EnhancedTaskDefinitionStep: React.FC<Props> = ({ promptData, updatePromptD
               onClick={onComplete}
               className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
             >
-              <span>Procedi a Style & Constraints</span>
+              <span>Procedi a Stile e Vincoli</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>

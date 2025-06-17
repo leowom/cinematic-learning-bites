@@ -12,6 +12,8 @@ interface Props {
 
 const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [microprompt, setMicroprompt] = useState(promptData.microprompt6 || '');
+  const [exerciseQuality, setExerciseQuality] = useState(0);
+  const [canProceedExercise, setCanProceedExercise] = useState(false);
 
   const handleToneChange = (type: 'formal' | 'empathy', value: number) => {
     updatePromptData('tone', {
@@ -25,22 +27,27 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
     updatePromptData('microprompt6', text);
   };
 
-  const canProceed = microprompt.trim().length > 0;
+  const handleExerciseQuality = (score: number, canProceed: boolean) => {
+    setExerciseQuality(score);
+    setCanProceedExercise(canProceed);
+  };
+
+  const canProceed = canProceedExercise;
 
   return (
     <div className="step-card glassmorphism-base">
       <div className="flex items-center space-x-3 mb-6 relative z-10">
         <Settings className="w-6 h-6 text-slate-300" />
         <h2 className="text-xl font-medium text-slate-200">
-          Style e Constraints
+          Stile e Vincoli Comunicativi
         </h2>
       </div>
       
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
           <p className="text-slate-300 leading-relaxed element-spacing">
-            Le constraints definiscono come l'AI deve comunicare. Includono tone, stile, lunghezza, 
-            limitazioni e requisiti specifici per la risposta.
+            I vincoli definiscono come l'AI deve comunicare. Includono tone, stile, lunghezza, 
+            limitazioni e requisiti specifici per mantenere coerenza e professionalità.
           </p>
           
           <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4 element-spacing">
@@ -135,13 +142,14 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
         </div>
 
         <MicropromptWriter
-          title="Pratica: Definisci Style e Constraints"
-          instruction="Scrivi le constraints specifiche per il tuo scenario: tone, limitazioni, requisiti aziendali e stile comunicativo."
-          placeholder="CONSTRAINTS:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
-          example="CONSTRAINTS:&#10;- Tone: Professionale ma caloroso, riconoscendo la frustrazione del cliente&#10;- Lunghezza: 150-200 parole massimo&#10;- Evitare: Promesse di tempistiche che non possiamo garantire&#10;- Includere sempre: Riferimento al numero ordine e policy aziendale&#10;- Struttura: Scuse → Soluzione → Azione → Chiusura positiva"
+          title="Pratica: Definisci Stile e Vincoli"
+          instruction="Scrivi i vincoli specifici per il tuo scenario: tone, limitazioni, requisiti aziendali e stile comunicativo."
+          placeholder="VINCOLI:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
+          example="VINCOLI:&#10;- Tone: Professionale ma caloroso, riconoscendo la frustrazione del cliente&#10;- Lunghezza: 150-200 parole massimo&#10;- Evitare: Promesse di tempistiche che non possiamo garantire&#10;- Includere sempre: Riferimento al numero ordine e policy aziendale&#10;- Struttura: Scuse → Soluzione → Azione → Chiusura positiva"
           context="tone"
           onTextChange={handleMicropromptChange}
           value={microprompt}
+          onQualityChange={handleExerciseQuality}
         />
 
         {canProceed && (

@@ -12,7 +12,7 @@ import FreeWritingStep from '@/components/prompt-lab/FreeWritingStep';
 import AITestingStep from '@/components/prompt-lab/AITestingStep';
 import MasteryTest from '@/components/prompt-lab/MasteryTest';
 import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePreviewPanel';
-import CompletionModal from '@/components/prompt-lab/CompletionModal';
+import FinalScoring from '@/components/prompt-lab/FinalScoring';
 import PromptLabHeader from '@/components/prompt-lab/PromptLabHeader';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import '../styles/prompt-lab.css';
@@ -39,6 +39,7 @@ const PromptEngineeringLab = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [startTime] = useState(Date.now());
   const [exerciseScores, setExerciseScores] = useState<number[]>([]);
+  const [showFinalScoring, setShowFinalScoring] = useState(false);
   
   const [promptData, setPromptData] = useState<PromptData>({
     role: '',
@@ -83,9 +84,14 @@ const PromptEngineeringLab = () => {
     if (currentStep < 9) {
       setCurrentStep(currentStep + 1);
     } else {
-      setIsCompleted(true);
+      setShowFinalScoring(true);
       clearSavedData();
     }
+  };
+
+  const handleFinalComplete = (finalData: { score: number; xp: number; completionTime: number }) => {
+    setShowFinalScoring(false);
+    setIsCompleted(true);
   };
 
   const handlePreviousStep = () => {
@@ -221,14 +227,35 @@ const PromptEngineeringLab = () => {
         )}
       </div>
 
-      {/* Completion Modal */}
+      {/* Final Scoring */}
+      {showFinalScoring && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-slate-900/95 border border-slate-700/50 rounded-xl p-8 max-w-4xl mx-4 shadow-2xl shadow-black/40">
+            <FinalScoring 
+              startTime={startTime}
+              totalScore={promptData.qualityScore}
+              exerciseScores={exerciseScores}
+              onComplete={handleFinalComplete}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Simple completion message after final scoring */}
       {isCompleted && (
-        <CompletionModal 
-          onClose={() => setIsCompleted(false)}
-          finalScore={promptData.qualityScore}
-          startTime={startTime}
-          exerciseScores={exerciseScores}
-        />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-slate-900/95 border border-slate-700/50 rounded-xl p-8 max-w-md mx-4 shadow-2xl shadow-black/40 text-center">
+            <Award className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-4">Congratulazioni!</h2>
+            <p className="text-slate-300 mb-6">Hai completato con successo il Prompt Engineering Lab.</p>
+            <Button
+              onClick={() => setIsCompleted(false)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Chiudi
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

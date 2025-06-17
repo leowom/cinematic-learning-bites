@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Edit3, Copy, Check, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import EnhancedAICoach from './EnhancedAICoach';
+import OpenAICoach from './OpenAICoach';
 
 interface Props {
   title: string;
@@ -26,7 +26,6 @@ const MicropromptWriter: React.FC<Props> = ({
   onQualityChange
 }) => {
   const [copied, setCopied] = useState(false);
-  const [currentScore, setCurrentScore] = useState(0);
 
   const handleCopyExample = () => {
     if (example) {
@@ -36,9 +35,8 @@ const MicropromptWriter: React.FC<Props> = ({
     }
   };
 
-  const handleScoreChange = (score: number) => {
-    setCurrentScore(score);
-    onQualityChange?.(score, score >= 4);
+  const handleScoreChange = (score: number, canProceed: boolean) => {
+    onQualityChange?.(score, canProceed);
   };
 
   const handleRetry = () => {
@@ -91,7 +89,7 @@ const MicropromptWriter: React.FC<Props> = ({
         rows={4}
       />
       
-      <EnhancedAICoach 
+      <OpenAICoach 
         userInput={value} 
         context={context}
         onScoreChange={handleScoreChange}

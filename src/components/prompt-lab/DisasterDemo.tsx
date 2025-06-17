@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Zap, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import { AlertTriangle, Brain, ArrowRight, Zap } from 'lucide-react';
+import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -10,152 +11,172 @@ interface Props {
 }
 
 const DisasterDemo: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [currentExample, setCurrentExample] = useState(0);
+  const [microprompt, setMicroprompt] = useState(promptData.microprompt2 || '');
 
-  const handleShowAnalysis = () => {
-    setShowAnalysis(true);
+  const badExamples = [
+    {
+      title: "Prompt Troppo Generico",
+      prompt: "Aiutami con le email",
+      response: "Ecco alcuni consigli generali per gestire le email: 1) Controlla la posta regolarmente 2) Usa oggetti chiari 3) Mantieni le email concise...",
+      problems: ["Nessun contesto specifico", "Risposta troppo generica", "Non actionable"]
+    },
+    {
+      title: "Manca il Ruolo Professionale",
+      prompt: "Come rispondo a un cliente arrabbiato?",
+      response: "Puoi provare a essere gentile e comprensivo. Ascolta le sue preoccupazioni e cerca di risolvere il problema...",
+      problems: ["Nessuna autorità/competenza", "Consigli vaghi", "Non settore-specifico"]
+    },
+    {
+      title: "Obiettivo Poco Chiaro",
+      prompt: "Migliora questa comunicazione aziendale",
+      response: "La comunicazione potrebbe essere migliorata in vari modi. Potresti considerare di renderla più chiara, più coinvolgente...",
+      problems: ["Obiettivo indefinito", "Nessun criterio di successo", "Output non strutturato"]
+    }
+  ];
+
+  const handleMicropromptChange = (text: string) => {
+    setMicroprompt(text);
+    updatePromptData('microprompt2', text);
     updatePromptData('disasterUnderstood', true);
   };
 
-  const clientEmail = `Subject: DEFECTIVE PRODUCT - IMMEDIATE REFUND REQUIRED
+  const nextExample = () => {
+    if (currentExample < badExamples.length - 1) {
+      setCurrentExample(currentExample + 1);
+    }
+  };
 
-Dear Customer Service,
+  const prevExample = () => {
+    if (currentExample > 0) {
+      setCurrentExample(currentExample - 1);
+    }
+  };
 
-I received your t-shirt yesterday but it arrived with a significant tear. This is unacceptable quality and I demand an immediate refund or I will escalate this matter through legal channels.
-
-Marco Rossi
-Order #12345`;
-
-  const badPrompt = `"Respond to this customer email"`;
-
-  const badResponse = `Hello Marco,
-
-Thank you for your email. I apologize for any inconvenience. What can I do to help you?
-
-Best regards`;
+  const example = badExamples[currentExample];
 
   return (
-    <div className="bg-slate-900/90 border border-slate-700/50 rounded-xl p-6 shadow-xl shadow-black/10 hover:bg-slate-800/95 transition-all duration-300">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-slate-800/5 to-transparent pointer-events-none" />
-      
+    <div className="step-card glassmorphism-base">
       <div className="flex items-center space-x-3 mb-6 relative z-10">
-        <Zap className="w-6 h-6 text-slate-300" />
-        <h2 className="text-xl font-medium text-slate-200">
-          Analyzing Ineffective Prompt Patterns
-        </h2>
+        <div className="p-2 bg-rose-900/40 rounded-lg border border-rose-700/50">
+          <Zap className="w-5 h-5 text-rose-300" />
+        </div>
+        <div>
+          <h2 className="text-slate-200 font-medium text-lg">
+            Errori Comuni nel Prompt Engineering
+          </h2>
+          <p className="text-slate-400 text-sm">Impara dai problemi tipici per evitarli</p>
+        </div>
       </div>
       
       <div className="relative z-10 space-y-6">
-        <p className="text-slate-400 leading-relaxed">
-          Let's examine how generic prompts fail in real-world customer service scenarios and identify improvement opportunities.
-        </p>
-
-        {/* Customer Email */}
-        <div>
-          <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
-            <span>Customer Communication:</span>
-          </h3>
-          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4">
-            <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans">
-              {clientEmail}
-            </pre>
+        <div className="section-spacing">
+          <p className="text-slate-300 leading-relaxed element-spacing">
+            Prima di costruire prompt efficaci, è essenziale comprendere i problemi più comuni. 
+            Questi esempi mostrano come prompt mal strutturati producano risultati insoddisfacenti.
+          </p>
+          
+          <div className="bg-rose-900/20 border border-rose-700/40 rounded-xl p-4 element-spacing">
+            <div className="flex items-center space-x-2 sub-element-spacing">
+              <AlertTriangle className="w-4 h-4 text-rose-300" />
+              <span className="text-rose-300 text-sm font-medium">Conseguenze dei Prompt Inefficaci:</span>
+            </div>
+            <ul className="text-slate-300 text-sm space-y-1">
+              <li>• Perdita di tempo con risposte inutili</li>
+              <li>• Frustrazione e diminuzione della produttività</li>
+              <li>• Risultati inconsistenti e inaffidabili</li>
+              <li>• Mancanza di fiducia negli strumenti AI</li>
+            </ul>
           </div>
         </div>
 
-        {/* Generic Prompt */}
-        <div>
-          <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
-            <span>Generic Prompt Used:</span>
-          </h3>
-          <div className="bg-rose-900/15 border border-rose-700/30 rounded-lg p-4">
-            <code className="text-rose-300 text-sm">{badPrompt}</code>
+        <div className="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5 section-spacing">
+          <div className="flex items-center justify-between element-spacing">
+            <h3 className="text-slate-200 font-medium">
+              Esempio {currentExample + 1} di {badExamples.length}: {example.title}
+            </h3>
+            <div className="flex space-x-2">
+              <Button
+                onClick={prevExample}
+                disabled={currentExample === 0}
+                variant="outline"
+                size="sm"
+                className="text-slate-400 border-slate-600 hover:bg-slate-700/60"
+              >
+                ← Precedente
+              </Button>
+              <Button
+                onClick={nextExample}
+                disabled={currentExample === badExamples.length - 1}
+                variant="outline"
+                size="sm"
+                className="text-slate-400 border-slate-600 hover:bg-slate-700/60"
+              >
+                Successivo →
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="bg-slate-900/40 rounded-lg p-4 border border-slate-700/30">
+              <div className="text-slate-400 text-sm sub-element-spacing">Prompt dell'Utente:</div>
+              <div className="text-slate-200 font-mono text-sm bg-slate-800/60 p-3 rounded border border-slate-700/30">
+                "{example.prompt}"
+              </div>
+            </div>
+
+            <div className="bg-slate-900/40 rounded-lg p-4 border border-slate-700/30">
+              <div className="text-slate-400 text-sm sub-element-spacing">Risposta AI (Inadeguata):</div>
+              <div className="text-slate-300 text-sm bg-slate-800/60 p-3 rounded border border-slate-700/30 italic">
+                {example.response}
+              </div>
+            </div>
+
+            <div className="bg-rose-900/20 border border-rose-700/30 rounded-lg p-4">
+              <div className="text-rose-300 text-sm font-medium sub-element-spacing">Problemi Identificati:</div>
+              <ul className="text-slate-300 text-sm space-y-1">
+                {example.problems.map((problem, index) => (
+                  <li key={index}>• {problem}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Poor AI Response */}
-        <div>
-          <h3 className="text-slate-200 font-medium mb-3 flex items-center space-x-2">
-            <span>Resulting AI Response:</span>
-          </h3>
-          <div className="bg-slate-800/30 border border-rose-700/30 rounded-lg p-4">
-            <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans">
-              {badResponse}
-            </pre>
-          </div>
-        </div>
+        {currentExample === badExamples.length - 1 && (
+          <div className="animate-fade-in section-spacing">
+            <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-xl p-4 element-spacing">
+              <div className="flex items-center space-x-2 sub-element-spacing">
+                <Brain className="w-4 h-4 text-emerald-300" />
+                <span className="text-emerald-300 text-sm font-medium">Lezione Chiave:</span>
+              </div>
+              <p className="text-slate-300 text-sm leading-relaxed">
+                Un prompt efficace deve sempre includere: <strong>ruolo specifico</strong>, <strong>contesto chiaro</strong>, 
+                e <strong>obiettivi misurabili</strong>. Senza questi elementi, anche l'AI più avanzata produce risultati mediocri.
+              </p>
+            </div>
 
-        {!showAnalysis && (
-          <div className="text-center">
-            <Button
-              onClick={handleShowAnalysis}
-              className="bg-orange-800 hover:bg-orange-700 text-orange-100 px-6 py-3 rounded-lg font-medium border border-orange-700"
-            >
-              Analyze Response Quality
-            </Button>
+            <MicropromptWriter
+              title="Pratica: Riscrivi un Prompt Problematico"
+              instruction="Prendi uno degli esempi sopra e riscrivilo includendo ruolo, contesto e obiettivo specifico:"
+              placeholder="Prendi un esempio sopra e miglioralo aggiungendo: ruolo (Sei un...), contesto (In una situazione di...), obiettivo (Il tuo compito è...)..."
+              example="Sei un responsabile customer service con 5 anni di esperienza in e-commerce. Un cliente ha ricevuto un prodotto difettoso e richiede un rimborso immediato via email. Redigi una risposta professionale che: 1) Riconosca il problema 2) Offra una soluzione concreta 3) Mantenga la relazione positiva"
+              context="role"
+              onTextChange={handleMicropromptChange}
+              value={microprompt}
+            />
           </div>
         )}
 
-        {showAnalysis && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="bg-rose-900/15 border border-rose-700/30 rounded-lg p-4">
-              <h4 className="text-rose-300 font-medium mb-3 flex items-center space-x-2">
-                <AlertTriangle className="w-4 h-4" />
-                <span>Critical Issues Identified:</span>
-              </h4>
-              <ul className="space-y-2 text-slate-300 text-sm">
-                <li className="flex items-start">
-                  <span className="text-rose-400 mr-2">•</span>
-                  Lacks acknowledgment of company responsibility
-                </li>
-                <li className="flex items-start">
-                  <span className="text-rose-400 mr-2">•</span>
-                  No concrete resolution offered (refund/replacement)
-                </li>
-                <li className="flex items-start">
-                  <span className="text-rose-400 mr-2">•</span>
-                  Inappropriate tone for escalated customer concern
-                </li>
-                <li className="flex items-start">
-                  <span className="text-rose-400 mr-2">•</span>
-                  Ignores specific refund request
-                </li>
-                <li className="flex items-start">
-                  <span className="text-rose-400 mr-2">•</span>
-                  Places burden on customer to direct resolution
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-orange-900/15 border border-orange-700/30 rounded-lg p-4">
-              <h4 className="text-orange-300 font-medium mb-2">Business Impact:</h4>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                This response likely escalates customer frustration and could result in negative reviews, 
-                social media complaints, or lost customer relationships. The lack of professional 
-                authority undermines brand credibility.
-              </p>
-            </div>
-
-            <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4">
-              <h4 className="text-emerald-300 font-medium mb-2 flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4" />
-                <span>Solution Preview:</span>
-              </h4>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                Through structured prompt engineering, we can transform this interaction into a 
-                professional resolution that addresses customer concerns, maintains brand integrity, 
-                and follows established service protocols.
-              </p>
-            </div>
-
-            <div className="flex justify-end">
-              <Button
-                onClick={onComplete}
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 border border-slate-600"
-              >
-                <span>Begin Structured Approach</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
+        {microprompt && (
+          <div className="flex justify-end">
+            <Button
+              onClick={onComplete}
+              className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
+            >
+              <span>Procedi alla Definizione del Ruolo</span>
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           </div>
         )}
       </div>

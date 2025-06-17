@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Settings, TrendingUp, ArrowRight, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Settings, ArrowRight, Palette, MessageSquare, Clock } from 'lucide-react';
+import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -10,227 +11,151 @@ interface Props {
 }
 
 const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [tone, setTone] = useState(promptData.tone || { formal: 60, empathy: 40 });
+  const [microprompt, setMicroprompt] = useState(promptData.microprompt6 || '');
 
   const handleToneChange = (type: 'formal' | 'empathy', value: number) => {
-    const newTone = { ...tone, [type]: value };
-    setTone(newTone);
-    updatePromptData('tone', newTone);
+    updatePromptData('tone', {
+      ...promptData.tone,
+      [type]: value
+    });
   };
 
-  const generateTonePreview = () => {
-    const formalLevel = tone.formal;
-    const empathyLevel = tone.empathy;
-    
-    if (formalLevel > 70 && empathyLevel < 40) {
-      return {
-        text: "Gentile Signor/Signora [Nome], la ringraziamo per aver contattato il nostro servizio clienti. Procederemo con l'analisi della sua richiesta secondo le procedure standard...",
-        score: 7
-      };
-    } else if (formalLevel < 40 && empathyLevel > 60) {
-      return {
-        text: "Ciao [Nome]! Ho visto il tuo messaggio e capisco perfettamente la tua frustrazione. Nessun problema, ci pensiamo noi a sistemare tutto! 😊",
-        score: 8
-      };
-    } else {
-      return {
-        text: "Gentile [Nome], comprendo la sua frustrazione riguardo al prodotto ricevuto. Mi scuso per l'inconveniente e procederò immediatamente per risolvere la situazione...",
-        score: 9
-      };
-    }
+  const handleMicropromptChange = (text: string) => {
+    setMicroprompt(text);
+    updatePromptData('microprompt6', text);
   };
 
-  const tonePreview = generateTonePreview();
+  const canProceed = microprompt.trim().length > 0;
 
   return (
     <div className="step-card glassmorphism-base">
       <div className="flex items-center space-x-3 mb-6 relative z-10">
-        <div className="p-2 bg-slate-800/60 rounded-lg border border-slate-700/50">
-          <Settings className="w-5 h-5 text-slate-300" />
-        </div>
-        <div>
-          <h2 className="text-slate-200 font-medium text-lg">
-            Definizione Stile e Vincoli
-          </h2>
-          <p className="text-slate-400 text-sm">Configura tono e parametri di comunicazione</p>
-        </div>
+        <Settings className="w-6 h-6 text-slate-300" />
+        <h2 className="text-xl font-medium text-slate-200">
+          Style e Constraints
+        </h2>
       </div>
       
       <div className="relative z-10 space-y-6">
         <div className="section-spacing">
           <p className="text-slate-300 leading-relaxed element-spacing">
-            Definisci il tono di comunicazione per adattare lo stile alle aspettative dei tuoi clienti.
+            Le constraints definiscono come l'AI deve comunicare. Includono tone, stile, lunghezza, 
+            limitazioni e requisiti specifici per la risposta.
           </p>
           
-          <div className="bg-orange-900/20 border border-orange-700/40 rounded-xl p-4 element-spacing">
-            <div className="flex items-center space-x-2 sub-element-spacing">
-              <AlertTriangle className="w-4 h-4 text-orange-300" />
-              <span className="text-orange-300 text-sm font-medium">Importanza del Tono:</span>
-            </div>
-            <div className="text-slate-300 text-sm leading-relaxed">
-              Il tono influenza direttamente la percezione del brand e la soddisfazione del cliente. 
-              Un equilibrio tra professionalità ed empatia ottimizza i risultati.
+          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4 element-spacing">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-3">
+                <div className="flex items-center space-x-2 sub-element-spacing">
+                  <Palette className="w-4 h-4 text-blue-300" />
+                  <span className="text-blue-300 text-sm font-medium">Tone & Style</span>
+                </div>
+                <ul className="text-slate-300 text-xs space-y-1">
+                  <li>• Professionale vs Casual</li>
+                  <li>• Empatico vs Diretto</li>
+                  <li>• Formale vs Conversazionale</li>
+                </ul>
+              </div>
+
+              <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-3">
+                <div className="flex items-center space-x-2 sub-element-spacing">
+                  <MessageSquare className="w-4 h-4 text-purple-300" />
+                  <span className="text-purple-300 text-sm font-medium">Limitazioni</span>
+                </div>
+                <ul className="text-slate-300 text-xs space-y-1">
+                  <li>• Lunghezza massima</li>
+                  <li>• Evitare termini specifici</li>
+                  <li>• Non rivelare informazioni</li>
+                </ul>
+              </div>
+
+              <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-3">
+                <div className="flex items-center space-x-2 sub-element-spacing">
+                  <Clock className="w-4 h-4 text-green-300" />
+                  <span className="text-green-300 text-sm font-medium">Requisiti</span>
+                </div>
+                <ul className="text-slate-300 text-xs space-y-1">
+                  <li>• Call to action chiare</li>
+                  <li>• Menzione policy aziendali</li>
+                  <li>• Firma specifica</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* Tone sliders */}
+
         <div className="section-spacing">
-          <label className="text-slate-200 font-medium element-spacing block">🎭 Tono di comunicazione:</label>
-          <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-5">
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">Formale</span>
-                  <span className="text-slate-200 font-medium bg-slate-700/60 px-3 py-1 rounded-lg border border-slate-600/50">{tone.formal}%</span>
-                  <span className="text-slate-400 text-sm">Casual</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={tone.formal}
-                  onChange={(e) => handleToneChange('formal', parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-700/60 rounded-lg appearance-none cursor-pointer slider border border-slate-600/30"
-                />
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">Diretto</span>
-                  <span className="text-slate-200 font-medium bg-slate-700/60 px-3 py-1 rounded-lg border border-slate-600/50">{tone.empathy}%</span>
-                  <span className="text-slate-400 text-sm">Empatico</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={tone.empathy}
-                  onChange={(e) => handleToneChange('empathy', parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-700/60 rounded-lg appearance-none cursor-pointer slider border border-slate-600/30"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional constraints */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 section-spacing">
-          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/40">
-            <label className="text-slate-300 text-sm mb-3 block font-medium">📏 Lunghezza risposta:</label>
-            <select className="w-full bg-slate-700/60 border border-slate-600/50 rounded-lg text-slate-200 p-3 focus:border-slate-500 focus:outline-none">
-              <option>Concisa (50-100 parole)</option>
-              <option>Standard (100-200 parole)</option>
-              <option>Dettagliata (200-300 parole)</option>
-            </select>
-          </div>
+          <h3 className="text-slate-200 font-medium sub-element-spacing">Configurazione Tone:</h3>
           
-          <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/40">
-            <label className="text-slate-300 text-sm mb-3 block font-medium">🌍 Lingua e localizzazione:</label>
-            <select className="w-full bg-slate-700/60 border border-slate-600/50 rounded-lg text-slate-200 p-3 focus:border-slate-500 focus:outline-none">
-              <option>Italiano (Italia)</option>
-              <option>Italiano (Svizzera)</option>
-              <option>Inglese (UK)</option>
-              <option>Inglese (US)</option>
-            </select>
-          </div>
-        </div>
-        
-        {/* Tone preview */}
-        <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-5 section-spacing">
-          <h4 className="text-slate-200 font-medium sub-element-spacing flex items-center space-x-2">
-            <TrendingUp className="w-4 h-4" />
-            <span>Anteprima Tono:</span>
-          </h4>
-          <p className="text-slate-300 text-sm italic leading-relaxed element-spacing bg-slate-700/30 p-4 rounded-lg border border-slate-600/30">
-            "{tonePreview.text}"
-          </p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center flex-1">
-              <span className="text-slate-400 text-xs mr-3">Punteggio Tono:</span>
-              <div className="bg-slate-700/60 rounded-full h-2 flex-1 max-w-32 border border-slate-600/30">
-                <div 
-                  className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${(tonePreview.score / 10) * 100}%` }}
-                />
-              </div>
-              <span className="text-emerald-400 text-sm ml-3 font-medium">{tonePreview.score}/10</span>
-            </div>
-            <div className="ml-4">
-              {tonePreview.score >= 8 && (
-                <span className="text-emerald-400 text-xs px-3 py-1 bg-emerald-400/20 rounded-full border border-emerald-400/30">
-                  ✨ Equilibrio Eccellente
+          <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-4 space-y-4">
+            <div>
+              <div className="flex items-center justify-between sub-element-spacing">
+                <label className="text-slate-300 text-sm">Livello di Formalità</label>
+                <span className="text-slate-400 text-xs">
+                  {promptData.tone?.formal > 70 ? 'Molto Formale' : 
+                   promptData.tone?.formal > 40 ? 'Bilanciato' : 'Casual'}
                 </span>
-              )}
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={promptData.tone?.formal || 60}
+                onChange={(e) => handleToneChange('formal', parseInt(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <div className="flex justify-between text-xs text-slate-400 mt-1">
+                <span>Casual</span>
+                <span>Formale</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between sub-element-spacing">
+                <label className="text-slate-300 text-sm">Livello di Empatia</label>
+                <span className="text-slate-400 text-xs">
+                  {promptData.tone?.empathy > 70 ? 'Molto Empatico' : 
+                   promptData.tone?.empathy > 40 ? 'Bilanciato' : 'Diretto'}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={promptData.tone?.empathy || 40}
+                onChange={(e) => handleToneChange('empathy', parseInt(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <div className="flex justify-between text-xs text-slate-400 mt-1">
+                <span>Diretto</span>
+                <span>Empatico</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Style recommendations */}
-        <div className="bg-slate-800/50 border border-slate-700/40 rounded-xl p-5 section-spacing">
-          <h4 className="text-slate-200 font-medium sub-element-spacing">🎯 Raccomandazioni AI:</h4>
-          <div className="space-y-3 text-sm">
-            {tone.formal > 80 && (
-              <div className="flex items-start space-x-3 p-3 bg-orange-900/20 rounded-lg border border-orange-700/30">
-                <span className="text-orange-400 text-lg">⚠️</span>
-                <span className="text-slate-300 leading-relaxed">Troppo formale potrebbe sembrare freddo. Considera di aggiungere più empatia.</span>
-              </div>
-            )}
-            {tone.empathy > 80 && tone.formal < 30 && (
-              <div className="flex items-start space-x-3 p-3 bg-orange-900/20 rounded-lg border border-orange-700/30">
-                <span className="text-orange-400 text-lg">⚠️</span>
-                <span className="text-slate-300 leading-relaxed">Troppo casual per contesti business. Bilancia con più professionalità.</span>
-              </div>
-            )}
-            {tone.formal >= 40 && tone.formal <= 70 && tone.empathy >= 40 && tone.empathy <= 70 && (
-              <div className="flex items-start space-x-3 p-3 bg-emerald-900/20 rounded-lg border border-emerald-700/30">
-                <span className="text-emerald-400 text-lg">✅</span>
-                <span className="text-slate-300 leading-relaxed">Perfetto! Bilanciamento ideale tra professionalità ed empatia.</span>
-              </div>
-            )}
+        <MicropromptWriter
+          title="Pratica: Definisci Style e Constraints"
+          instruction="Scrivi le constraints specifiche per il tuo scenario: tone, limitazioni, requisiti aziendali e stile comunicativo."
+          placeholder="CONSTRAINTS:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
+          example="CONSTRAINTS:&#10;- Tone: Professionale ma caloroso, riconoscendo la frustrazione del cliente&#10;- Lunghezza: 150-200 parole massimo&#10;- Evitare: Promesse di tempistiche che non possiamo garantire&#10;- Includere sempre: Riferimento al numero ordine e policy aziendale&#10;- Struttura: Scuse → Soluzione → Azione → Chiusura positiva"
+          context="tone"
+          onTextChange={handleMicropromptChange}
+          value={microprompt}
+        />
+
+        {canProceed && (
+          <div className="flex justify-end">
+            <Button
+              onClick={onComplete}
+              className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
+            >
+              <span>Procedi al Formato Output</span>
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           </div>
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            onClick={onComplete}
-            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
-          >
-            <span>Procedi al Formato Output</span>
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        </div>
+        )}
       </div>
-
-      <style>
-        {`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: #64748b;
-          border: 2px solid #475569;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        
-        .slider::-webkit-slider-thumb:hover {
-          background: #94a3b8;
-          border-color: #64748b;
-        }
-        
-        .slider::-moz-range-thumb {
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: #64748b;
-          border: 2px solid #475569;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        `}
-      </style>
     </div>
   );
 };

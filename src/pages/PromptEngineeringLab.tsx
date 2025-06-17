@@ -9,6 +9,7 @@ import BusinessContextStep from '@/components/prompt-lab/BusinessContextStep';
 import EnhancedTaskDefinitionStep from '@/components/prompt-lab/EnhancedTaskDefinitionStep';
 import StyleConstraintsStep from '@/components/prompt-lab/StyleConstraintsStep';
 import OutputFormatStep from '@/components/prompt-lab/OutputFormatStep';
+import HandsOnWritingStep from '@/components/prompt-lab/HandsOnWritingStep';
 import AITestingStep from '@/components/prompt-lab/AITestingStep';
 import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePreviewPanel';
 import FinalScoring from '@/components/prompt-lab/FinalScoring';
@@ -103,7 +104,7 @@ const PromptEngineeringLab = () => {
     // Scroll to top when changing lesson
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    if (currentStep < 7) {
+    if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
     } else {
       setShowFinalScoring(true);
@@ -134,7 +135,8 @@ const PromptEngineeringLab = () => {
       { icon: Target, title: "Task Specification", subtitle: "Defining measurable objectives" },
       { icon: Settings, title: "Communication Style", subtitle: "Establishing tone and constraints" },
       { icon: FileText, title: "Output Format", subtitle: "Structuring response templates" },
-      { icon: TestTube, title: "Final Test & Mastery", subtitle: "Complete prompt validation" }
+      { icon: Edit3, title: "Hands-On Writing", subtitle: "Complete prompt composition practice" },
+      { icon: TestTube, title: "Final AI Testing", subtitle: "Real GPT-4o validation and mastery" }
     ];
     return steps[currentStep] || { icon: Brain, title: "Prompt Engineering Lab", subtitle: "Professional prompt development" };
   };
@@ -155,7 +157,7 @@ const PromptEngineeringLab = () => {
         {/* New Navigation Header */}
         <PromptLabHeader 
           currentStep={currentStep}
-          totalSteps={8}
+          totalSteps={9}
           onPreviousStep={handlePreviousStep}
           canGoBack={currentStep > 0}
         />
@@ -179,8 +181,17 @@ const PromptEngineeringLab = () => {
               />
             )}
           </div>
+        ) : currentStep === 7 ? (
+          /* Centered layout for hands-on writing step */
+          <div className="max-w-5xl mx-auto">
+            <HandsOnWritingStep 
+              promptData={promptData}
+              updatePromptData={updatePromptData}
+              onComplete={handleStepComplete}
+            />
+          </div>
         ) : (
-          /* Grid layout for steps 2+ with preview panel */
+          /* Grid layout for steps 2-6 and 8 with preview panel */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left column - Steps */}
             <div className="lg:col-span-2">
@@ -219,7 +230,7 @@ const PromptEngineeringLab = () => {
                   onComplete={handleStepComplete}
                 />
               )}
-              {currentStep === 7 && (
+              {currentStep === 8 && (
                 <AITestingStep 
                   promptData={promptData}
                   updatePromptData={updatePromptData}

@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Brain, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
-import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -11,32 +10,9 @@ interface Props {
 }
 
 const FoundationStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
-  const [userPrompt, setUserPrompt] = useState('');
-  const [showDemo, setShowDemo] = useState(false);
-  const [microprompt, setMicroprompt] = useState(promptData.microprompt1 || '');
-
-  const handleUserPromptSubmit = () => {
-    setShowDemo(true);
+  const handleComplete = () => {
     updatePromptData('foundationComplete', true);
-  };
-
-  const handleMicropromptChange = (text: string) => {
-    setMicroprompt(text);
-    updatePromptData('microprompt1', text);
-  };
-
-  const getAIResponse = (prompt: string) => {
-    if (!prompt.trim()) return "Fornisci istruzioni chiare per un'assistenza ottimale.";
-    
-    if (prompt.toLowerCase().includes('aiutami') || prompt.toLowerCase().includes('help')) {
-      return "Posso fornire assistenza generale su produttività, gestione email, ottimizzazione workflow e altri argomenti. Specifica le tue esigenze per un supporto più mirato.";
-    }
-    
-    if (prompt.toLowerCase().includes('email') && prompt.toLowerCase().includes('cliente')) {
-      return "Ho bisogno di contesto aggiuntivo per fornirti assistenza efficace. Che tipo di comunicazione email? Quale contesto aziendale? Quale risultato specifico stai cercando?";
-    }
-    
-    return "Posso aiutarti con la tua richiesta. Tuttavia, fornire contesto più specifico e obiettivi chiari mi permetterebbe di offrire una guida più precisa e attuabile.";
+    onComplete();
   };
 
   return (
@@ -98,85 +74,40 @@ const FoundationStep: React.FC<Props> = ({ promptData, updatePromptData, onCompl
           </div>
         </div>
 
-        <div className="bg-slate-800/20 border border-slate-700/30 rounded-lg p-4 section-spacing">
-          <h3 className="text-slate-200 font-medium element-spacing flex items-center space-x-2">
-            <Brain className="w-4 h-4" />
-            <span>Esercizio Pratico:</span>
-          </h3>
-          <div className="space-y-3">
-            <div>
-              <label className="text-slate-400 text-sm block sub-element-spacing">
-                Inserisci la tua istruzione per il sistema AI:
-              </label>
-              <textarea
-                value={userPrompt}
-                onChange={(e) => setUserPrompt(e.target.value)}
-                placeholder="Esempio: Aiutami con la gestione delle email..."
-                className="w-full bg-slate-800/40 border border-slate-700/50 rounded-lg p-3 text-slate-200 placeholder-slate-500 resize-none focus:border-slate-600 focus:outline-none"
-                rows={2}
-              />
-            </div>
-            <Button
-              onClick={handleUserPromptSubmit}
-              disabled={!userPrompt.trim()}
-              className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600"
-            >
-              Invia Prompt
-            </Button>
+        <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-lg p-4 section-spacing">
+          <div className="flex items-center space-x-2 sub-element-spacing">
+            <CheckCircle className="w-4 h-4 text-emerald-300" />
+            <span className="text-emerald-300 text-sm font-medium">Principi Chiave:</span>
           </div>
+          <ul className="text-slate-300 text-sm space-y-2 mt-3">
+            <li className="flex items-start space-x-2">
+              <span className="text-emerald-400 mt-1">•</span>
+              <span><strong>Specificità:</strong> Più dettagli fornisci, più precise saranno le risposte</span>
+            </li>
+            <li className="flex items-start space-x-2">
+              <span className="text-emerald-400 mt-1">•</span>
+              <span><strong>Contesto:</strong> Definisci sempre il ruolo e la situazione</span>
+            </li>
+            <li className="flex items-start space-x-2">
+              <span className="text-emerald-400 mt-1">•</span>
+              <span><strong>Obiettivi:</strong> Specifica cosa vuoi ottenere dalla risposta</span>
+            </li>
+            <li className="flex items-start space-x-2">
+              <span className="text-emerald-400 mt-1">•</span>
+              <span><strong>Struttura:</strong> Organizza le informazioni in modo logico</span>
+            </li>
+          </ul>
         </div>
 
-        {showDemo && (
-          <div className="bg-slate-800/30 border border-orange-700/30 rounded-lg p-4 animate-fade-in section-spacing">
-            <h4 className="text-orange-300 font-medium sub-element-spacing flex items-center space-x-2">
-              <Brain className="w-4 h-4" />
-              <span>Risposta AI:</span>
-            </h4>
-            <div className="bg-slate-900/40 rounded-lg p-3 element-spacing">
-              <p className="text-slate-300 text-sm leading-relaxed">
-                {getAIResponse(userPrompt)}
-              </p>
-            </div>
-            
-            <div className="bg-rose-900/15 border border-rose-700/30 rounded-lg p-3">
-              <h5 className="text-rose-300 font-medium sub-element-spacing flex items-center space-x-2">
-                <AlertTriangle className="w-4 h-4" />
-                <span>Osservazione Chiave:</span>
-              </h5>
-              <ul className="text-slate-300 text-sm space-y-1">
-                <li>• I sistemi AI rispondono letteralmente all'input fornito</li>
-                <li>• Istruzioni vaghe producono risposte generiche</li>
-                <li>• Contesto specifico produce risultati mirati</li>
-                <li>• <strong>La precisione è essenziale per l'efficacia</strong></li>
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {showDemo && (
-          <>
-            <MicropromptWriter
-              title="Pratica: Crea un Prompt Specifico"
-              instruction="Ora prova tu! Scrivi un prompt più specifico e strutturato per lo stesso obiettivo:"
-              placeholder="Sei un [ruolo] con [esperienza]. Il tuo compito è [obiettivo specifico]..."
-              example="Sei un responsabile customer service con 5 anni di esperienza. Redigi una risposta professionale per un cliente che richiede supporto tecnico per un prodotto difettoso."
-              context="role"
-              onTextChange={handleMicropromptChange}
-              value={microprompt}
-            />
-
-            <div className="flex justify-end">
-              <Button
-                onClick={onComplete}
-                disabled={!microprompt.trim()}
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 flex items-center space-x-2 border border-slate-600"
-              >
-                <span>Procedi al Modulo Successivo</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </>
-        )}
+        <div className="flex justify-end">
+          <Button
+            onClick={handleComplete}
+            className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 border border-slate-600 flex items-center space-x-2"
+          >
+            <span>Procedi al Modulo Successivo</span>
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Brain, Target, Users, Building, Settings, FileText, Edit3, TestTube, Award, Zap } from 'lucide-react';
 import FoundationStep from '@/components/prompt-lab/FoundationStep';
@@ -14,6 +13,8 @@ import AITestingStep from '@/components/prompt-lab/AITestingStep';
 import MasteryTest from '@/components/prompt-lab/MasteryTest';
 import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePreviewPanel';
 import CompletionModal from '@/components/prompt-lab/CompletionModal';
+import PromptLabHeader from '@/components/prompt-lab/PromptLabHeader';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import '../styles/prompt-lab.css';
 
 interface PromptData {
@@ -52,6 +53,18 @@ const PromptEngineeringLab = () => {
     disasterUnderstood: false
   });
 
+  // Auto-save functionality
+  const { loadSavedData, clearSavedData } = useAutoSave(promptData, currentStep);
+
+  // Load saved data on component mount
+  useEffect(() => {
+    const saved = loadSavedData();
+    if (saved) {
+      setPromptData(saved.data);
+      setCurrentStep(saved.step);
+    }
+  }, []);
+
   const updatePromptData = (field: keyof PromptData, value: any) => {
     setPromptData(prev => ({
       ...prev,
@@ -60,10 +73,17 @@ const PromptEngineeringLab = () => {
   };
 
   const handleStepComplete = () => {
-    if (currentStep < 9) { // Now goes to step 9 (0-9 = 10 steps)
+    if (currentStep < 9) {
       setCurrentStep(currentStep + 1);
     } else {
       setIsCompleted(true);
+      clearSavedData();
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -96,64 +116,13 @@ const PromptEngineeringLab = () => {
       <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-slate-600/5 rounded-full blur-3xl" />
 
       <div className="prompt-lab-container">
-        {/* Professional Progress Header */}
-        <div className="mb-6">
-          <div className="step-card glassmorphism-base">
-            <div className="flex items-center justify-between mb-3 relative z-10">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-slate-800/60 rounded-lg border border-slate-700/50">
-                  <StepIcon className="w-5 h-5 text-slate-300" />
-                </div>
-                <div>
-                  <h1 className="text-slate-200 font-medium text-lg">{stepInfo.title}</h1>
-                  <p className="text-slate-400 text-sm">{stepInfo.subtitle}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-slate-300 font-medium text-sm">Step {currentStep + 1} of 10</div>
-                <div className="text-slate-400 text-xs">Progress: {Math.round(((currentStep + 1) / 10) * 100)}%</div>
-              </div>
-            </div>
-            
-            <div className="bg-slate-800/50 rounded-lg h-2 relative z-10 mb-3">
-              <div 
-                className="bg-gradient-to-r from-slate-600 to-slate-500 h-2 rounded-lg transition-all duration-1000"
-                style={{ width: `${((currentStep + 1) / 10) * 100}%` }}
-              />
-            </div>
-            
-            {promptData.qualityScore > 0 && (
-              <div className="flex items-center justify-between relative z-10">
-                <span className="text-slate-400 text-xs">Quality Metrics</span>
-                <div className="flex items-center space-x-4">
-                  {promptData.qualityScore > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <span className="text-slate-400 text-xs">Quality:</span>
-                      <span className="text-emerald-300 font-medium text-sm">{promptData.qualityScore.toFixed(1)}/10</span>
-                    </div>
-                  )}
-                  {promptData.taskComplexity > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <span className="text-slate-400 text-xs">Complexity:</span>
-                      <span className={`font-medium text-sm ${
-                        promptData.taskComplexity <= 6 ? 'text-emerald-300' : 
-                        promptData.taskComplexity <= 10 ? 'text-orange-300' : 'text-rose-300'
-                      }`}>
-                        {promptData.taskComplexity}/15
-                      </span>
-                    </div>
-                  )}
-                  {promptData.aiTestScore > 0 && (
-                    <div className="flex items-center space-x-1">
-                      <span className="text-slate-400 text-xs">Test Score:</span>
-                      <span className="text-slate-300 font-medium text-sm">{promptData.aiTestScore}/10</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* New Navigation Header */}
+        <PromptLabHeader 
+          currentStep={currentStep}
+          totalSteps={10}
+          onPreviousStep={handlePreviousStep}
+          canGoBack={currentStep > 0}
+        />
 
         {/* Main content - centered layout for early steps, grid for later steps */}
         {currentStep < 2 ? (

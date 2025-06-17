@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Users, CheckCircle, ArrowRight, Brain, Building, Headphones, Briefcase, TrendingUp } from 'lucide-react';
+import HandsOnWriter from './HandsOnWriter';
 
 interface Props {
   promptData: any;
@@ -12,7 +12,7 @@ interface Props {
 const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onComplete }) => {
   const [selectedRole, setSelectedRole] = useState(promptData.role || '');
   const [experience, setExperience] = useState(promptData.experience || 5);
-  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [handwrittenRole, setHandwrittenRole] = useState(promptData.handwrittenRole || '');
 
   const roles = [
     {
@@ -52,9 +52,7 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
     updatePromptData('role', roleId);
-    setShowAnalysis(true);
     
-    // Update quality score based on role selection
     const baseScore = 3;
     updatePromptData('qualityScore', baseScore);
   };
@@ -63,9 +61,13 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
     setExperience(value);
     updatePromptData('experience', value);
     
-    // Update quality score based on experience
     const experienceBonus = Math.min(value * 0.3, 2);
     updatePromptData('qualityScore', (promptData.qualityScore || 3) + experienceBonus);
+  };
+
+  const handleHandwrittenRoleChange = (text: string) => {
+    setHandwrittenRole(text);
+    updatePromptData('handwrittenRole', text);
   };
 
   const getSelectedRole = () => {
@@ -78,6 +80,13 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
     if (experience <= 8) return { label: 'Senior', color: 'text-emerald-300' };
     return { label: 'Esperto', color: 'text-blue-300' };
   };
+
+  const roleTemplate = `Sei un ${selectedRole ? roles.find(r => r.id === selectedRole)?.title : '[RUOLO]'} con ${experience} anni di esperienza.
+
+Specializzazioni:
+- [Prima specializzazione]
+- [Seconda specializzazione]
+- [Terza specializzazione]`;
 
   return (
     <div className="step-card glassmorphism-base">
@@ -121,7 +130,7 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
         </div>
 
         <div className="section-spacing">
-          <h3 className="text-slate-200 font-medium element-spacing">Seleziona il Ruolo Professionale:</h3>
+          <h3 className="text-slate-200 font-medium element-spacing">1. Seleziona il Ruolo Base:</h3>
           <div className="grid grid-cols-1 gap-3">
             {roles.map((role) => {
               const Icon = role.icon;
@@ -201,7 +210,25 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
           </div>
         )}
 
-        {showAnalysis && selectedRole && (
+        {selectedRole && (
+          <div className="section-spacing">
+            <h3 className="text-slate-200 font-medium element-spacing">2. 🖊️ Scrivi la TUA Definizione del Ruolo:</h3>
+            <p className="text-slate-400 text-sm element-spacing">
+              Ora prova tu! Scrivi come definiresti questo ruolo in un prompt. Usa il template come guida o scrivilo completamente da zero.
+            </p>
+            
+            <HandsOnWriter
+              title="Definizione del Ruolo"
+              placeholder="Inizia con: Sei un... e continua definendo il ruolo con le tue parole"
+              template={roleTemplate}
+              context="role"
+              onTextChange={handleHandwrittenRoleChange}
+              value={handwrittenRole}
+            />
+          </div>
+        )}
+
+        {selectedRole && handwrittenRole && (
           <div className="space-y-4 animate-fade-in section-spacing">
             <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-xl p-5">
               <h4 className="text-emerald-300 font-medium sub-element-spacing flex items-center space-x-2">
@@ -260,7 +287,7 @@ const RoleSelectionStep: React.FC<Props> = ({ promptData, updatePromptData, onCo
         <div className="flex justify-end">
           <Button
             onClick={onComplete}
-            disabled={!selectedRole}
+            disabled={!selectedRole || !handwrittenRole.trim()}
             className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 border border-slate-600 flex items-center space-x-2"
           >
             <span>Procedi al Contesto Aziendale</span>

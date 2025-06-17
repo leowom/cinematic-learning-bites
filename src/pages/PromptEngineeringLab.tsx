@@ -37,6 +37,9 @@ interface PromptData {
 const PromptEngineeringLab = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [startTime] = useState(Date.now());
+  const [exerciseScores, setExerciseScores] = useState<number[]>([]);
+  
   const [promptData, setPromptData] = useState<PromptData>({
     role: '',
     experience: 5,
@@ -70,6 +73,10 @@ const PromptEngineeringLab = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const recordExerciseScore = (score: number) => {
+    setExerciseScores(prev => [...prev, score]);
   };
 
   const handleStepComplete = () => {
@@ -219,6 +226,8 @@ const PromptEngineeringLab = () => {
         <CompletionModal 
           onClose={() => setIsCompleted(false)}
           finalScore={promptData.qualityScore}
+          startTime={startTime}
+          exerciseScores={exerciseScores}
         />
       )}
     </div>

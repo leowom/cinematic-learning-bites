@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Brain, CheckCircle, AlertTriangle, Lightbulb, RotateCcw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,7 +36,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. COMPLETEZZA: Include tutti gli elementi necessari per il ruolo (0-100)
 5. SPECIFICITÀ: Dettagli concreti invece di descrizioni vaghe (0-100)
 
-SOGLIA MINIMA: 70/100 per procedere
+SOGLIA MINIMA: 80/100 per procedere (equivale a 4/5 stelle)
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -46,7 +45,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_70
+  "canProceed": true_se_score_maggiore_uguale_80
 }`,
 
       context: `Analizza questo testo che dovrebbe fornire il contesto aziendale.
@@ -58,7 +57,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. VINCOLI: Specifica policy o limitazioni aziendali (0-100)
 5. DETTAGLIO: Fornisce informazioni concrete e specifiche (0-100)
 
-SOGLIA MINIMA: 70/100 per procedere
+SOGLIA MINIMA: 80/100 per procedere (equivale a 4/5 stelle)
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -67,7 +66,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_70
+  "canProceed": true_se_score_maggiore_uguale_80
 }`,
 
       tasks: `Analizza questo testo che dovrebbe definire task specifici.
@@ -79,7 +78,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. MISURABILITÀ: Task con risultati verificabili (0-100)
 5. SPECIFICITÀ: Dettagli concreti, non vaghi (0-100)
 
-SOGLIA MINIMA: 70/100 per procedere
+SOGLIA MINIMA: 80/100 per procedere (equivale a 4/5 stelle)
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -88,7 +87,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_70
+  "canProceed": true_se_score_maggiore_uguale_80
 }`,
 
       tone: `Analizza questo testo che dovrebbe definire stile e vincoli comunicativi.
@@ -100,7 +99,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. COERENZA: Allineato con contesto aziendale (0-100)
 5. APPLICABILITÀ: Facile da implementare e seguire (0-100)
 
-SOGLIA MINIMA: 70/100 per procedere
+SOGLIA MINIMA: 80/100 per procedere (equivale a 4/5 stelle)
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -109,7 +108,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_70
+  "canProceed": true_se_score_maggiore_uguale_80
 }`,
 
       format: `Analizza questo testo che dovrebbe definire il formato output.
@@ -121,7 +120,7 @@ CRITERI DI VALUTAZIONE (1-100 per criterio):
 4. IMPLEMENTABILITÀ: Facile da seguire e replicare (0-100)
 5. DETTAGLIO: Specifico sui requisiti di formattazione (0-100)
 
-SOGLIA MINIMA: 70/100 per procedere
+SOGLIA MINIMA: 80/100 per procedere (equivale a 4/5 stelle)
 
 Rispondi SOLO in formato JSON con questa struttura esatta:
 {
@@ -130,7 +129,7 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
   "suggestions": ["suggerimento1", "suggerimento2"],
   "strengths": ["punto_di_forza1", "punto_di_forza2"],
   "improvements": ["miglioramento1", "miglioramento2"],
-  "canProceed": true_se_score_maggiore_uguale_70
+  "canProceed": true_se_score_maggiore_uguale_80
 }`
     };
     return prompts[context] || prompts.role;
@@ -194,7 +193,7 @@ TESTO DA ANALIZZARE:
 
         // Converti score da 1-100 a 1-5 per compatibilità UI
         const normalizedScore = Math.round((parsedFeedback.score / 100) * 5);
-        const canProceed = parsedFeedback.score >= 70; // Soglia 70/100
+        const canProceed = parsedFeedback.score >= 80; // Soglia 80/100 per 4/5 stelle
 
         const aiFeedback: AIFeedback = {
           score: normalizedScore,
@@ -203,7 +202,7 @@ TESTO DA ANALIZZARE:
           strengths: parsedFeedback.strengths || [],
           improvements: parsedFeedback.improvements || [],
           canProceed: canProceed,
-          type: canProceed ? 'success' : parsedFeedback.score >= 50 ? 'warning' : 'info'
+          type: canProceed ? 'success' : parsedFeedback.score >= 60 ? 'warning' : 'info'
         };
 
         console.log('🎯 Final feedback:', aiFeedback);
@@ -351,7 +350,7 @@ TESTO DA ANALIZZARE:
 
           {!feedback.canProceed && (
             <div className="mt-2 p-2 bg-orange-900/30 border border-orange-700/50 rounded text-xs text-orange-200">
-              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 70/100
+              ⚠️ Punteggio insufficiente per procedere. Minimo richiesto: 80/100 (4/5 stelle)
             </div>
           )}
         </div>

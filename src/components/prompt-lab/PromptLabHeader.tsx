@@ -26,7 +26,7 @@ const PromptLabHeader: React.FC<Props> = ({
           onClick={() => navigate('/dashboard')}
           variant="ghost"
           size="sm"
-          className="text-slate-400 hover:text-slate-200"
+          className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
         >
           <Home className="w-4 h-4 mr-2" />
           Dashboard
@@ -37,7 +37,7 @@ const PromptLabHeader: React.FC<Props> = ({
             onClick={onPreviousStep}
             variant="ghost"
             size="sm"
-            className="text-slate-400 hover:text-slate-200"
+            className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Indietro

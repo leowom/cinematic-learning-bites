@@ -19,12 +19,12 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
     return Boolean(field);
   };
 
-  // Check completion status for each section
-  const roleComplete = isFieldCompleted(promptData.userWrittenRole) || isFieldCompleted(promptData.role);
-  const contextComplete = isFieldCompleted(promptData.userWrittenContext) || isFieldCompleted(promptData.context);
-  const tasksComplete = isFieldCompleted(promptData.userWrittenTasks) || isFieldCompleted(promptData.tasks);
-  const styleComplete = isFieldCompleted(promptData.userWrittenTone) || (promptData.tone?.formal && promptData.tone?.empathy);
-  const formatComplete = isFieldCompleted(promptData.userWrittenFormat) || isFieldCompleted(promptData.outputFormat);
+  // Check completion status for each section - only user written content counts
+  const roleComplete = isFieldCompleted(promptData.userWrittenRole);
+  const contextComplete = isFieldCompleted(promptData.userWrittenContext);
+  const tasksComplete = isFieldCompleted(promptData.userWrittenTasks);
+  const styleComplete = isFieldCompleted(promptData.userWrittenTone);
+  const formatComplete = isFieldCompleted(promptData.userWrittenFormat);
 
   const getStatusIcon = (isComplete: boolean) => {
     return isComplete ? (
@@ -34,33 +34,28 @@ const EnhancedLivePreviewPanel: React.FC<Props> = ({ promptData }) => {
     );
   };
 
-  // Generate the current prompt preview
+  // Generate the current prompt preview - only show completed sections
   const generatePromptPreview = () => {
     let preview = "";
     
     if (roleComplete) {
-      const roleText = promptData.userWrittenRole || `Sei un ${promptData.role || 'assistente AI'} con ${promptData.experience || 5} anni di esperienza.`;
-      preview += roleText + "\n\n";
+      preview += promptData.userWrittenRole + "\n\n";
     }
     
     if (contextComplete) {
-      const contextText = promptData.userWrittenContext || promptData.context;
-      preview += "CONTESTO:\n" + contextText + "\n\n";
+      preview += "CONTESTO:\n" + promptData.userWrittenContext + "\n\n";
     }
     
     if (tasksComplete) {
-      const tasksText = promptData.userWrittenTasks || (Array.isArray(promptData.tasks) ? promptData.tasks.join(", ") : promptData.tasks);
-      preview += "TASK:\n" + tasksText + "\n\n";
+      preview += "TASK:\n" + promptData.userWrittenTasks + "\n\n";
     }
     
     if (styleComplete) {
-      const styleText = promptData.userWrittenTone || `Mantieni un tono ${promptData.tone?.formal > 70 ? 'formale' : 'informale'} e ${promptData.tone?.empathy > 70 ? 'empatico' : 'diretto'}.`;
-      preview += "VINCOLI:\n" + styleText + "\n\n";
+      preview += "VINCOLI:\n" + promptData.userWrittenTone + "\n\n";
     }
     
     if (formatComplete) {
-      const formatText = promptData.userWrittenFormat || (Array.isArray(promptData.outputFormat) ? promptData.outputFormat.join(", ") : promptData.outputFormat);
-      preview += "FORMATO OUTPUT:\n" + formatText;
+      preview += "FORMATO OUTPUT:\n" + promptData.userWrittenFormat;
     }
     
     return preview.trim() || "Il tuo prompt apparirà qui man mano che completi gli step...";

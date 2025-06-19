@@ -125,8 +125,22 @@ Sofia`,
       
       console.log('✅ Test completato:', result);
       
-      setTestResult(result);
-      updatePromptData('aiTestScore', result.score);
+      // Assicurati che il score sia tra 1-5
+      const normalizedScore = Math.max(1, Math.min(5, Math.round(result.score)));
+      const normalizedResult = {
+        ...result,
+        score: normalizedScore,
+        analysis: {
+          completeness: Math.max(0, Math.min(100, result.analysis.completeness)),
+          accuracy: Math.max(0, Math.min(100, result.analysis.accuracy)),
+          tone: Math.max(0, Math.min(100, result.analysis.tone)),
+          specificity: Math.max(0, Math.min(100, result.analysis.specificity)),
+          actionability: Math.max(0, Math.min(100, result.analysis.actionability))
+        }
+      };
+      
+      setTestResult(normalizedResult);
+      updatePromptData('aiTestScore', normalizedScore);
       
     } catch (error: any) {
       console.error('❌ Errore test AI:', error);

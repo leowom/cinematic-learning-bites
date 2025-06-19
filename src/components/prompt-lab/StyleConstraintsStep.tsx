@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Settings, ArrowRight, Palette, MessageSquare, Clock } from 'lucide-react';
-import OpenAICoach from './OpenAICoach';
+import MicropromptWriter from './MicropromptWriter';
 
 interface Props {
   promptData: any;
@@ -182,29 +181,19 @@ const StyleConstraintsStep: React.FC<Props> = ({ promptData, updatePromptData, o
           </div>
         </div>
 
-        {/* Esercizio Pratico con OpenAICoach */}
+        {/* Esercizio Pratico con MicropromptWriter invece di OpenAICoach */}
         <div className="section-spacing">
-          <div className="bg-emerald-900/15 border border-emerald-700/30 rounded-xl p-4">
-            <h4 className="text-emerald-300 font-medium mb-3 flex items-center">
-              ✅ Esercizio Pratico: Definisci Stile e Vincoli
-            </h4>
-            <p className="text-emerald-200 text-sm mb-3">
-              Scrivi i vincoli specifici per il customer service. Riceverai feedback dall'AI Coach per migliorare la qualità.
-            </p>
-            <textarea
-              value={microprompt}
-              onChange={(e) => handleMicropromptChange(e.target.value)}
-              placeholder="VINCOLI:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
-              className="w-full bg-slate-800/60 border border-emerald-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 resize-none h-32 focus:border-emerald-500 focus:outline-none text-sm"
-              rows={6}
-            />
-            
-            <OpenAICoach 
-              userInput={microprompt} 
-              context="tone"
-              onScoreChange={handleExerciseQuality}
-            />
-          </div>
+          <MicropromptWriter
+            title="Esercizio Pratico: Definisci Stile e Vincoli"
+            instruction="Scrivi i vincoli specifici per il customer service. Riceverai feedback dall'AI Coach per migliorare la qualità."
+            placeholder="VINCOLI:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere&#10;- Includi sempre: Policy di rimborso e numero di riferimento&#10;- Chiudi con: Invito a contattare per ulteriori informazioni"
+            example="VINCOLI:&#10;- Tone: Professionale ed empatico&#10;- Lunghezza: Massimo 200 parole&#10;- Evita: Promesse che non possiamo mantenere (es. 'risolveremo subito')&#10;- Includi sempre: Policy di rimborso e numero di riferimento del caso&#10;- Usa linguaggio: Chiaro e comprensibile, evita termini tecnici complessi&#10;- Timeline: Sempre realistiche (24-48 ore lavorative)&#10;- Chiudi con: Invito a contattare per ulteriori informazioni e firma completa"
+            context="tone"
+            onTextChange={handleMicropromptChange}
+            value={microprompt}
+            onQualityChange={handleExerciseQuality}
+            updatePromptData={updatePromptData}
+          />
         </div>
 
         {canProceed && (

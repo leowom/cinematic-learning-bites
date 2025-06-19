@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useOpenAI } from '@/hooks/useOpenAI';
@@ -63,47 +62,28 @@ Sofia`,
   const generateFinalPrompt = () => {
     let prompt = '';
     
-    if (promptData.userWrittenRole || promptData.role) {
-      const role = promptData.userWrittenRole || promptData.role;
-      prompt += `Sei un ${role}`;
-      if (promptData.experience) {
-        prompt += ` con ${promptData.experience} anni di esperienza`;
-      }
-      prompt += '.\n\n';
+    // Only use user-written content to avoid duplications
+    if (promptData.userWrittenRole) {
+      prompt += `${promptData.userWrittenRole}\n\n`;
     }
     
-    if (promptData.userWrittenContext || promptData.context) {
-      const context = promptData.userWrittenContext || promptData.context;
-      prompt += `CONTESTO:\n${context}\n\n`;
+    if (promptData.userWrittenContext) {
+      prompt += `CONTESTO:\n${promptData.userWrittenContext}\n\n`;
     }
     
     if (promptData.userWrittenTasks) {
       prompt += `TASK:\n${promptData.userWrittenTasks}\n\n`;
-    } else if (promptData.tasks?.length > 0) {
-      prompt += 'TASK:\n';
-      promptData.tasks.forEach((task: string, index: number) => {
-        prompt += `${index + 1}. ${task}\n`;
-      });
-      prompt += '\n';
     }
     
     if (promptData.userWrittenTone) {
       prompt += `VINCOLI:\n${promptData.userWrittenTone}\n\n`;
-    } else if (promptData.tone) {
-      prompt += 'VINCOLI:\n';
-      prompt += `- Tone: ${promptData.tone.formal > 60 ? 'Professionale' : 'Casual'} ${promptData.tone.empathy > 60 ? 'ed empatico' : 'e diretto'}\n\n`;
     }
     
     if (promptData.userWrittenFormat) {
       prompt += `FORMATO OUTPUT:\n${promptData.userWrittenFormat}`;
-    } else if (promptData.outputFormat?.length > 0) {
-      prompt += 'FORMATO OUTPUT:\n';
-      promptData.outputFormat.forEach((format: string) => {
-        prompt += `${format}\n`;
-      });
     }
     
-    return prompt;
+    return prompt.trim();
   };
 
   const handleGeneratePrompt = () => {

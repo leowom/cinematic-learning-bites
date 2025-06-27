@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Mail, 
   Search, 
@@ -117,28 +119,28 @@ const AITransformationDay1 = () => {
       <div className="space-y-6">
         <div>
           <Label className="text-slate-200 mb-2 block">Dimmi il tuo ruolo:</Label>
-          <select 
-            className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 focus:border-slate-500 focus:outline-none"
-            value={userProfile.role}
-            onChange={(e) => setUserProfile(prev => ({...prev, role: e.target.value}))}
-          >
-            <option value="">Seleziona il tuo ruolo</option>
-            <option value="manager">Manager</option>
-            <option value="developer">Developer</option>
-            <option value="marketing">Marketing</option>
-            <option value="sales">Sales</option>
-            <option value="hr">HR</option>
-            <option value="consultant">Consultant</option>
-            <option value="entrepreneur">Entrepreneur</option>
-            <option value="other">Altro</option>
-          </select>
+          <Select value={userProfile.role} onValueChange={(value) => setUserProfile(prev => ({...prev, role: value}))}>
+            <SelectTrigger className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0">
+              <SelectValue placeholder="Seleziona il tuo ruolo" />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-800 border-slate-600 z-50">
+              <SelectItem value="manager" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Manager</SelectItem>
+              <SelectItem value="developer" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Developer</SelectItem>
+              <SelectItem value="marketing" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Marketing</SelectItem>
+              <SelectItem value="sales" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Sales</SelectItem>
+              <SelectItem value="hr" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">HR</SelectItem>
+              <SelectItem value="consultant" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Consultant</SelectItem>
+              <SelectItem value="entrepreneur" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Entrepreneur</SelectItem>
+              <SelectItem value="other" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Altro</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <Label className="text-slate-200 mb-2 block">Una sfida che affronti questa settimana:</Label>
           <Textarea
             placeholder="Descrivi una sfida lavorativa che stai affrontando..."
-            className="bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none resize-none"
+            className="bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0 resize-none"
             rows={4}
             value={userProfile.currentChallenge}
             onChange={(e) => setUserProfile(prev => ({...prev, currentChallenge: e.target.value}))}
@@ -256,9 +258,9 @@ const AITransformationDay1 = () => {
         <div className="space-y-4">
           <div>
             <Label className="text-slate-200 mb-2 block">Destinatario:</Label>
-            <input
+            <Input
               type="text"
-              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
+              className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0"
               value={formData.recipient}
               onChange={(e) => setFormData(prev => ({...prev, recipient: e.target.value}))}
               placeholder="es. Cliente, Manager, Team..."
@@ -267,9 +269,9 @@ const AITransformationDay1 = () => {
 
           <div>
             <Label className="text-slate-200 mb-2 block">Argomento:</Label>
-            <input
+            <Input
               type="text"
-              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
+              className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0"
               value={formData.subject}
               onChange={(e) => setFormData(prev => ({...prev, subject: e.target.value}))}
               placeholder="es. Aggiornamento progetto, Proposta..."
@@ -278,9 +280,9 @@ const AITransformationDay1 = () => {
 
           <div>
             <Label className="text-slate-200 mb-2 block">Obiettivo:</Label>
-            <input
+            <Input
               type="text"
-              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
+              className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0"
               value={formData.objective}
               onChange={(e) => setFormData(prev => ({...prev, objective: e.target.value}))}
               placeholder="es. Richiedere feedback, Proporre meeting..."
@@ -289,15 +291,16 @@ const AITransformationDay1 = () => {
 
           <div>
             <Label className="text-slate-200 mb-2 block">Tono desiderato:</Label>
-            <select 
-              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 focus:border-slate-500 focus:outline-none"
-              value={formData.tone}
-              onChange={(e) => setFormData(prev => ({...prev, tone: e.target.value}))}
-            >
-              <option value="formale">Formale</option>
-              <option value="amichevole">Amichevole</option>
-              <option value="diretto">Diretto</option>
-            </select>
+            <Select value={formData.tone} onValueChange={(value) => setFormData(prev => ({...prev, tone: value}))}>
+              <SelectTrigger className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-slate-600 z-50">
+                <SelectItem value="formale" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Formale</SelectItem>
+                <SelectItem value="amichevole" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Amichevole</SelectItem>
+                <SelectItem value="diretto" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Diretto</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <Button

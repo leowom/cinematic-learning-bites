@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { 
@@ -119,7 +118,7 @@ const AITransformationDay1 = () => {
         <div>
           <Label className="text-slate-200 mb-2 block">Dimmi il tuo ruolo:</Label>
           <select 
-            className="w-full p-3 rounded-lg bg-slate-800/50 border border-slate-600 text-white"
+            className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 focus:border-slate-500 focus:outline-none"
             value={userProfile.role}
             onChange={(e) => setUserProfile(prev => ({...prev, role: e.target.value}))}
           >
@@ -139,7 +138,7 @@ const AITransformationDay1 = () => {
           <Label className="text-slate-200 mb-2 block">Una sfida che affronti questa settimana:</Label>
           <Textarea
             placeholder="Descrivi una sfida lavorativa che stai affrontando..."
-            className="bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
+            className="bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none resize-none"
             rows={4}
             value={userProfile.currentChallenge}
             onChange={(e) => setUserProfile(prev => ({...prev, currentChallenge: e.target.value}))}
@@ -256,9 +255,10 @@ const AITransformationDay1 = () => {
 
         <div className="space-y-4">
           <div>
-            <Label className="text-slate-200">Destinatario:</Label>
-            <Input
-              className="bg-slate-800/50 border-slate-600 text-white"
+            <Label className="text-slate-200 mb-2 block">Destinatario:</Label>
+            <input
+              type="text"
+              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
               value={formData.recipient}
               onChange={(e) => setFormData(prev => ({...prev, recipient: e.target.value}))}
               placeholder="es. Cliente, Manager, Team..."
@@ -266,9 +266,10 @@ const AITransformationDay1 = () => {
           </div>
 
           <div>
-            <Label className="text-slate-200">Argomento:</Label>
-            <Input
-              className="bg-slate-800/50 border-slate-600 text-white"
+            <Label className="text-slate-200 mb-2 block">Argomento:</Label>
+            <input
+              type="text"
+              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
               value={formData.subject}
               onChange={(e) => setFormData(prev => ({...prev, subject: e.target.value}))}
               placeholder="es. Aggiornamento progetto, Proposta..."
@@ -276,9 +277,10 @@ const AITransformationDay1 = () => {
           </div>
 
           <div>
-            <Label className="text-slate-200">Obiettivo:</Label>
-            <Input
-              className="bg-slate-800/50 border-slate-600 text-white"
+            <Label className="text-slate-200 mb-2 block">Obiettivo:</Label>
+            <input
+              type="text"
+              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
               value={formData.objective}
               onChange={(e) => setFormData(prev => ({...prev, objective: e.target.value}))}
               placeholder="es. Richiedere feedback, Proporre meeting..."
@@ -286,9 +288,9 @@ const AITransformationDay1 = () => {
           </div>
 
           <div>
-            <Label className="text-slate-200">Tono desiderato:</Label>
+            <Label className="text-slate-200 mb-2 block">Tono desiderato:</Label>
             <select 
-              className="w-full p-3 rounded-lg bg-slate-800/50 border border-slate-600 text-white"
+              className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg p-3 text-slate-200 focus:border-slate-500 focus:outline-none"
               value={formData.tone}
               onChange={(e) => setFormData(prev => ({...prev, tone: e.target.value}))}
             >

@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
@@ -103,6 +102,19 @@ const AITransformationDay1 = () => {
     }
   };
 
+  // Optimized handlers to prevent re-rendering issues
+  const handleRoleChange = useCallback((value: string) => {
+    setUserProfile(prev => ({ ...prev, role: value }));
+  }, []);
+
+  const handleChallengeChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setUserProfile(prev => ({ ...prev, currentChallenge: value }));
+  }, []);
+
+  // Base input styles consistent with prompt lab
+  const inputBaseStyles = "w-full bg-slate-800/80 border border-slate-600/60 text-slate-100 placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:ring-offset-0 focus:outline-none transition-all duration-200";
+
   // Onboarding Screen
   const OnboardingScreen = () => (
     <GlassmorphismCard className="max-w-2xl mx-auto">
@@ -118,39 +130,39 @@ const AITransformationDay1 = () => {
 
       <div className="space-y-6">
         <div>
-          <Label className="text-slate-200 mb-2 block">Dimmi il tuo ruolo:</Label>
-          <Select value={userProfile.role} onValueChange={(value) => setUserProfile(prev => ({...prev, role: value}))}>
-            <SelectTrigger className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0">
+          <Label className="text-slate-200 mb-2 block font-medium">Dimmi il tuo ruolo:</Label>
+          <Select value={userProfile.role} onValueChange={handleRoleChange}>
+            <SelectTrigger className={inputBaseStyles}>
               <SelectValue placeholder="Seleziona il tuo ruolo" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600 z-50">
-              <SelectItem value="manager" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Manager</SelectItem>
-              <SelectItem value="developer" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Developer</SelectItem>
-              <SelectItem value="marketing" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Marketing</SelectItem>
-              <SelectItem value="sales" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Sales</SelectItem>
-              <SelectItem value="hr" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">HR</SelectItem>
-              <SelectItem value="consultant" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Consultant</SelectItem>
-              <SelectItem value="entrepreneur" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Entrepreneur</SelectItem>
-              <SelectItem value="other" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Altro</SelectItem>
+            <SelectContent className="bg-slate-800/95 border-slate-600/60 backdrop-blur-sm z-50">
+              <SelectItem value="manager" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Manager</SelectItem>
+              <SelectItem value="developer" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Developer</SelectItem>
+              <SelectItem value="marketing" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Marketing</SelectItem>
+              <SelectItem value="sales" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Sales</SelectItem>
+              <SelectItem value="hr" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">HR</SelectItem>
+              <SelectItem value="consultant" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Consultant</SelectItem>
+              <SelectItem value="entrepreneur" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Entrepreneur</SelectItem>
+              <SelectItem value="other" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Altro</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
-          <Label className="text-slate-200 mb-2 block">Una sfida che affronti questa settimana:</Label>
+          <Label className="text-slate-200 mb-2 block font-medium">Una sfida che affronti questa settimana:</Label>
           <Textarea
             placeholder="Descrivi una sfida lavorativa che stai affrontando..."
-            className="bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0 resize-none"
+            className={`${inputBaseStyles} resize-none min-h-[120px]`}
             rows={4}
             value={userProfile.currentChallenge}
-            onChange={(e) => setUserProfile(prev => ({...prev, currentChallenge: e.target.value}))}
+            onChange={handleChallengeChange}
           />
         </div>
 
         <Button
           onClick={() => setCurrentStep(1)}
           disabled={!userProfile.role || !userProfile.currentChallenge}
-          className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white py-4 text-lg font-semibold"
+          className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white py-4 text-lg font-semibold transition-all duration-200"
         >
           <Zap className="w-5 h-5 mr-2" />
           INIZIA LE SFIDE
@@ -167,6 +179,15 @@ const AITransformationDay1 = () => {
       objective: '',
       tone: 'professionale'
     });
+
+    const handleInputChange = useCallback((field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }, []);
+
+    const handleToneChange = useCallback((value: string) => {
+      setFormData(prev => ({ ...prev, tone: value }));
+    }, []);
 
     const generateEmail = async () => {
       const prompt = `
@@ -257,48 +278,48 @@ const AITransformationDay1 = () => {
 
         <div className="space-y-4">
           <div>
-            <Label className="text-slate-200 mb-2 block">Destinatario:</Label>
+            <Label className="text-slate-200 mb-2 block font-medium">Destinatario:</Label>
             <Input
               type="text"
-              className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0"
+              className={inputBaseStyles}
               value={formData.recipient}
-              onChange={(e) => setFormData(prev => ({...prev, recipient: e.target.value}))}
+              onChange={handleInputChange('recipient')}
               placeholder="es. Cliente, Manager, Team..."
             />
           </div>
 
           <div>
-            <Label className="text-slate-200 mb-2 block">Argomento:</Label>
+            <Label className="text-slate-200 mb-2 block font-medium">Argomento:</Label>
             <Input
               type="text"
-              className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0"
+              className={inputBaseStyles}
               value={formData.subject}
-              onChange={(e) => setFormData(prev => ({...prev, subject: e.target.value}))}
+              onChange={handleInputChange('subject')}
               placeholder="es. Aggiornamento progetto, Proposta..."
             />
           </div>
 
           <div>
-            <Label className="text-slate-200 mb-2 block">Obiettivo:</Label>
+            <Label className="text-slate-200 mb-2 block font-medium">Obiettivo:</Label>
             <Input
               type="text"
-              className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0"
+              className={inputBaseStyles}
               value={formData.objective}
-              onChange={(e) => setFormData(prev => ({...prev, objective: e.target.value}))}
+              onChange={handleInputChange('objective')}
               placeholder="es. Richiedere feedback, Proporre meeting..."
             />
           </div>
 
           <div>
-            <Label className="text-slate-200 mb-2 block">Tono desiderato:</Label>
-            <Select value={formData.tone} onValueChange={(value) => setFormData(prev => ({...prev, tone: value}))}>
-              <SelectTrigger className="w-full bg-slate-800/60 border border-slate-600/50 text-slate-200 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:ring-offset-0">
+            <Label className="text-slate-200 mb-2 block font-medium">Tono desiderato:</Label>
+            <Select value={formData.tone} onValueChange={handleToneChange}>
+              <SelectTrigger className={inputBaseStyles}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600 z-50">
-                <SelectItem value="formale" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Formale</SelectItem>
-                <SelectItem value="amichevole" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Amichevole</SelectItem>
-                <SelectItem value="diretto" className="text-slate-200 focus:bg-slate-700 focus:text-slate-100">Diretto</SelectItem>
+              <SelectContent className="bg-slate-800/95 border-slate-600/60 backdrop-blur-sm z-50">
+                <SelectItem value="formale" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Formale</SelectItem>
+                <SelectItem value="amichevole" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Amichevole</SelectItem>
+                <SelectItem value="diretto" className="text-slate-200 focus:bg-slate-700/80 focus:text-slate-100">Diretto</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -306,7 +327,7 @@ const AITransformationDay1 = () => {
           <Button
             onClick={generateEmail}
             disabled={!formData.recipient || !formData.subject || !formData.objective || isProcessing}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg transition-all duration-200"
           >
             {isProcessing ? (
               <>

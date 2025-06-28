@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import GlassmorphismCard from '@/components/GlassmorphismCard';
+import TransformationHeader from '@/components/ai-transformation/TransformationHeader';
 import OnboardingScreen from '@/components/ai-transformation/OnboardingScreen';
 import EmailChallenge from '@/components/ai-transformation/EmailChallenge';
 import ResultsScreen from '@/components/ai-transformation/ResultsScreen';
+import InsightsPanel from '@/components/ai-transformation/InsightsPanel';
 
 interface UserProfile {
   name: string;
@@ -90,71 +89,80 @@ const AITransformationDay1 = () => {
     setCurrentStep(1);
   }, []);
 
-  const getCurrentStepProgress = () => {
-    if (currentStep === 0) return 0;
-    if (currentStep === 6) return 100;
-    return (currentStep / 5) * 100;
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
-      {/* Progress Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
       {currentStep > 0 && currentStep < 6 && (
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-white">AI Transformation - Giorno 1</h1>
-            <div className="text-slate-300">
-              Step {currentStep}/5
-            </div>
-          </div>
-          <Progress value={getCurrentStepProgress()} className="w-full h-2" />
-        </div>
-      )}
-
-      {/* Render current step */}
-      {currentStep === 0 && (
-        <OnboardingScreen
-          userProfile={userProfile}
-          onUserProfileChange={handleUserProfileChange}
-          onStart={handleStart}
-        />
-      )}
-      
-      {currentStep === 1 && (
-        <EmailChallenge
-          userProfile={userProfile}
+        <TransformationHeader
+          currentStep={currentStep}
+          totalSteps={5}
           timeLeft={timeLeft}
           formatTime={formatTime}
-          callAIService={callAIService}
-          completeChallenge={completeChallenge}
-          isProcessing={isProcessing}
-        />
-      )}
-      
-      {currentStep === 6 && (
-        <ResultsScreen
-          challengeResults={challengeResults}
-          sessionStartTime={sessionStartTime}
         />
       )}
 
-      {/* Placeholder for challenges 2-5 */}
-      {currentStep >= 2 && currentStep <= 5 && (
-        <GlassmorphismCard className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Sfida {currentStep}/5 - In Sviluppo
-          </h2>
-          <p className="text-slate-300 mb-6">
-            Questa sfida sarà disponibile presto!
-          </p>
-          <Button 
-            onClick={() => setCurrentStep(currentStep + 1)}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Prossima Sfida
-          </Button>
-        </GlassmorphismCard>
-      )}
+      <div className="flex min-h-screen">
+        {/* Main Content */}
+        <div className={currentStep > 0 && currentStep < 6 ? "flex-1 pr-4" : "w-full"}>
+          {/* Render current step */}
+          {currentStep === 0 && (
+            <OnboardingScreen
+              userProfile={userProfile}
+              onUserProfileChange={handleUserProfileChange}
+              onStart={handleStart}
+            />
+          )}
+          
+          {currentStep === 1 && (
+            <EmailChallenge
+              userProfile={userProfile}
+              timeLeft={timeLeft}
+              formatTime={formatTime}
+              callAIService={callAIService}
+              completeChallenge={completeChallenge}
+              isProcessing={isProcessing}
+            />
+          )}
+          
+          {currentStep === 6 && (
+            <ResultsScreen
+              challengeResults={challengeResults}
+              sessionStartTime={sessionStartTime}
+            />
+          )}
+
+          {/* Placeholder for challenges 2-5 */}
+          {currentStep >= 2 && currentStep <= 5 && (
+            <div className="prompt-lab-container">
+              <div className="step-card max-w-2xl mx-auto text-center">
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  🚧 Sfida {currentStep}/5 - In Sviluppo
+                </h2>
+                <p className="text-slate-300 mb-6">
+                  Questa sfida sarà disponibile presto! Stiamo perfezionando l'esperienza per te.
+                </p>
+                <button 
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Prossima Sfida →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Insights Panel - Only show during challenges */}
+        {currentStep > 0 && currentStep < 6 && (
+          <div className="w-80 p-4 bg-slate-900/50 border-l border-slate-700">
+            <InsightsPanel
+              currentStep={currentStep}
+              userProfile={userProfile}
+              challengeResults={challengeResults}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

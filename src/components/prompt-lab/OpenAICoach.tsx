@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Brain, CheckCircle, AlertTriangle, Lightbulb, RotateCcw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +26,7 @@ const OpenAICoach: React.FC<Props> = ({ userInput, context, onScoreChange, onRet
   const [error, setError] = useState<string | null>(null);
   const lastAnalyzedInput = useRef<string>('');
   const analysisInProgress = useRef<boolean>(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   console.log('🔍 OpenAICoach state:', {
     context,
@@ -38,7 +38,7 @@ const OpenAICoach: React.FC<Props> = ({ userInput, context, onScoreChange, onRet
     error
   });
 
-  const getContextPrompt = (context: string) => {
+  const getContextPrompt = useCallback((context: string) => {
     const prompts = {
       role: `Analizza questo testo che dovrebbe definire il ruolo di un AI assistant.
 
@@ -167,7 +167,14 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
 }`
     };
     return prompts[context] || prompts.role;
-  };
+  }, []);
+
+  // Stable callback for onScoreChange
+  const stableOnScoreChange = useCallback((score: number, canProceed: boolean) => {
+    if (onScoreChange) {
+      onScoreChange(score, canProceed);
+    }
+  }, [onScoreChange]);
 
   useEffect(() => {
     const trimmedInput = userInput.trim();
@@ -179,11 +186,16 @@ Rispondi SOLO in formato JSON con questa struttura esatta:
       analysisInProgress: analysisInProgress.current
     });
     
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
     if (!trimmedInput) {
       console.log('🔍 Input vuoto, resetting...');
       setFeedback(null);
       setError(null);
-      onScoreChange?.(0, false);
+      stableOnScoreChange(0, false);
       lastAnalyzedInput.current = '';
       return;
     }
@@ -267,7 +279,7 @@ TESTO DA ANALIZZARE:
         
         if (trimmedInput === userInput.trim()) {
           setFeedback(aiFeedback);
-          onScoreChange?.(normalizedScore, canProceed);
+          stableOnScoreChange(normalizedScore, canProceed);
           lastAnalyzedInput.current = trimmedInput;
           console.log('✅ Feedback set and callback called');
         }
@@ -293,7 +305,7 @@ TESTO DA ANALIZZARE:
           
           console.log('🔧 Fallback feedback applied:', fallbackFeedback);
           setFeedback(fallbackFeedback);
-          onScoreChange?.(fallbackScore, fallbackCanProceed);
+          stableOnScoreChange(fallbackScore, fallbackCanProceed);
         }
       } finally {
         analysisInProgress.current = false;
@@ -301,9 +313,23 @@ TESTO DA ANALIZZARE:
       }
     };
 
-    const timer = setTimeout(analyzeWithAI, 1500);
-    return () => clearTimeout(timer);
-  }, [userInput, context, onScoreChange]);
+    timeoutRef.current = setTimeout(analyzeWithAI, 1500);
+    
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [userInput, context, getContextPrompt, stableOnScoreChange]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!feedback && !isAnalyzing) return null;
 

@@ -415,7 +415,7 @@ const LLMFundamentals = () => {
                                 onClick={() => navigate('/ai-tutorial-interactive')}
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
                               >
-                                Modulo 2 →
+                                Modulo 1.2 →
                               </Button>
                             )}
                           </div>

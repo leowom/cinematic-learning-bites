@@ -698,16 +698,15 @@ const RoleInstruction = () => {
                       >
                         Modulo 2.4 →
                       </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+                     </div>
+                   </div>
+                 )}
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     );
+   };
 
 export default RoleInstruction;

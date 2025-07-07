@@ -446,6 +446,7 @@ const ContestoExercise = () => {
                                     } else if (module.id !== 'modulo-2') {
                                       navigateToModule(module.route);
                                     }
+                                    // Current lesson (2.1) - no navigation needed
                                   }}
                                 >
                                   <div className="flex items-start justify-between">

@@ -33,17 +33,17 @@ const PromptingCourse = () => {
       id: 'modulo-1',
       title: 'Modulo 1 - LLM Fundamentals',
       description: 'Fondamenti dei Large Language Models',
-      duration: '20:00',
+      duration: '8:12',
       completed: true,
       route: '/llm-fundamentals',
       lessons: [
         {
           id: 0,
-          title: "Fondamenti dei Large Language Models",
-          duration: "20:00",
+          title: "Dentro un LLM: cosa fa e come parlarci in modo efficace",
+          duration: "8:12",
           completed: true,
           current: false,
-          description: "Comprendi i principi fondamentali dei Large Language Models e il loro impatto"
+          description: "Esplora il funzionamento interno dei Large Language Models e impara le tecniche più efficaci per comunicare con l'AI"
         }
       ]
     },
@@ -69,7 +69,7 @@ const PromptingCourse = () => {
       id: 'modulo-2',
       title: 'Modulo 2 - Prompting',
       description: 'Tecniche avanzate di prompting',
-      duration: '25:36',
+      duration: '35:36',
       completed: false,
       route: '/prompting',
       lessons: [
@@ -80,6 +80,14 @@ const PromptingCourse = () => {
           completed: false,
           current: true,
           description: "Scopri le tecniche avanzate di prompting per massimizzare l'efficacia della comunicazione con l'intelligenza artificiale"
+        },
+        {
+          id: 1,
+          title: "Il potere del contesto nel prompt",
+          duration: "10:00",
+          completed: false,
+          current: false,
+          description: "Esercizio pratico per comprendere l'importanza del contesto nei prompt"
         }
       ]
     }
@@ -122,14 +130,14 @@ const PromptingCourse = () => {
             </Button>
           </div>
 
-          <div className="text-center">
-            <div className="text-slate-200 font-medium">
-              Modulo 2 - Prompting
+            <div className="text-center">
+              <div className="text-slate-200 font-medium">
+                Modulo 2 - Prompting
+              </div>
+              <div className="text-slate-400 text-sm">
+                Passo 1 di 2
+              </div>
             </div>
-            <div className="text-slate-400 text-sm">
-              Passo 1 di 1
-            </div>
-          </div>
 
           <div className="text-right">
             <div className="text-slate-300 text-sm">
@@ -252,7 +260,11 @@ const PromptingCourse = () => {
                                   }`}
                                   onClick={() => {
                                     if (module.id === 'modulo-2') {
-                                      setCurrentLesson(index);
+                                      if (index === 0) {
+                                        setCurrentLesson(index);
+                                      } else if (index === 1) {
+                                        navigate('/contesto');
+                                      }
                                     } else {
                                       navigateToModule(module.route);
                                     }
@@ -388,10 +400,10 @@ const PromptingCourse = () => {
                     ← Modulo 1.2
                   </Button>
                   <Button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/contesto')}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    Completa Modulo
+                    Modulo 2.1 →
                   </Button>
                 </div>
               </div>

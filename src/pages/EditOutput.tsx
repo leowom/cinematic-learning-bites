@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { Home, Play, CheckCircle, Clock, User, BookOpen, Award, ArrowRight, Bot, MessageCircle, Lightbulb, ChevronDown, ChevronRight, Menu, Layout, List, Table } from 'lucide-react';
+import { Home, Play, CheckCircle, Clock, User, BookOpen, Award, ArrowRight, Bot, MessageCircle, Lightbulb, ChevronDown, ChevronRight, Menu, Edit3, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 
-const FormatControl = () => {
+const EditOutput = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
   const [showTutorial, setShowTutorial] = useState(true);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false, false]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [userInput, setUserInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'ai', content: string, timestamp?: number}>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [stepCompleted, setStepCompleted] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [expandedModules, setExpandedModules] = useState<string[]>(['modulo-2']);
 
@@ -95,15 +100,15 @@ const FormatControl = () => {
           id: 2,
           title: "Controllare il formato dell'output",
           duration: "10:00",
-          completed: false,
-          current: true,
+          completed: true,
+          current: false,
           description: "Scopri come ottenere output strutturati e utilizzabili specificando il formato desiderato"
         },
         {
           id: 3,
           title: "Dare un ruolo all'AI nel prompt",
           duration: "10:00",
-          completed: false,
+          completed: true,
           current: false,
           description: "Impara come assegnare ruoli specifici per ottenere risposte più esperte e specializzate"
         },
@@ -112,7 +117,7 @@ const FormatControl = () => {
           title: "Chiedere modifiche all'output",
           duration: "10:00",
           completed: false,
-          current: false,
+          current: true,
           description: "Pratica l'interazione iterativa per affinare e migliorare le risposte dell'AI"
         }
       ]
@@ -136,62 +141,60 @@ const FormatControl = () => {
     navigate(route);
   };
 
-  const exercises = [
-    {
-      id: 0,
-      title: "Output in Tabella",
-      icon: Table,
-      prompt: "Potresti farmi una panoramica comparativa di 3 tool di intelligenza artificiale utili per chi lavora in marketing, indicando nome, funzione e se sono gratuiti o a pagamento?",
-      outputWithoutFormat: "ChatGPT: un assistente AI per scrivere testi, email, script, brainstorming. Offre sia versione gratuita che a pagamento.\n\nCopy.ai: AI per generare testi pubblicitari, headline, email. Ha un piano gratuito limitato.\n\nSurfer SEO: AI per ottimizzazione SEO, crea articoli e brief. Solo a pagamento.",
-      formatRequest: "...e puoi mostrarmeli in una tabella con queste colonne: Nome, Funzione, Prezzo?",
-      outputWithFormat: "Nome\t\tFunzione\t\t\t\t\tPrezzo\nChatGPT\t\tAssistente AI per testi e idee\t\t\tGratuito + Pro\nCopy.ai\t\tGeneratore testi pubblicitari\t\t\tGratuito (limitato)\nSurfer SEO\tOttimizzazione SEO e content brief\tA pagamento",
-      tooltip: "La tabella rende il confronto immediato e facilmente copiabile in slide, report o email.",
-      color: "blue"
-    },
-    {
-      id: 1,
-      title: "Output in Bullet List Operativa",
-      icon: List,
-      prompt: "Mi scrivi uno script base per una call di follow-up con un cliente che ha chiesto informazioni ma non ha ancora acquistato?",
-      outputWithoutFormat: "Certo. Potresti iniziare salutando il cliente e ringraziandolo per l'interesse. Poi chiedere se ha domande o dubbi sul servizio, infine ribadire i benefici e proporre di fissare una call più dettagliata o direttamente l'acquisto.",
-      formatRequest: "...puoi invece scrivermelo come elenco puntato, diviso per fasi della call?",
-      outputWithFormat: "Script follow-up:\n\n• Apertura:\n  - \"Ciao [Nome], grazie ancora per l'interesse di qualche giorno fa.\"\n  - \"Hai avuto modo di pensarci o ci sono domande a cui posso rispondere?\"\n\n• Ascolto attivo:\n  - Ascolta dubbi, motivazioni, obiezioni\n  - \"Capisco perfettamente, ti va se rivediamo insieme i punti principali?\"\n\n• Proposta:\n  - \"Come ti accennavo, ecco i vantaggi principali del servizio...\"\n  - \"Possiamo fissare una demo oppure iniziare già con il primo step.\"\n\n• Chiusura:\n  - \"Ti andrebbe di fissare un appuntamento già domani o venerdì?\"",
-      tooltip: "La bullet list rende il discorso più operativo e ti guida passo-passo nella call.",
-      color: "emerald"
-    },
-    {
-      id: 2,
-      title: "Output in Formato Slide",
-      icon: Layout,
-      prompt: "Devo preparare una presentazione introduttiva sull'uso dell'intelligenza artificiale in ufficio da mostrare ai miei colleghi. Puoi darmi una sintesi chiara con i punti principali?",
-      outputWithoutFormat: "Certo. L'intelligenza artificiale sta diventando uno strumento essenziale negli uffici. Può aiutare a generare testi, riassumere documenti, rispondere a email, analizzare dati e supportare decisioni. È importante però usarla con senso critico...",
-      formatRequest: "...puoi organizzarla come se fosse una presentazione PowerPoint? Tipo: slide 1 = titolo + bullet point, e così via?",
-      outputWithFormat: "Slide 1 – Cos'è l'Intelligenza Artificiale\n• È la simulazione del ragionamento umano da parte delle macchine\n• Si basa su dati, modelli statistici e linguaggio\n• È già integrata in molti strumenti che usiamo\n\nSlide 2 – Usi pratici in ufficio\n• Scrivere email e report più velocemente\n• Riassumere documenti o meeting\n• Creare presentazioni, analizzare dati\n\nSlide 3 – Cose da ricordare\n• Verificare sempre i risultati\n• L'AI è un supporto, non un sostituto\n• Serve sperimentare per integrarla bene nel proprio lavoro",
-      tooltip: "Chiedere il formato 'slide' aiuta a ottenere contenuti già pronti da incollare in PowerPoint.",
-      color: "purple"
-    }
+  const initialPrompt = "Cos'è l'Intelligenza Artificiale Generativa?";
+  const initialResponse = "L'intelligenza artificiale generativa è una branca dell'AI che si occupa di creare nuovi contenuti come testi, immagini, musica o codice, partendo da dati esistenti. Utilizza modelli linguistici di grandi dimensioni (LLM) per imparare e replicare la struttura del linguaggio umano o di altri segnali digitali.";
+
+  const simplifiedResponse = "L'intelligenza artificiale generativa è una tecnologia che può creare cose nuove, come testi, immagini o musica. Lo fa imparando da tanti esempi già esistenti. È come un programma molto intelligente che ha letto milioni di cose e ora riesce a scriverne di nuove da solo.";
+
+  const childFriendlyResponse = "L'intelligenza artificiale generativa è come un robot che legge tanti libri e poi ne inventa uno nuovo tutto da solo. Non copia, ma crea cose nuove, come storie, disegni o canzoni, proprio come fanno le persone creative.";
+
+  const tooltips = [
+    "Puoi chiedere all'AI di riscrivere, semplificare o adattare la risposta al tuo pubblico.",
+    "Non servono prompt perfetti. Basta dire cosa vuoi in modo chiaro.",
+    "ChatGPT è una conversazione, non un generatore a colpo singolo!"
   ];
 
-  const nextStep = () => {
-    if (currentStep < exercises.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+  const startExercise = () => {
+    setShowTutorial(false);
+    // Initialize chat with the first prompt and response
+    setChatMessages([
+      { type: 'user', content: initialPrompt },
+      { type: 'ai', content: initialResponse }
+    ]);
   };
 
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  const handleSendMessage = async () => {
+    if (!userInput.trim()) return;
 
-  const markStepCompleted = () => {
-    const newCompleted = [...completedSteps];
-    newCompleted[currentStep] = true;
-    setCompletedSteps(newCompleted);
-  };
+    const newMessages = [...chatMessages, { type: 'user' as const, content: userInput }];
+    setChatMessages(newMessages);
+    setIsLoading(true);
 
-  const isAllCompleted = completedSteps.every(step => step);
-  const currentExercise = exercises[currentStep];
+    // Simulate AI thinking time
+    setTimeout(() => {
+      let aiResponse = "";
+      const input = userInput.toLowerCase();
+
+      if (input.includes('semplice') || input.includes('semplicemente') || input.includes('più facile')) {
+        aiResponse = simplifiedResponse;
+      } else if (input.includes('10 anni') || input.includes('bambino') || input.includes('bambini') || input.includes('semplice per')) {
+        aiResponse = childFriendlyResponse;
+      } else {
+        aiResponse = "Perfetto! Prova a chiedermi di 'rendere più semplice' la spiegazione, oppure di 'spiegarlo come se avessi 10 anni'. Sono qui per adattare la risposta alle tue esigenze!";
+      }
+
+      setChatMessages([...newMessages, { type: 'ai', content: aiResponse }]);
+      setIsLoading(false);
+      setUserInput('');
+      
+      // Show tooltip after successful interaction
+      if (aiResponse !== "Perfetto! Prova a chiedermi di 'rendere più semplice' la spiegazione, oppure di 'spiegarlo come se avessi 10 anni'. Sono qui per adattare la risposta alle tue esigenze!") {
+        setStepCompleted(true);
+        setShowTooltip(true);
+        setTimeout(() => setShowTooltip(false), 5000);
+      }
+    }, 2000);
+  };
 
   if (showTutorial) {
     return (
@@ -215,16 +218,16 @@ const FormatControl = () => {
 
             <div className="text-center">
               <div className="text-slate-200 font-medium">
-                Modulo 2.2 – Controllare il formato dell'output
+                Modulo 2.4 – Chiedere modifiche all'output
               </div>
               <div className="text-slate-400 text-sm">
-                3 Esercizi Comparativi
+                Esercizio Interattivo
               </div>
             </div>
 
             <div className="text-right">
               <div className="text-slate-300 text-sm">
-                Prima & Dopo
+                Pratica Guidata
               </div>
             </div>
           </div>
@@ -234,57 +237,51 @@ const FormatControl = () => {
             <div className="step-card glassmorphism-base text-center">
               <div className="section-spacing">
                 <div className="mb-8">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-orange-500/20 rounded-full flex items-center justify-center">
-                    <Layout className="w-10 h-10 text-orange-400" />
+                  <div className="w-20 h-20 mx-auto mb-6 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <Edit3 className="w-10 h-10 text-green-400" />
                   </div>
                   <h1 className="text-3xl font-bold text-white mb-4">
-                    📋 Controllare il formato dell'output
+                    ✏️ Chiedere modifiche all'output
                   </h1>
                   <p className="text-slate-300 text-lg leading-relaxed max-w-3xl mx-auto mb-8">
-                    Scopri come lo stesso contenuto può diventare molto più utile e professionale 
-                    semplicemente specificando il formato desiderato nel tuo prompt.
+                    Ora è il tuo turno! Sperimenta l'interazione iterativa con l'AI per affinare 
+                    e migliorare le risposte in base alle tue esigenze specifiche.
                   </p>
                 </div>
 
-                <div className="bg-orange-900/20 border border-orange-700/40 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
-                  <h3 className="text-orange-300 font-semibold mb-4 flex items-center">
-                    <Layout className="w-5 h-5 mr-2" />
-                    Formati che sperimenterai:
+                <div className="bg-green-900/20 border border-green-700/40 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
+                  <h3 className="text-green-300 font-semibold mb-4 flex items-center">
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    Come funziona:
                   </h3>
                   <ul className="text-slate-300 space-y-2">
                     <li className="flex items-start">
-                      <Table className="w-4 h-4 mr-2 mt-0.5 text-blue-400" />
-                      <div>
-                        <strong>Tabelle</strong> - Per confronti chiari e dati strutturati
-                      </div>
+                      <span className="text-blue-400 mr-2">1.</span>
+                      L'AI risponderà a una domanda iniziale
                     </li>
                     <li className="flex items-start">
-                      <List className="w-4 h-4 mr-2 mt-0.5 text-emerald-400" />
-                      <div>
-                        <strong>Bullet List</strong> - Per istruzioni operative step-by-step
-                      </div>
+                      <span className="text-emerald-400 mr-2">2.</span>
+                      Tu chiederai di modificare la risposta
                     </li>
                     <li className="flex items-start">
-                      <Layout className="w-4 h-4 mr-2 mt-0.5 text-purple-400" />
-                      <div>
-                        <strong>Slide PowerPoint</strong> - Per presentazioni pronte all'uso
-                      </div>
+                      <span className="text-purple-400 mr-2">3.</span>
+                      L'AI adatterà l'output alle tue richieste
                     </li>
                   </ul>
                 </div>
 
                 <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-4 mb-8 text-left max-w-2xl mx-auto">
                   <p className="text-yellow-300 text-sm">
-                    <strong>💡 Punto chiave:</strong> Il contenuto è sempre lo stesso, cambia solo come viene presentato. 
-                    Questo ti fa risparmiare tempo nella formattazione e rende l'output immediatamente utilizzabile.
+                    <strong>💡 Suggerimenti:</strong> Prova a dire "Rendilo più semplice" o 
+                    "Spiegamelo come se avessi 10 anni" per vedere come l'AI adatta la risposta!
                   </p>
                 </div>
 
                 <Button
-                  onClick={() => setShowTutorial(false)}
-                  className="bg-orange-600 hover:bg-orange-700 text-white text-lg px-8 py-3"
+                  onClick={startExercise}
+                  className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-3"
                 >
-                  Inizia gli Esercizi
+                  Inizia a Chattare
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
@@ -316,23 +313,17 @@ const FormatControl = () => {
 
           <div className="text-center">
             <div className="text-slate-200 font-medium">
-              Modulo 2.2 – Controllare il formato dell'output
+              Modulo 2.4 – Chiedere modifiche all'output
             </div>
             <div className="text-slate-400 text-sm">
-              Esercizio {currentStep + 1} di {exercises.length}
+              Chat Interattiva
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
-              Progresso: {completedSteps.filter(Boolean).length}/{exercises.length}
-            </div>
-            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
-              <div
-                className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(completedSteps.filter(Boolean).length / exercises.length) * 100}%` }}
-              />
-            </div>
+            <Badge variant="outline" className={`${stepCompleted ? 'text-emerald-300 border-emerald-500/50' : 'text-green-300 border-green-500/50'}`}>
+              {stepCompleted ? 'Completato!' : 'In Corso'}
+            </Badge>
           </div>
         </div>
 
@@ -386,7 +377,7 @@ const FormatControl = () => {
                           <div
                             className={`p-4 cursor-pointer transition-all duration-200 ${
                               module.id === 'modulo-2' 
-                                ? 'bg-orange-900/30 border-l-4 border-orange-400' 
+                                ? 'bg-green-900/30 border-l-4 border-green-400' 
                                 : module.completed
                                 ? 'bg-emerald-900/20 hover:bg-emerald-900/30 border-l-4 border-emerald-400'
                                 : 'bg-slate-800/40 hover:bg-slate-700/50 border-l-4 border-slate-600'
@@ -399,7 +390,7 @@ const FormatControl = () => {
                                   {module.completed ? (
                                     <CheckCircle className="w-5 h-5 text-emerald-400" />
                                   ) : module.id === 'modulo-2' ? (
-                                    <Play className="w-5 h-5 text-orange-400" />
+                                    <Play className="w-5 h-5 text-green-400" />
                                   ) : (
                                     <div className="w-5 h-5 rounded-full border-2 border-slate-500" />
                                   )}
@@ -437,7 +428,7 @@ const FormatControl = () => {
                                   key={lesson.id}
                                   className={`p-4 pl-16 cursor-pointer transition-all duration-200 border-l-4 ${
                                     lesson.current && module.id === 'modulo-2'
-                                      ? 'bg-orange-800/20 border-orange-400'
+                                      ? 'bg-green-800/20 border-green-400'
                                       : lesson.completed
                                       ? 'bg-emerald-800/10 hover:bg-emerald-800/20 border-emerald-400/50'
                                       : 'hover:bg-slate-700/20 border-transparent'
@@ -448,8 +439,12 @@ const FormatControl = () => {
                                         navigateToModule('/prompting');
                                       } else if (index === 1) {
                                         navigateToModule('/contesto');
+                                      } else if (index === 2) {
+                                        navigateToModule('/ai-interactive/format-control');
+                                      } else if (index === 3) {
+                                        navigateToModule('/ai-interactive/role-instruction');
                                       }
-                                      // Current lesson (2.2) - no navigation needed
+                                      // Current lesson (2.4) - no navigation needed
                                     } else if (module.id !== 'modulo-2') {
                                       navigateToModule(module.route);
                                     }
@@ -458,7 +453,7 @@ const FormatControl = () => {
                                   <div className="flex items-start justify-between">
                                     <div className="flex-1 min-w-0 pr-3">
                                       <h5 className={`text-sm font-medium leading-tight ${
-                                        lesson.current && module.id === 'modulo-2' ? 'text-orange-300' : 'text-slate-300'
+                                        lesson.current && module.id === 'modulo-2' ? 'text-green-300' : 'text-slate-300'
                                       }`}>
                                         {lesson.title}
                                       </h5>
@@ -490,7 +485,7 @@ const FormatControl = () => {
                           key={module.id}
                           className={`w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
                             module.id === 'modulo-2' 
-                              ? 'bg-orange-900/40 border border-orange-400/50' 
+                              ? 'bg-green-900/40 border border-green-400/50' 
                               : module.completed
                               ? 'bg-emerald-900/40 border border-emerald-400/50'
                               : 'bg-slate-800/40 border border-slate-600/50 hover:bg-slate-700/50'
@@ -505,7 +500,7 @@ const FormatControl = () => {
                           {module.completed ? (
                             <CheckCircle className="w-4 h-4 text-emerald-400" />
                           ) : module.id === 'modulo-2' ? (
-                            <Play className="w-4 h-4 text-orange-400" />
+                            <Play className="w-4 h-4 text-green-400" />
                           ) : (
                             <div className="w-3 h-3 rounded-full border border-slate-500" />
                           )}
@@ -518,196 +513,175 @@ const FormatControl = () => {
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* Main Content - Chat Interface */}
           <div className="flex-1 min-w-0">
-            <div className="step-card glassmorphism-base">
-              <div className="section-spacing">
-                {!isAllCompleted ? (
-                  <>
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-white flex items-center">
-                          <currentExercise.icon className={`w-6 h-6 mr-3 text-${currentExercise.color}-400`} />
-                          {currentExercise.title}
-                        </h2>
-                        <Badge 
-                          variant="outline" 
-                          className="text-orange-300 border-orange-500/50"
-                        >
-                          {currentStep + 1}/{exercises.length}
-                        </Badge>
-                      </div>
-                    </div>
+            <div className="step-card glassmorphism-base h-full">
+              <div className="section-spacing h-full flex flex-col">
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white mb-2 flex items-center">
+                    <Edit3 className="w-6 h-6 mr-3 text-green-400" />
+                    Chat Interattiva con l'AI
+                  </h2>
+                  <p className="text-slate-400 text-sm">
+                    Prova a chiedere modifiche alla risposta dell'AI per adattarla alle tue esigenze
+                  </p>
+                </div>
 
-                    {/* Original Prompt */}
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-white mb-3">📝 Prompt Base (sempre lo stesso)</h3>
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                        <div className="flex items-center mb-3">
-                          <User className="w-5 h-5 mr-2 text-blue-400" />
-                          <span className="text-blue-300 font-medium">Input Utente</span>
-                        </div>
-                        <div className="bg-blue-600 text-white rounded-lg px-4 py-3 inline-block max-w-[90%]">
-                          <p className="text-sm">{currentExercise.prompt}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Without Format */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-white">❌ Senza formato specificato</h3>
-                      </div>
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                        <div className="flex items-center mb-3">
-                          <Bot className="w-5 h-5 mr-2 text-red-400" />
-                          <span className="text-red-300 font-medium">Risposta AI</span>
-                        </div>
-                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3">
-                          <p className="text-sm whitespace-pre-line">{currentExercise.outputWithoutFormat}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* With Format Request */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-white">✅ Con formato richiesto</h3>
-                      </div>
-                      
-                      {/* Format Request */}
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4">
-                        <div className="flex items-center mb-3">
-                          <User className="w-5 h-5 mr-2 text-blue-400" />
-                          <span className="text-blue-300 font-medium">Aggiunta al Prompt</span>
-                        </div>
-                        <div className="bg-blue-600 text-white rounded-lg px-4 py-3 inline-block max-w-[90%]">
-                          <p className="text-sm">{currentExercise.formatRequest}</p>
-                        </div>
-                      </div>
-
-                      {/* Formatted Output */}
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                        <div className="flex items-center mb-3">
-                          <Bot className="w-5 h-5 mr-2 text-emerald-400" />
-                          <span className="text-emerald-300 font-medium">Risposta AI Formattata</span>
-                        </div>
-                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3">
-                          <pre className="text-sm whitespace-pre-wrap font-mono">{currentExercise.outputWithFormat}</pre>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tooltip */}
-                    <div className={`bg-${currentExercise.color}-900/20 border border-${currentExercise.color}-700/40 rounded-lg p-4 mb-6`}>
-                      <div className="flex items-center mb-2">
-                        <Lightbulb className={`w-5 h-5 mr-2 text-${currentExercise.color}-400`} />
-                        <span className={`text-${currentExercise.color}-300 font-medium`}>Perché funziona meglio?</span>
-                      </div>
-                      <p className="text-slate-300 text-sm">{currentExercise.tooltip}</p>
-                    </div>
-
-                    {/* Navigation */}
-                    <div className="flex justify-between items-center">
-                      <Button
-                        onClick={prevStep}
-                        disabled={currentStep === 0}
-                        variant="ghost"
-                        className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50"
-                      >
-                        ← Precedente
-                      </Button>
-                      
-                      <div className="flex space-x-4">
-                        {!completedSteps[currentStep] && (
-                          <Button
-                            onClick={markStepCompleted}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            Ho Capito!
-                          </Button>
-                        )}
-                        
-                        {completedSteps[currentStep] && currentStep < exercises.length - 1 && (
-                          <Button
-                            onClick={nextStep}
-                            className="bg-orange-600 hover:bg-orange-700 text-white"
-                          >
-                            Prossimo Esercizio →
-                          </Button>
-                        )}
-                        
-                        {completedSteps[currentStep] && currentStep === exercises.length - 1 && (
-                          <Button
-                            onClick={() => {
-                              // Mark as fully completed and show final message
-                              setCompletedSteps([true, true, true]);
-                            }}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            Completa Modulo
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  /* Final Summary */
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-10 h-10 text-emerald-400" />
-                    </div>
-                    
-                    <h2 className="text-2xl font-bold text-white mb-4">
-                      🎉 Modulo Completato!
-                    </h2>
-                    
-                    <p className="text-slate-300 text-lg mb-6">
-                      Hai visto come può cambiare lo stesso contenuto solo in base al formato richiesto?
+                {/* Tooltip */}
+                {showTooltip && (
+                  <div className="mb-4 bg-green-900/20 border border-green-700/40 rounded-lg p-3 animate-fade-in">
+                    <p className="text-green-300 text-sm flex items-center">
+                      <Lightbulb className="w-4 h-4 mr-2" />
+                      {tooltips[Math.floor(Math.random() * tooltips.length)]}
                     </p>
-
-                    <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-6 mb-6 text-left max-w-2xl mx-auto">
-                      <h3 className="text-blue-300 font-semibold mb-4">🧠 Con i LLM puoi chiedere:</h3>
-                      <ul className="text-slate-300 space-y-2">
-                        <li className="flex items-start">
-                          <span className="text-blue-400 mr-2">•</span>
-                          "Fammi una tabella con..."
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-emerald-400 mr-2">•</span>
-                          "Scrivimi in bullet point..."
-                        </li>
-                        <li className="flex items-start">
-                          <span className="text-purple-400 mr-2">•</span>
-                          "Organizzalo come presentazione slide..."
-                        </li>
-                      </ul>
-                      
-                      <div className="bg-orange-900/30 border border-orange-700/30 rounded p-4 mt-4">
-                        <p className="text-orange-200 text-sm">
-                          <strong>💡 Regola d'oro:</strong> Ogni formato ti fa risparmiare tempo in un contesto diverso: 
-                          presentazioni, call, email, documenti.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center space-x-4">
-                      <Button
-                        onClick={() => navigate('/contesto')}
-                        variant="ghost"
-                        className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-                      >
-                        ← Modulo 2.1
-                      </Button>
-                      <Button
-                        onClick={() => navigate('/ai-interactive/role-instruction')}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                      >
-                        Modulo 2.3 →
-                      </Button>
-                    </div>
                   </div>
                 )}
+
+                {/* Chat Area */}
+                <div className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4 overflow-y-auto min-h-[400px] max-h-[500px]">
+                  <div className="space-y-4">
+                    {chatMessages.map((message, index) => (
+                      <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                          message.type === 'user' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-slate-700/50 text-slate-200'
+                        }`}>
+                          {message.type === 'ai' && (
+                            <div className="flex items-center mb-2">
+                              <Bot className="w-4 h-4 mr-2 text-green-400" />
+                              <span className="text-green-400 text-sm font-medium">AI Assistant</span>
+                            </div>
+                          )}
+                          <p className="text-sm whitespace-pre-line">{message.content}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Loading State */}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%]">
+                          <div className="flex items-center mb-2">
+                            <Bot className="w-4 h-4 mr-2 text-green-400" />
+                            <span className="text-green-400 text-sm font-medium">AI Assistant</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
+                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
+                            <span className="text-slate-400 text-xs">Sto pensando...</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {chatMessages.length === 0 && (
+                      <div className="flex items-center justify-center h-full text-slate-400">
+                        <div className="text-center">
+                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                          <p>La conversazione inizierà automaticamente...</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Input Area */}
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <Textarea
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      placeholder="Scrivi qui la tua richiesta di modifica (es. 'Rendilo più semplice')..."
+                      className="flex-1 bg-slate-700/50 border-slate-600/50 text-slate-200 placeholder:text-slate-400 resize-none focus:border-green-500/50 focus:ring-green-500/20"
+                      rows={2}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={!userInput.trim() || isLoading}
+                      className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed self-end"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Suggestions */}
+                  {!stepCompleted && chatMessages.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        onClick={() => setUserInput("Rendilo più semplice")}
+                        variant="outline"
+                        size="sm"
+                        className="bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-600/50 text-xs"
+                      >
+                        💡 Rendilo più semplice
+                      </Button>
+                      <Button
+                        onClick={() => setUserInput("Spiegamelo come se avessi 10 anni")}
+                        variant="outline"
+                        size="sm"
+                        className="bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-600/50 text-xs"
+                      >
+                        👶 Come per un bambino
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Navigation */}
+                  <div className="flex justify-between items-center pt-4 border-t border-slate-700/50">
+                    <Button
+                      onClick={() => navigate('/ai-interactive/role-instruction')}
+                      variant="ghost"
+                      className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                    >
+                      ← Modulo 2.3
+                    </Button>
+                    
+                    {stepCompleted ? (
+                      <div className="text-center">
+                        <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 mb-4 max-w-lg">
+                          <div className="flex items-center mb-2">
+                            <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
+                            <h3 className="text-emerald-300 font-semibold">Ottimo lavoro!</h3>
+                          </div>
+                          <p className="text-slate-300 text-sm mb-3">
+                            Hai sperimentato l'interazione iterativa con l'AI per migliorare l'output in base alle tue esigenze.
+                          </p>
+                          <div className="text-left bg-slate-800/30 rounded p-3">
+                            <p className="text-slate-300 text-xs mb-2">Non serve riscrivere da zero. Basta dire:</p>
+                            <ul className="text-slate-400 text-xs space-y-1">
+                              <li>• "Semplifica"</li>
+                              <li>• "Fallo più tecnico"</li>
+                              <li>• "Fammelo in bullet"</li>
+                              <li>• "Scrivilo per LinkedIn"</li>
+                            </ul>
+                            <p className="text-green-300 text-xs mt-2 font-medium">L'AI ti segue, se la guidi.</p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => navigate('/dashboard')}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          Completa Modulo 2
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="text-slate-400 text-sm">
+                        Prova a modificare la risposta dell'AI
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -717,4 +691,4 @@ const FormatControl = () => {
   );
 };
 
-export default FormatControl;
+export default EditOutput;

@@ -71,7 +71,7 @@ const RoleInstruction = () => {
       id: 'modulo-2',
       title: 'Modulo 2 - Prompting',
       description: 'Tecniche avanzate di prompting',
-      duration: '55:36',
+      duration: '65:36',
       completed: false,
       route: '/prompting',
       lessons: [
@@ -106,6 +106,14 @@ const RoleInstruction = () => {
           completed: false,
           current: true,
           description: "Impara come assegnare ruoli specifici per ottenere risposte più esperte e specializzate"
+        },
+        {
+          id: 4,
+          title: "Chiedere modifiche all'output",
+          duration: "10:00",
+          completed: false,
+          current: false,
+          description: "Pratica l'interazione iterativa per affinare e migliorare le risposte dell'AI"
         }
       ]
     }
@@ -427,8 +435,11 @@ const RoleInstruction = () => {
                                         navigateToModule('/contesto');
                                       } else if (index === 2) {
                                         navigateToModule('/ai-interactive/format-control');
+                                      } else if (index === 3) {
+                                        // Current lesson - no navigation
+                                      } else if (index === 4) {
+                                        navigateToModule('/ai-interactive/edit-output');
                                       }
-                                      // Current lesson (2.3) - no navigation needed
                                     } else if (module.id !== 'modulo-2') {
                                       navigateToModule(module.route);
                                     }
@@ -674,10 +685,10 @@ const RoleInstruction = () => {
                         ← Modulo 2.2
                       </Button>
                       <Button
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => navigate('/ai-interactive/edit-output')}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white"
                       >
-                        Torna alla Dashboard
+                        Modulo 2.4 →
                       </Button>
                     </div>
                   </div>

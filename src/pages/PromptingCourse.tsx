@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Play, CheckCircle, Clock, User, BookOpen } from 'lucide-react';
+import { Home, Play, CheckCircle, Clock, User, BookOpen, ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
@@ -7,20 +7,103 @@ import { useNavigate } from 'react-router-dom';
 const PromptingCourse = () => {
   const navigate = useNavigate();
   const [currentLesson, setCurrentLesson] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [expandedModules, setExpandedModules] = useState<string[]>(['modulo-2']);
 
-  const lessons = [
+  const allModules = [
     {
-      id: 0,
-      title: "Prompting Avanzato e Strategie di Comunicazione con l'AI",
-      duration: "25:36",
+      id: 'introduzione',
+      title: 'Introduzione',
+      description: 'Introduzione all\'AI',
+      duration: '13:54',
+      completed: true,
+      route: '/introduzione',
+      lessons: [
+        {
+          id: 0,
+          title: "Introduzione all'AI",
+          duration: "13:54",
+          completed: true,
+          current: false,
+          description: "Scopri i fondamenti dell'intelligenza artificiale e come può trasformare il tuo business"
+        }
+      ]
+    },
+    {
+      id: 'modulo-1',
+      title: 'Modulo 1 - LLM Fundamentals',
+      description: 'Fondamenti dei Large Language Models',
+      duration: '20:00',
+      completed: true,
+      route: '/llm-fundamentals',
+      lessons: [
+        {
+          id: 0,
+          title: "Fondamenti dei Large Language Models",
+          duration: "20:00",
+          completed: true,
+          current: false,
+          description: "Comprendi i principi fondamentali dei Large Language Models e il loro impatto"
+        }
+      ]
+    },
+    {
+      id: 'modulo-1-2',
+      title: 'Modulo 1.2 - Tutorial Interattivo',
+      description: 'Esercizio guidato pratico',
+      duration: '15:00',
+      completed: true,
+      route: '/ai-tutorial-interactive',
+      lessons: [
+        {
+          id: 0,
+          title: "Esercizio Guidato Pratico",
+          duration: "15:00", 
+          completed: true,
+          current: false,
+          description: "Metti in pratica le conoscenze acquisite attraverso un esercizio guidato interattivo"
+        }
+      ]
+    },
+    {
+      id: 'modulo-2',
+      title: 'Modulo 2 - Prompting',
+      description: 'Tecniche avanzate di prompting',
+      duration: '25:36',
       completed: false,
-      current: true,
-      description: "Scopri le tecniche avanzate di prompting per massimizzare l'efficacia della comunicazione con l'intelligenza artificiale"
+      route: '/prompting',
+      lessons: [
+        {
+          id: 0,
+          title: "Prompting Avanzato e Strategie di Comunicazione con l'AI",
+          duration: "25:36",
+          completed: false,
+          current: true,
+          description: "Scopri le tecniche avanzate di prompting per massimizzare l'efficacia della comunicazione con l'intelligenza artificiale"
+        }
+      ]
     }
   ];
 
+  const lessons = allModules.find(m => m.id === 'modulo-2')?.lessons || [];
   const currentLessonData = lessons[currentLesson];
-  const progressPercentage = (lessons.filter(l => l.completed).length / lessons.length) * 100;
+  
+  const totalLessons = allModules.reduce((acc, module) => acc + module.lessons.length, 0);
+  const completedLessons = allModules.reduce((acc, module) => 
+    acc + module.lessons.filter(l => l.completed).length, 0);
+  const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules(prev => 
+      prev.includes(moduleId) 
+        ? prev.filter(id => id !== moduleId)
+        : [...prev, moduleId]
+    );
+  };
+
+  const navigateToModule = (route: string) => {
+    navigate(route);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
@@ -61,66 +144,144 @@ const PromptingCourse = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Sidebar - Lista Lezioni */}
-          <div className="col-span-12 lg:col-span-4">
-            <div className="step-card glassmorphism-base">
+        <div className="flex gap-6 relative">
+          {/* Collapsible Sidebar - Course Navigation */}
+          <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-80'} flex-shrink-0`}>
+            <div className="step-card glassmorphism-base sticky top-4">
               <div className="section-spacing">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
-                  Contenuti del Corso
-                </h3>
-                
-                <div className="space-y-3">
-                  {lessons.map((lesson, index) => (
-                    <div
-                      key={lesson.id}
-                      className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${
-                        lesson.current 
-                          ? 'bg-blue-900/30 border-blue-500/50 shadow-lg' 
-                          : lesson.completed
-                          ? 'bg-emerald-900/20 border-emerald-700/40 hover:bg-emerald-900/30'
-                          : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50'
-                      }`}
-                      onClick={() => setCurrentLesson(index)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-3">
-                          {lesson.completed ? (
-                            <CheckCircle className="w-5 h-5 text-emerald-400" />
-                          ) : lesson.current ? (
-                            <Play className="w-5 h-5 text-blue-400" />
-                          ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-slate-500" />
-                          )}
-                          <span className={`font-medium text-sm ${
-                            lesson.current ? 'text-blue-300' : lesson.completed ? 'text-emerald-300' : 'text-slate-300'
-                          }`}>
-                            Lezione {index + 1}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-slate-400 text-xs">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {lesson.duration}
-                        </div>
-                      </div>
-                      <h4 className={`font-semibold text-sm mb-1 ${
-                        lesson.current ? 'text-white' : 'text-slate-200'
-                      }`}>
-                        {lesson.title}
-                      </h4>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {lesson.description}
-                      </p>
-                    </div>
-                  ))}
+                {/* Sidebar Header */}
+                <div className="flex items-center justify-between mb-4">
+                  {!sidebarCollapsed && (
+                    <h3 className="text-lg font-semibold text-white flex items-center">
+                      <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
+                      Corso Completo
+                    </h3>
+                  )}
+                  <Button
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 p-2"
+                  >
+                    <Menu className="w-4 h-4" />
+                  </Button>
                 </div>
+
+                {!sidebarCollapsed && (
+                  <>
+                    {/* Overall Progress */}
+                    <div className="mb-6 p-3 bg-slate-800/40 rounded-lg border border-slate-700/30">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-slate-300 text-sm font-medium">Progresso Totale</span>
+                        <span className="text-emerald-400 text-sm font-bold">{Math.round(progressPercentage)}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/60 rounded-full h-2">
+                        <div 
+                          className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentage}%` }}
+                        />
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1">
+                        {completedLessons} di {totalLessons} lezioni completate
+                      </div>
+                    </div>
+
+                    {/* Modules List */}
+                    <div className="space-y-2">
+                      {allModules.map((module) => (
+                        <div key={module.id} className="border border-slate-700/40 rounded-lg overflow-hidden">
+                          {/* Module Header */}
+                          <div
+                            className={`p-3 cursor-pointer transition-all duration-200 flex items-center justify-between ${
+                              module.id === 'modulo-2' 
+                                ? 'bg-blue-900/30 border-blue-500/50' 
+                                : module.completed
+                                ? 'bg-emerald-900/20 hover:bg-emerald-900/30'
+                                : 'bg-slate-800/50 hover:bg-slate-700/50'
+                            }`}
+                            onClick={() => toggleModule(module.id)}
+                          >
+                            <div className="flex items-center space-x-3 flex-1">
+                              {module.completed ? (
+                                <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                              ) : module.id === 'modulo-2' ? (
+                                <Play className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                              ) : (
+                                <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex-shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`font-semibold text-sm ${
+                                  module.id === 'modulo-2' ? 'text-white' : 'text-slate-200'
+                                }`}>
+                                  {module.title}
+                                </h4>
+                                <p className="text-xs text-slate-400 truncate">
+                                  {module.description}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="flex items-center text-slate-400 text-xs">
+                                <Clock className="w-3 h-3 mr-1" />
+                                {module.duration}
+                              </div>
+                              {expandedModules.includes(module.id) ? (
+                                <ChevronDown className="w-4 h-4 text-slate-400" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4 text-slate-400" />
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Module Lessons */}
+                          {expandedModules.includes(module.id) && (
+                            <div className="border-t border-slate-700/40">
+                              {module.lessons.map((lesson, index) => (
+                                <div
+                                  key={lesson.id}
+                                  className={`p-3 pl-12 cursor-pointer transition-all duration-200 ${
+                                    lesson.current && module.id === 'modulo-2'
+                                      ? 'bg-blue-800/30 border-l-2 border-blue-400'
+                                      : lesson.completed
+                                      ? 'bg-emerald-800/20 hover:bg-emerald-800/30'
+                                      : 'hover:bg-slate-700/30'
+                                  }`}
+                                  onClick={() => {
+                                    if (module.id === 'modulo-2') {
+                                      setCurrentLesson(index);
+                                    } else {
+                                      navigateToModule(module.route);
+                                    }
+                                  }}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1 min-w-0">
+                                      <h5 className={`text-sm font-medium ${
+                                        lesson.current && module.id === 'modulo-2' ? 'text-blue-300' : 'text-slate-300'
+                                      }`}>
+                                        {lesson.title}
+                                      </h5>
+                                    </div>
+                                    <div className="flex items-center text-slate-500 text-xs ml-2">
+                                      <Clock className="w-3 h-3 mr-1" />
+                                      {lesson.duration}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           {/* Main Content - Video Player */}
-          <div className="col-span-12 lg:col-span-8">
+          <div className="flex-1 min-w-0">
             <div className="step-card glassmorphism-base">
               <div className="section-spacing">
                 <div className="mb-4">

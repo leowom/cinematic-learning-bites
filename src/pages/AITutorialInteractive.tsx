@@ -13,7 +13,6 @@ const AITutorialInteractive = () => {
   const [currentPrompt, setCurrentPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showResponse, setShowResponse] = useState<boolean[]>([false, false, false, false, false]);
-  const [apiResponses, setApiResponses] = useState<string[]>(['', '', '', '', '']);
   
   const steps = [{
     id: 0,
@@ -56,27 +55,6 @@ const AITutorialInteractive = () => {
     feedback: "Fantastico! L'AI può spiegare concetti complessi in modo accessibile e interessante. Puoi sempre chiedere approfondimenti o esempi pratici.",
     tips: "💡 Puoi sempre dire: 'spiegamelo con un esempio', 'rendilo ancora più semplice', 'dammi più dettagli su...'."
   }];
-  const callOpenAI = async (prompt: string, stepContext: string) => {
-    try {
-      const response = await fetch('https://dnircioi-ceb-nrd-wi-fmkl.functions.supabase.co/ai-tutorial-response', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          stepContext
-        }),
-      });
-
-      const data = await response.json();
-      return data.response;
-    } catch (error) {
-      console.error('Error calling OpenAI:', error);
-      return "Mi dispiace, c'è stato un errore. Riprova più tardi.";
-    }
-  };
-
   const handlePromptSubmit = async () => {
     if (currentPrompt.trim()) {
       const newPrompts = [...userPrompts];
@@ -84,52 +62,21 @@ const AITutorialInteractive = () => {
       setUserPrompts(newPrompts);
       setIsLoading(true);
       
-      // Verifica se il prompt è quello suggerito o personalizzato
-      const isUsingSuggestedPrompt = currentPrompt.trim().toLowerCase() === currentStepData.suggestedPrompt.toLowerCase();
+      // Simula delay realistico (2-4 secondi)
+      const delay = Math.random() * 2000 + 2000;
       
-      if (isUsingSuggestedPrompt) {
-        // Usa risposta simulata con delay realistico
-        const delay = Math.random() * 2000 + 2000;
+      setTimeout(() => {
+        const newCompleted = [...completedSteps];
+        newCompleted[currentStep] = true;
+        setCompletedSteps(newCompleted);
         
-        setTimeout(() => {
-          const newCompleted = [...completedSteps];
-          newCompleted[currentStep] = true;
-          setCompletedSteps(newCompleted);
-          
-          const newShowResponse = [...showResponse];
-          newShowResponse[currentStep] = true;
-          setShowResponse(newShowResponse);
-          
-          setIsLoading(false);
-          setCurrentPrompt('');
-        }, delay);
-      } else {
-        // Usa OpenAI per prompt personalizzati
-        const stepContext = `Siamo nell'esercizio "${currentStepData.title}". L'utente dovrebbe praticare: ${currentStepData.tips}`;
+        const newShowResponse = [...showResponse];
+        newShowResponse[currentStep] = true;
+        setShowResponse(newShowResponse);
         
-        try {
-          const aiResponse = await callOpenAI(currentPrompt, stepContext);
-          
-          // Salva la risposta dell'API
-          const newApiResponses = [...apiResponses];
-          newApiResponses[currentStep] = aiResponse;
-          setApiResponses(newApiResponses);
-          
-          const newCompleted = [...completedSteps];
-          newCompleted[currentStep] = true;
-          setCompletedSteps(newCompleted);
-          
-          const newShowResponse = [...showResponse];
-          newShowResponse[currentStep] = true;
-          setShowResponse(newShowResponse);
-          
-          setIsLoading(false);
-          setCurrentPrompt('');
-        } catch (error) {
-          console.error('Error:', error);
-          setIsLoading(false);
-        }
-      }
+        setIsLoading(false);
+        setCurrentPrompt('');
+      }, delay);
     }
   };
   const nextStep = () => {
@@ -359,7 +306,7 @@ const AITutorialInteractive = () => {
                                 <span className="text-blue-400 text-sm font-medium">LearningBitesAI</span>
                               </div>
                               <div className="text-sm leading-relaxed whitespace-pre-line">
-                                {apiResponses[currentStep] ? apiResponses[currentStep] : currentStepData.simulatedResponse}
+                                {currentStepData.simulatedResponse}
                               </div>
                             </div>
                           </div>

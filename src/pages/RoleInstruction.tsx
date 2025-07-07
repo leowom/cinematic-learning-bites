@@ -474,12 +474,11 @@ const RoleInstruction = () => {
                       ))}
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Collapsed State Content */}
-                {sidebarCollapsed && (
-                  <div className="flex flex-col items-center space-y-4 flex-1">
+              {sidebarCollapsed && (
+                  <div className="flex flex-col items-center space-y-4 flex-1 p-6">
                     <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
                       <span className="text-emerald-400 text-xs font-bold">{Math.round(progressPercentage)}%</span>
                     </div>

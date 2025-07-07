@@ -363,7 +363,7 @@ const FormatControl = () => {
                     </div>
 
                     {/* Modules List - Scrollable */}
-                    <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-1">
+                    <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
                       {allModules.map((module) => (
                         <div key={module.id} className="border border-slate-700/40 rounded-lg overflow-hidden bg-slate-800/20">
                           {/* Module Header */}

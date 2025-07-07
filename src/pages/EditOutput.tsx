@@ -8,11 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 const EditOutput = () => {
   const navigate = useNavigate();
   const [showTutorial, setShowTutorial] = useState(true);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentExercise, setCurrentExercise] = useState(0); // 0: first exercise, 1: second exercise, 2: completion
   const [userInput, setUserInput] = useState('');
   const [chatMessages, setChatMessages] = useState<Array<{type: 'user' | 'ai', content: string, timestamp?: number}>>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [stepCompleted, setStepCompleted] = useState(false);
+  const [exerciseCompleted, setExerciseCompleted] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [expandedModules, setExpandedModules] = useState<string[]>(['modulo-2']);
@@ -148,6 +148,23 @@ const EditOutput = () => {
 
   const childFriendlyResponse = "L'intelligenza artificiale generativa è come un robot che legge tanti libri e poi ne inventa uno nuovo tutto da solo. Non copia, ma crea cose nuove, come storie, disegni o canzoni, proprio come fanno le persone creative.";
 
+  const exercises = [
+    {
+      title: "Esercizio 1: Semplificare",
+      description: "Chiedi all'AI di rendere più semplice la risposta",
+      targetPrompt: "semplice",
+      targetResponse: simplifiedResponse,
+      instruction: "Prova a dire 'Rendilo più semplice'"
+    },
+    {
+      title: "Esercizio 2: Spiegazione per bambini", 
+      description: "Chiedi all'AI di spiegare come a un bambino",
+      targetPrompt: "bambino",
+      targetResponse: childFriendlyResponse,
+      instruction: "Prova a dire 'Spiegamelo come se avessi 10 anni'"
+    }
+  ];
+
   const tooltips = [
     "Puoi chiedere all'AI di riscrivere, semplificare o adattare la risposta al tuo pubblico.",
     "Non servono prompt perfetti. Basta dire cosa vuoi in modo chiaro.",
@@ -156,6 +173,7 @@ const EditOutput = () => {
 
   const startExercise = () => {
     setShowTutorial(false);
+    setCurrentExercise(0);
     // Initialize chat with the first prompt and response
     setChatMessages([
       { type: 'user', content: initialPrompt },
@@ -174,13 +192,16 @@ const EditOutput = () => {
     setTimeout(() => {
       let aiResponse = "";
       const input = userInput.toLowerCase();
+      const currentEx = exercises[currentExercise];
 
-      if (input.includes('semplice') || input.includes('semplicemente') || input.includes('più facile')) {
+      if (currentExercise === 0 && (input.includes('semplice') || input.includes('semplicemente') || input.includes('più facile'))) {
         aiResponse = simplifiedResponse;
-      } else if (input.includes('10 anni') || input.includes('bambino') || input.includes('bambini') || input.includes('semplice per')) {
+        setExerciseCompleted(true);
+      } else if (currentExercise === 1 && (input.includes('10 anni') || input.includes('bambino') || input.includes('bambini') || input.includes('semplice per'))) {
         aiResponse = childFriendlyResponse;
+        setExerciseCompleted(true);
       } else {
-        aiResponse = "Perfetto! Prova a chiedermi di 'rendere più semplice' la spiegazione, oppure di 'spiegarlo come se avessi 10 anni'. Sono qui per adattare la risposta alle tue esigenze!";
+        aiResponse = `Perfetto! ${currentEx.instruction} per vedere come l'AI adatta la risposta!`;
       }
 
       setChatMessages([...newMessages, { type: 'ai', content: aiResponse }]);
@@ -188,12 +209,24 @@ const EditOutput = () => {
       setUserInput('');
       
       // Show tooltip after successful interaction
-      if (aiResponse !== "Perfetto! Prova a chiedermi di 'rendere più semplice' la spiegazione, oppure di 'spiegarlo come se avessi 10 anni'. Sono qui per adattare la risposta alle tue esigenze!") {
-        setStepCompleted(true);
+      if (exerciseCompleted) {
         setShowTooltip(true);
         setTimeout(() => setShowTooltip(false), 5000);
       }
     }, 2000);
+  };
+
+  const nextExercise = () => {
+    if (currentExercise < exercises.length - 1) {
+      setCurrentExercise(currentExercise + 1);
+      setExerciseCompleted(false);
+      setChatMessages([
+        { type: 'user', content: initialPrompt },
+        { type: 'ai', content: initialResponse }
+      ]);
+    } else {
+      setCurrentExercise(2); // Completion screen
+    }
   };
 
   if (showTutorial) {
@@ -313,16 +346,16 @@ const EditOutput = () => {
 
           <div className="text-center">
             <div className="text-slate-200 font-medium">
-              Modulo 2.4 – Chiedere modifiche all'output
+              {currentExercise === 2 ? 'Modulo 2.4 – Completato!' : exercises[currentExercise]?.title || 'Modulo 2.4 – Chiedere modifiche all\'output'}
             </div>
             <div className="text-slate-400 text-sm">
-              Chat Interattiva
+              {currentExercise === 2 ? 'Congratulazioni!' : `Esercizio ${currentExercise + 1} di ${exercises.length}`}
             </div>
           </div>
 
           <div className="text-right">
-            <Badge variant="outline" className={`${stepCompleted ? 'text-emerald-300 border-emerald-500/50' : 'text-green-300 border-green-500/50'}`}>
-              {stepCompleted ? 'Completato!' : 'In Corso'}
+            <Badge variant="outline" className={`${exerciseCompleted ? 'text-emerald-300 border-emerald-500/50' : 'text-green-300 border-green-500/50'}`}>
+              {exerciseCompleted ? 'Completato!' : 'In Corso'}
             </Badge>
           </div>
         </div>
@@ -524,171 +557,224 @@ const EditOutput = () => {
           <div className="flex-1 min-w-0">
             <div className="step-card glassmorphism-base h-full">
               <div className="section-spacing h-full flex flex-col">
-                <div className="mb-4">
-                  <h2 className="text-xl font-bold text-white mb-2 flex items-center">
-                    <Edit3 className="w-6 h-6 mr-3 text-green-400" />
-                    Chat Interattiva con l'AI
-                  </h2>
-                  <p className="text-slate-400 text-sm">
-                    Prova a chiedere modifiche alla risposta dell'AI per adattarla alle tue esigenze
-                  </p>
-                </div>
+                 {/* Main Content - Chat Interface or Completion Screen */}
+                 {currentExercise === 2 ? (
+                   // Completion Screen
+                   <div className="text-center">
+                     <div className="w-20 h-20 mx-auto mb-6 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                       <Award className="w-10 h-10 text-emerald-400" />
+                     </div>
+                     <h2 className="text-3xl font-bold text-white mb-4">
+                       🎉 Congratulazioni!
+                     </h2>
+                     <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+                       Hai completato con successo entrambi gli esercizi del Modulo 2.4!
+                       Ora sai come chiedere all'AI di modificare e adattare le risposte alle tue esigenze specifiche.
+                     </p>
 
-                {/* Tooltip */}
-                {showTooltip && (
-                  <div className="mb-4 bg-green-900/20 border border-green-700/40 rounded-lg p-3 animate-fade-in">
-                    <p className="text-green-300 text-sm flex items-center">
-                      <Lightbulb className="w-4 h-4 mr-2" />
-                      {tooltips[Math.floor(Math.random() * tooltips.length)]}
-                    </p>
-                  </div>
-                )}
+                     <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
+                       <h3 className="text-emerald-300 font-semibold mb-4">🎯 Cosa hai imparato:</h3>
+                       <ul className="text-slate-300 space-y-2">
+                         <li className="flex items-start">
+                           <span className="text-emerald-400 mr-2">✓</span>
+                           Come semplificare risposte complesse
+                         </li>
+                         <li className="flex items-start">
+                           <span className="text-emerald-400 mr-2">✓</span>
+                           Come adattare il linguaggio per diversi pubblici
+                         </li>
+                         <li className="flex items-start">
+                           <span className="text-emerald-400 mr-2">✓</span>
+                           L'importanza dell'interazione iterativa con l'AI
+                         </li>
+                       </ul>
+                     </div>
 
-                {/* Chat Area */}
-                <div className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4 overflow-y-auto min-h-[400px] max-h-[500px]">
-                  <div className="space-y-4">
-                    {chatMessages.map((message, index) => (
-                      <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                          message.type === 'user' 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-slate-700/50 text-slate-200'
-                        }`}>
-                          {message.type === 'ai' && (
-                            <div className="flex items-center mb-2">
-                              <Bot className="w-4 h-4 mr-2 text-green-400" />
-                              <span className="text-green-400 text-sm font-medium">AI Assistant</span>
-                            </div>
-                          )}
-                          <p className="text-sm whitespace-pre-line">{message.content}</p>
-                        </div>
-                      </div>
-                    ))}
+                     <div className="text-left bg-slate-800/30 rounded-lg p-4 mb-8 max-w-2xl mx-auto">
+                       <p className="text-slate-300 text-sm mb-2">💡 Ricorda: Non serve riscrivere da zero. Basta dire:</p>
+                       <ul className="text-slate-400 text-sm space-y-1">
+                         <li>• "Semplifica"</li>
+                         <li>• "Fallo più tecnico"</li>
+                         <li>• "Fammelo in bullet"</li>
+                         <li>• "Scrivilo per LinkedIn"</li>
+                       </ul>
+                       <p className="text-emerald-300 text-sm mt-2 font-medium">L'AI ti segue, se la guidi.</p>
+                     </div>
 
-                    {/* Loading State */}
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%]">
-                          <div className="flex items-center mb-2">
-                            <Bot className="w-4 h-4 mr-2 text-green-400" />
-                            <span className="text-green-400 text-sm font-medium">AI Assistant</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
-                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                              <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                            </div>
-                            <span className="text-slate-400 text-xs">Sto pensando...</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                     <Button
+                       onClick={() => navigate('/dashboard')}
+                       className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3"
+                     >
+                       Completa Modulo 2
+                       <ArrowRight className="w-5 h-5 ml-2" />
+                     </Button>
+                   </div>
+                 ) : (
+                   // Chat Interface
+                   <>
+                     <div className="mb-4">
+                       <h2 className="text-xl font-bold text-white mb-2 flex items-center">
+                         <Edit3 className="w-6 h-6 mr-3 text-green-400" />
+                         {exercises[currentExercise]?.title}
+                       </h2>
+                       <p className="text-slate-400 text-sm">
+                         {exercises[currentExercise]?.description}
+                       </p>
+                     </div>
 
-                    {/* Empty State */}
-                    {chatMessages.length === 0 && (
-                      <div className="flex items-center justify-center h-full text-slate-400">
-                        <div className="text-center">
-                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>La conversazione inizierà automaticamente...</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                     {/* Tooltip */}
+                     {showTooltip && (
+                       <div className="mb-4 bg-green-900/20 border border-green-700/40 rounded-lg p-3 animate-fade-in">
+                         <p className="text-green-300 text-sm flex items-center">
+                           <Lightbulb className="w-4 h-4 mr-2" />
+                           {tooltips[Math.floor(Math.random() * tooltips.length)]}
+                         </p>
+                       </div>
+                     )}
 
-                {/* Input Area */}
-                <div className="space-y-4">
-                  <div className="flex space-x-2">
-                    <Textarea
-                      value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
-                      placeholder="Scrivi qui la tua richiesta di modifica (es. 'Rendilo più semplice')..."
-                      className="flex-1 bg-slate-700/50 border-slate-600/50 text-slate-200 placeholder:text-slate-400 resize-none focus:border-green-500/50 focus:ring-green-500/20"
-                      rows={2}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                    />
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!userInput.trim() || isLoading}
-                      className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed self-end"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
+                     {/* Chat Area */}
+                     <div className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4 overflow-y-auto min-h-[400px] max-h-[500px]">
+                       <div className="space-y-4">
+                         {chatMessages.map((message, index) => (
+                           <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                             <div className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                               message.type === 'user' 
+                                 ? 'bg-blue-600 text-white' 
+                                 : 'bg-slate-700/50 text-slate-200'
+                             }`}>
+                               {message.type === 'ai' && (
+                                 <div className="flex items-center mb-2">
+                                   <Bot className="w-4 h-4 mr-2 text-green-400" />
+                                   <span className="text-green-400 text-sm font-medium">AI Assistant</span>
+                                 </div>
+                               )}
+                               <p className="text-sm whitespace-pre-line">{message.content}</p>
+                             </div>
+                           </div>
+                         ))}
 
-                  {/* Suggestions */}
-                  {!stepCompleted && chatMessages.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        onClick={() => setUserInput("Rendilo più semplice")}
-                        variant="outline"
-                        size="sm"
-                        className="bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-600/50 text-xs"
-                      >
-                        💡 Rendilo più semplice
-                      </Button>
-                      <Button
-                        onClick={() => setUserInput("Spiegamelo come se avessi 10 anni")}
-                        variant="outline"
-                        size="sm"
-                        className="bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-600/50 text-xs"
-                      >
-                        👶 Come per un bambino
-                      </Button>
-                    </div>
-                  )}
+                         {/* Loading State */}
+                         {isLoading && (
+                           <div className="flex justify-start">
+                             <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%]">
+                               <div className="flex items-center mb-2">
+                                 <Bot className="w-4 h-4 mr-2 text-green-400" />
+                                 <span className="text-green-400 text-sm font-medium">AI Assistant</span>
+                               </div>
+                               <div className="flex items-center space-x-2">
+                                 <div className="flex space-x-1">
+                                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
+                                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                                 </div>
+                                 <span className="text-slate-400 text-xs">Sto pensando...</span>
+                               </div>
+                             </div>
+                           </div>
+                         )}
 
-                  {/* Navigation */}
-                  <div className="flex justify-between items-center pt-4 border-t border-slate-700/50">
-                    <Button
-                      onClick={() => navigate('/ai-interactive/role-instruction')}
-                      variant="ghost"
-                      className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-                    >
-                      ← Modulo 2.3
-                    </Button>
-                    
-                    {stepCompleted ? (
-                      <div className="text-center">
-                        <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 mb-4 max-w-lg">
-                          <div className="flex items-center mb-2">
-                            <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
-                            <h3 className="text-emerald-300 font-semibold">Ottimo lavoro!</h3>
-                          </div>
-                          <p className="text-slate-300 text-sm mb-3">
-                            Hai sperimentato l'interazione iterativa con l'AI per migliorare l'output in base alle tue esigenze.
-                          </p>
-                          <div className="text-left bg-slate-800/30 rounded p-3">
-                            <p className="text-slate-300 text-xs mb-2">Non serve riscrivere da zero. Basta dire:</p>
-                            <ul className="text-slate-400 text-xs space-y-1">
-                              <li>• "Semplifica"</li>
-                              <li>• "Fallo più tecnico"</li>
-                              <li>• "Fammelo in bullet"</li>
-                              <li>• "Scrivilo per LinkedIn"</li>
-                            </ul>
-                            <p className="text-green-300 text-xs mt-2 font-medium">L'AI ti segue, se la guidi.</p>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => navigate('/dashboard')}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        >
-                          Completa Modulo 2
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="text-slate-400 text-sm">
-                        Prova a modificare la risposta dell'AI
-                      </div>
-                    )}
-                  </div>
-                </div>
+                         {/* Empty State */}
+                         {chatMessages.length === 0 && (
+                           <div className="flex items-center justify-center h-full text-slate-400">
+                             <div className="text-center">
+                               <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                               <p>La conversazione inizierà automaticamente...</p>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     </div>
+
+                     {/* Input Area */}
+                     <div className="space-y-4">
+                       <div className="flex space-x-2">
+                         <Textarea
+                           value={userInput}
+                           onChange={(e) => setUserInput(e.target.value)}
+                           placeholder={`Scrivi qui la tua richiesta (es. '${exercises[currentExercise]?.instruction}')...`}
+                           className="flex-1 bg-slate-700/50 border-slate-600/50 text-slate-200 placeholder:text-slate-400 resize-none focus:border-green-500/50 focus:ring-green-500/20"
+                           rows={2}
+                           onKeyDown={(e) => {
+                             if (e.key === 'Enter' && !e.shiftKey) {
+                               e.preventDefault();
+                               handleSendMessage();
+                             }
+                           }}
+                           disabled={exerciseCompleted}
+                         />
+                         <Button
+                           onClick={handleSendMessage}
+                           disabled={!userInput.trim() || isLoading || exerciseCompleted}
+                           className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed self-end"
+                         >
+                           <Send className="w-4 h-4" />
+                         </Button>
+                       </div>
+
+                       {/* Suggestions */}
+                       {!exerciseCompleted && chatMessages.length > 0 && (
+                         <div className="flex flex-wrap gap-2">
+                           {currentExercise === 0 && (
+                             <Button
+                               onClick={() => setUserInput("Rendilo più semplice")}
+                               variant="outline"
+                               size="sm"
+                               className="bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-600/50 text-xs"
+                             >
+                               💡 Rendilo più semplice
+                             </Button>
+                           )}
+                           {currentExercise === 1 && (
+                             <Button
+                               onClick={() => setUserInput("Spiegamelo come se avessi 10 anni")}
+                               variant="outline"
+                               size="sm"
+                               className="bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-600/50 text-xs"
+                             >
+                               👶 Come per un bambino
+                             </Button>
+                           )}
+                         </div>
+                       )}
+
+                       {/* Navigation */}
+                       <div className="flex justify-between items-center pt-4 border-t border-slate-700/50">
+                         <Button
+                           onClick={() => navigate('/ai-interactive/role-instruction')}
+                           variant="ghost"
+                           className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                         >
+                           ← Modulo 2.3
+                         </Button>
+                         
+                         {exerciseCompleted ? (
+                           <div className="text-center">
+                             <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 mb-4 max-w-lg">
+                               <div className="flex items-center mb-2">
+                                 <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
+                                 <h3 className="text-emerald-300 font-semibold">Esercizio completato!</h3>
+                               </div>
+                               <p className="text-slate-300 text-sm">
+                                 Perfetto! Hai imparato come {currentExercise === 0 ? 'semplificare' : 'adattare il linguaggio per bambini'} le risposte dell'AI.
+                               </p>
+                             </div>
+                             <Button
+                               onClick={nextExercise}
+                               className="bg-green-600 hover:bg-green-700 text-white"
+                             >
+                               {currentExercise < exercises.length - 1 ? 'Prossimo Esercizio' : 'Completa Modulo'}
+                               <ArrowRight className="w-4 h-4 ml-2" />
+                             </Button>
+                           </div>
+                         ) : (
+                           <div className="text-slate-400 text-sm">
+                             {exercises[currentExercise]?.instruction}
+                           </div>
+                         )}
+                       </div>
+                     </div>
+                   </>
+                 )}
               </div>
             </div>
           </div>

@@ -296,7 +296,7 @@ const EditOutput = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
       background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
     }}>
-      <div className="prompt-lab-container max-w-7xl mx-auto">
+      <div className="prompt-lab-container">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
@@ -327,9 +327,9 @@ const EditOutput = () => {
           </div>
         </div>
 
-        <div className="flex gap-4 relative">
+        <div className="flex gap-6 relative">
           {/* Collapsible Sidebar - Course Navigation */}
-          <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-72'} flex-shrink-0`}>
+          <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-80'} flex-shrink-0`}>
             <div className="step-card glassmorphism-base sticky top-4 h-[calc(100vh-2rem)] flex flex-col">
               <div className="p-6 flex-shrink-0">
                 {/* Sidebar Header */}
@@ -521,11 +521,11 @@ const EditOutput = () => {
           </div>
 
           {/* Main Content - Chat Interface */}
-          <div className="flex-1 max-w-4xl mx-auto">
+          <div className="flex-1 min-w-0">
             <div className="step-card glassmorphism-base h-full">
               <div className="section-spacing h-full flex flex-col">
-                <div className="mb-4 text-center">
-                  <h2 className="text-xl font-bold text-white mb-2 flex items-center justify-center">
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white mb-2 flex items-center">
                     <Edit3 className="w-6 h-6 mr-3 text-green-400" />
                     Chat Interattiva con l'AI
                   </h2>
@@ -654,7 +654,35 @@ const EditOutput = () => {
                       ← Modulo 2.3
                     </Button>
                     
-                    {!stepCompleted && (
+                    {stepCompleted ? (
+                      <div className="text-center">
+                        <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 mb-4 max-w-lg">
+                          <div className="flex items-center mb-2">
+                            <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
+                            <h3 className="text-emerald-300 font-semibold">Ottimo lavoro!</h3>
+                          </div>
+                          <p className="text-slate-300 text-sm mb-3">
+                            Hai sperimentato l'interazione iterativa con l'AI per migliorare l'output in base alle tue esigenze.
+                          </p>
+                          <div className="text-left bg-slate-800/30 rounded p-3">
+                            <p className="text-slate-300 text-xs mb-2">Non serve riscrivere da zero. Basta dire:</p>
+                            <ul className="text-slate-400 text-xs space-y-1">
+                              <li>• "Semplifica"</li>
+                              <li>• "Fallo più tecnico"</li>
+                              <li>• "Fammelo in bullet"</li>
+                              <li>• "Scrivilo per LinkedIn"</li>
+                            </ul>
+                            <p className="text-green-300 text-xs mt-2 font-medium">L'AI ti segue, se la guidi.</p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => navigate('/dashboard')}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          Completa Modulo 2
+                        </Button>
+                      </div>
+                    ) : (
                       <div className="text-slate-400 text-sm">
                         Prova a modificare la risposta dell'AI
                       </div>
@@ -665,39 +693,6 @@ const EditOutput = () => {
             </div>
           </div>
         </div>
-        
-        {/* Completion Section - Outside main content for better centering */}
-        {stepCompleted && (
-          <div className="mt-8 text-center max-w-2xl mx-auto">
-            <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-6 mb-6">
-              <div className="flex items-center justify-center mb-4">
-                <CheckCircle className="w-8 h-8 mr-3 text-emerald-400" />
-                <h3 className="text-emerald-300 font-bold text-xl">Ottimo lavoro!</h3>
-              </div>
-              <p className="text-slate-300 mb-4">
-                Hai sperimentato l'interazione iterativa con l'AI per migliorare l'output in base alle tue esigenze.
-              </p>
-              <div className="text-left bg-slate-800/30 rounded-lg p-4">
-                <p className="text-slate-300 text-sm mb-3 font-medium">Non serve riscrivere da zero. Basta dire:</p>
-                <ul className="text-slate-400 text-sm space-y-2">
-                  <li className="flex items-center"><span className="text-green-400 mr-2">•</span> "Semplifica"</li>
-                  <li className="flex items-center"><span className="text-green-400 mr-2">•</span> "Fallo più tecnico"</li>
-                  <li className="flex items-center"><span className="text-green-400 mr-2">•</span> "Fammelo in bullet"</li>
-                  <li className="flex items-center"><span className="text-green-400 mr-2">•</span> "Scrivilo per LinkedIn"</li>
-                </ul>
-                <p className="text-green-300 text-sm mt-4 font-semibold text-center">L'AI ti segue, se la guidi.</p>
-              </div>
-            </div>
-            <Button
-              onClick={() => navigate('/dashboard')}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3"
-              size="lg"
-            >
-              <Award className="w-5 h-5 mr-2" />
-              Completa Modulo 2
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

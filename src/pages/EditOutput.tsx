@@ -602,7 +602,7 @@ const EditOutput = () => {
                      </div>
 
                      <Button
-                       onClick={() => navigate('/dashboard')}
+                       onClick={() => navigate('/prompt-lab')}
                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3"
                      >
                        Completa Modulo 2
@@ -686,7 +686,8 @@ const EditOutput = () => {
                      </div>
 
                      {/* Input Area */}
-                     <div className="space-y-4">
+                      {!exerciseCompleted && (
+                        <div className="space-y-4">
                        <div className="flex space-x-2">
                          <Textarea
                            value={userInput}
@@ -737,44 +738,46 @@ const EditOutput = () => {
                          </div>
                        )}
 
-                       {/* Navigation */}
-                       <div className="flex justify-between items-center pt-4 border-t border-slate-700/50">
-                         <Button
-                           onClick={() => navigate('/ai-interactive/role-instruction')}
-                           variant="ghost"
-                           className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-                         >
-                           ← Modulo 2.3
-                         </Button>
-                         
-                         {exerciseCompleted ? (
-                           <div className="text-center">
-                             <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 mb-4 max-w-lg">
-                               <div className="flex items-center mb-2">
-                                 <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
-                                 <h3 className="text-emerald-300 font-semibold">Esercizio completato!</h3>
-                               </div>
-                               <p className="text-slate-300 text-sm">
-                                 Perfetto! Hai imparato come {currentExercise === 0 ? 'semplificare' : 'adattare il linguaggio per bambini'} le risposte dell'AI.
-                               </p>
-                             </div>
-                             <Button
-                               onClick={nextExercise}
-                               className="bg-green-600 hover:bg-green-700 text-white"
-                             >
-                               {currentExercise < exercises.length - 1 ? 'Prossimo Esercizio' : 'Completa Modulo'}
-                               <ArrowRight className="w-4 h-4 ml-2" />
-                             </Button>
-                           </div>
-                         ) : (
-                           <div className="text-slate-400 text-sm">
-                             {exercises[currentExercise]?.instruction}
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                   </>
-                 )}
+                        </div>
+                      )}
+                      
+                      {/* Navigation */}
+                      <div className="flex justify-between items-center pt-4 border-t border-slate-700/50">
+                        <Button
+                          onClick={() => navigate('/ai-interactive/role-instruction')}
+                          variant="ghost"
+                          className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                        >
+                          ← Modulo 2.3
+                        </Button>
+                        
+                        {exerciseCompleted ? (
+                          <div className="text-center">
+                            <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 mb-4 max-w-lg">
+                              <div className="flex items-center mb-2">
+                                <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
+                                <h3 className="text-emerald-300 font-semibold">Esercizio completato!</h3>
+                              </div>
+                              <p className="text-slate-300 text-sm">
+                                Perfetto! Hai imparato come {currentExercise === 0 ? 'semplificare' : 'adattare il linguaggio per bambini'} le risposte dell'AI.
+                              </p>
+                            </div>
+                            <Button
+                              onClick={nextExercise}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              {currentExercise < exercises.length - 1 ? 'Prossimo Esercizio' : 'Completa Modulo'}
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-slate-400 text-sm">
+                            {exercises[currentExercise]?.instruction}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
               </div>
             </div>
           </div>

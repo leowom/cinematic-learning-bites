@@ -109,7 +109,7 @@ const AITutorialInteractive = () => {
 
             <div className="text-center">
               <div className="text-slate-200 font-medium">
-                Tutorial Interattivo AI
+                Modulo 2 – Entrare nel Mindset e Parlare con un'Intelligenza Artificiale
               </div>
               <div className="text-slate-400 text-sm">
                 Primi passi guidati
@@ -197,7 +197,7 @@ const AITutorialInteractive = () => {
 
           <div className="text-center">
             <div className="text-slate-200 font-medium">
-              Tutorial Interattivo AI
+              Modulo 2 – Entrare nel Mindset e Parlare con un'Intelligenza Artificiale
             </div>
             <div className="text-slate-400 text-sm">
               Passo {currentStep + 1} di {steps.length}
@@ -375,8 +375,8 @@ const AITutorialInteractive = () => {
 
                 {/* Navigation */}
                 <div className="flex justify-between items-center">
-                  <Button onClick={prevStep} disabled={currentStep === 0} variant="ghost" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50">
-                    ← Precedente
+                  <Button onClick={() => navigate('/llm-fundamentals')} variant="ghost" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
+                    ← Modulo 1
                   </Button>
                   
                   {isCompleted ? <Button onClick={() => navigate('/dashboard')} className="bg-emerald-600 hover:bg-emerald-700 text-white">

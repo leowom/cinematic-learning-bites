@@ -69,7 +69,7 @@ const PromptingCourse = () => {
       id: 'modulo-2',
       title: 'Modulo 2 - Prompting',
       description: 'Tecniche avanzate di prompting',
-      duration: '35:36',
+      duration: '55:36',
       completed: false,
       route: '/prompting',
       lessons: [
@@ -96,6 +96,14 @@ const PromptingCourse = () => {
           completed: false,
           current: false,
           description: "Scopri come ottenere output strutturati e utilizzabili specificando il formato desiderato"
+        },
+        {
+          id: 3,
+          title: "Dare un ruolo all'AI nel prompt",
+          duration: "10:00",
+          completed: false,
+          current: false,
+          description: "Impara come assegnare ruoli specifici per ottenere risposte più esperte e specializzate"
         }
       ]
     }
@@ -143,7 +151,7 @@ const PromptingCourse = () => {
                 Modulo 2 - Prompting
               </div>
               <div className="text-slate-400 text-sm">
-                Passo 1 di 3
+                Passo 1 di 4
               </div>
             </div>
 
@@ -274,6 +282,8 @@ const PromptingCourse = () => {
                                         navigate('/contesto');
                                       } else if (index === 2) {
                                         navigate('/ai-interactive/format-control');
+                                      } else if (index === 3) {
+                                        navigate('/ai-interactive/role-instruction');
                                       }
                                     } else {
                                       navigateToModule(module.route);

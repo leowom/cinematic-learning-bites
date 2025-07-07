@@ -260,8 +260,20 @@ const AITutorialInteractive = () => {
                   </div>
                   
                   {!completedSteps[currentStep] && <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4 mb-6">
-                      <p className="text-blue-300 text-sm mb-2">💡 <strong>Prompt suggerito:</strong></p>
-                      <p className="text-slate-300 text-sm italic">"{currentStepData.suggestedPrompt}"</p>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-blue-300 text-sm mb-2">💡 <strong>Prompt suggerito:</strong></p>
+                          <p className="text-slate-300 text-sm italic">"{currentStepData.suggestedPrompt}"</p>
+                        </div>
+                        <Button 
+                          onClick={() => setCurrentPrompt(currentStepData.suggestedPrompt)} 
+                          variant="outline" 
+                          size="sm" 
+                          className="ml-4 bg-blue-600 hover:bg-blue-700 text-white border-blue-500 hover:border-blue-600 transition-colors"
+                        >
+                          Usa questo
+                        </Button>
+                      </div>
                     </div>}
                 </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play, CheckCircle, Clock, User, BookOpen } from 'lucide-react';
+import { Home, Play, CheckCircle, Clock, User, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
@@ -13,49 +13,9 @@ const IntroduzioneCourse = () => {
       id: 0,
       title: "Introduzione all'AI",
       duration: "13:54",
-      completed: true,
+      completed: false,
       current: true,
       description: "Scopri i fondamenti dell'intelligenza artificiale e come può trasformare il tuo business"
-    },
-    {
-      id: 1, 
-      title: "La Roadmap verso $10,000/mese",
-      duration: "33:38",
-      completed: false,
-      current: false,
-      description: "Strategia completa per monetizzare le competenze AI"
-    },
-    {
-      id: 2,
-      title: "Selezione della Nicchia",
-      duration: "24:16", 
-      completed: false,
-      current: false,
-      description: "Come identificare la specializzazione più profittevole"
-    },
-    {
-      id: 3,
-      title: "Creare Offerte Irresistibili",
-      duration: "26:23",
-      completed: false,
-      current: false,
-      description: "Sviluppa proposte di valore che i clienti non possono rifiutare"
-    },
-    {
-      id: 4,
-      title: "Impostare l'Agenzia per il Successo",
-      duration: "41:19",
-      completed: false,
-      current: false,
-      description: "Struttura organizzativa e processi per la crescita scalabile"
-    },
-    {
-      id: 5,
-      title: "Massimizzare l'Efficienza",
-      duration: "43:48",
-      completed: false,
-      current: false,
-      description: "Ottimizzazione dei processi interni e dell'infrastruttura"
     }
   ];
 
@@ -63,34 +23,40 @@ const IntroduzioneCourse = () => {
   const progressPercentage = (lessons.filter(l => l.completed).length / lessons.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
       <div className="prompt-lab-container">
-        {/* Header */}
-        <div className="step-card glassmorphism-base">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={() => navigate('/dashboard')}
-                variant="outline"
-                size="sm"
-                className="text-slate-300 border-slate-600 hover:bg-slate-700/50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Torna alla Dashboard
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-white">AI Agency Accelerator</h1>
-                <p className="text-slate-400">Modulo Introduttivo</p>
-              </div>
+        {/* Header - Same as Prompt Lab */}
+        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={() => navigate('/dashboard')}
+              variant="ghost"
+              size="sm"
+              className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </div>
+
+          <div className="text-center">
+            <div className="text-slate-200 font-medium">
+              Introduzione
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm text-slate-400">Progresso Corso</p>
-                <p className="text-lg font-semibold text-emerald-400">{Math.round(progressPercentage)}% completato</p>
-              </div>
-              <div className="w-24">
-                <Progress value={progressPercentage} className="bg-slate-700" />
-              </div>
+            <div className="text-slate-400 text-sm">
+              Passo 1 di 1
+            </div>
+          </div>
+
+          <div className="text-right">
+            <div className="text-slate-300 text-sm">
+              Progresso: {Math.round(progressPercentage)}%
+            </div>
+            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+              <div 
+                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
             </div>
           </div>
         </div>
@@ -208,22 +174,12 @@ const IntroduzioneCourse = () => {
                 </div>
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between mt-6">
+                <div className="flex justify-center mt-6">
                   <Button
-                    onClick={() => currentLesson > 0 && setCurrentLesson(currentLesson - 1)}
-                    disabled={currentLesson === 0}
-                    variant="outline"
-                    className="text-slate-300 border-slate-600 hover:bg-slate-700/50 disabled:opacity-50"
+                    onClick={() => navigate('/dashboard')}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    Lezione Precedente
-                  </Button>
-                  
-                  <Button
-                    onClick={() => currentLesson < lessons.length - 1 && setCurrentLesson(currentLesson + 1)}
-                    disabled={currentLesson === lessons.length - 1}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Prossima Lezione
+                    Torna alla Dashboard
                   </Button>
                 </div>
               </div>

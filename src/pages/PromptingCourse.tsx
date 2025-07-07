@@ -88,6 +88,14 @@ const PromptingCourse = () => {
           completed: false,
           current: false,
           description: "Esercizio pratico per comprendere l'importanza del contesto nei prompt"
+        },
+        {
+          id: 2,
+          title: "Controllare il formato dell'output",
+          duration: "10:00",
+          completed: false,
+          current: false,
+          description: "Scopri come ottenere output strutturati e utilizzabili specificando il formato desiderato"
         }
       ]
     }
@@ -135,7 +143,7 @@ const PromptingCourse = () => {
                 Modulo 2 - Prompting
               </div>
               <div className="text-slate-400 text-sm">
-                Passo 1 di 2
+                Passo 1 di 3
               </div>
             </div>
 
@@ -264,6 +272,8 @@ const PromptingCourse = () => {
                                         setCurrentLesson(index);
                                       } else if (index === 1) {
                                         navigate('/contesto');
+                                      } else if (index === 2) {
+                                        navigate('/ai-interactive/format-control');
                                       }
                                     } else {
                                       navigateToModule(module.route);

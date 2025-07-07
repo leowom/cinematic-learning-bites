@@ -19,6 +19,7 @@ import LLMFundamentals from "./pages/LLMFundamentals";
 import AITutorialInteractive from "./pages/AITutorialInteractive";
 import PromptingCourse from "./pages/PromptingCourse";
 import ContestoExercise from "./pages/ContestoExercise";
+import FormatControl from "./pages/FormatControl";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/ai-tutorial-interactive" element={<AITutorialInteractive />} />
             <Route path="/prompting" element={<PromptingCourse />} />
             <Route path="/contesto" element={<ContestoExercise />} />
+            <Route path="/ai-interactive/format-control" element={<FormatControl />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

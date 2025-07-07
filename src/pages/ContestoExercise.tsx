@@ -92,9 +92,17 @@ const ContestoExercise = () => {
           id: 1,
           title: "Il potere del contesto nel prompt",
           duration: "10:00",
-          completed: false,
-          current: true,
+          completed: true,
+          current: false,
           description: "Esercizio pratico per comprendere l'importanza del contesto nei prompt"
+        },
+        {
+          id: 2,
+          title: "Controllare il formato dell'output",
+          duration: "10:00",
+          completed: false,
+          current: false,
+          description: "Scopri come ottenere output strutturati e utilizzabili specificando il formato desiderato"
         }
       ]
     }

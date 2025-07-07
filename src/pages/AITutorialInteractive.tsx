@@ -109,7 +109,7 @@ const AITutorialInteractive = () => {
 
             <div className="text-center">
               <div className="text-slate-200 font-medium">
-                Modulo 2 – Entrare nel Mindset e Parlare con un'Intelligenza Artificiale
+                Modulo 1.2 – Entrare nel Mindset e Parlare con un'Intelligenza Artificiale
               </div>
               <div className="text-slate-400 text-sm">
                 Primi passi guidati
@@ -197,7 +197,7 @@ const AITutorialInteractive = () => {
 
           <div className="text-center">
             <div className="text-slate-200 font-medium">
-              Modulo 2 – Entrare nel Mindset e Parlare con un'Intelligenza Artificiale
+              Modulo 1.2 – Entrare nel Mindset e Parlare con un'Intelligenza Artificiale
             </div>
             <div className="text-slate-400 text-sm">
               Passo {currentStep + 1} di {steps.length}

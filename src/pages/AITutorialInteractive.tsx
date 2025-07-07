@@ -391,9 +391,9 @@ const AITutorialInteractive = () => {
                     ← Modulo 1
                   </Button>
                   
-                  {isCompleted ? <Button onClick={() => navigate('/dashboard')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  {isCompleted ? <Button onClick={() => navigate('/prompting')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                       <Award className="w-4 h-4 mr-2" />
-                      Completa Tutorial
+                      Modulo 2 →
                     </Button> : <Button onClick={nextStep} disabled={currentStep === steps.length - 1 || !completedSteps[currentStep]} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50">
                       Successivo →
                     </Button>}

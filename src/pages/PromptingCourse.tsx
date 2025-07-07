@@ -4,18 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
 
-const IntroduzioneCourse = () => {
+const PromptingCourse = () => {
   const navigate = useNavigate();
   const [currentLesson, setCurrentLesson] = useState(0);
 
   const lessons = [
     {
       id: 0,
-      title: "Introduzione all'AI",
-      duration: "13:54",
+      title: "Prompting Avanzato e Strategie di Comunicazione con l'AI",
+      duration: "25:36",
       completed: false,
       current: true,
-      description: "Scopri i fondamenti dell'intelligenza artificiale e come può trasformare il tuo business"
+      description: "Scopri le tecniche avanzate di prompting per massimizzare l'efficacia della comunicazione con l'intelligenza artificiale"
     }
   ];
 
@@ -41,7 +41,7 @@ const IntroduzioneCourse = () => {
 
           <div className="text-center">
             <div className="text-slate-200 font-medium">
-              Introduzione
+              Modulo 2 - Prompting
             </div>
             <div className="text-slate-400 text-sm">
               Passo 1 di 1
@@ -130,7 +130,7 @@ const IntroduzioneCourse = () => {
                   <div className="flex items-center space-x-4 text-slate-400 text-sm">
                     <div className="flex items-center">
                       <User className="w-4 h-4 mr-1" />
-                      Iman Gadzhi
+                      AI Expert
                     </div>
                     <div className="flex items-center">
                       <Clock className="w-4 h-4 mr-1" />
@@ -144,7 +144,7 @@ const IntroduzioneCourse = () => {
                   <iframe
                     width="100%"
                     height="100%"
-                    src="https://www.youtube.com/embed/Yq0QkCxoTHM?rel=0&modestbranding=1"
+                    src="https://www.youtube.com/embed/Oyp2m9bf10k?rel=0&modestbranding=1"
                     title={currentLessonData.title}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -157,35 +157,37 @@ const IntroduzioneCourse = () => {
                 <div className="element-spacing">
                   <h3 className="text-lg font-semibold text-white mb-3">Descrizione della Lezione</h3>
                   <p className="text-slate-300 leading-relaxed mb-4">
-                    {currentLessonData.description}. In questo video fondamentale, 
-                    esploreremo i concetti chiave che definiranno il tuo percorso verso il successo 
-                    nell'ecosistema dell'intelligenza artificiale.
+                    {currentLessonData.description}. In questo modulo approfondiremo 
+                    le tecniche più avanzate di prompt engineering, esplorando come strutturare 
+                    conversazioni efficaci con l'AI per ottenere risultati eccezionali.
                   </p>
                   
-                  <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4">
-                    <h4 className="text-blue-300 font-medium mb-2">💡 Punti Chiave</h4>
+                  <div className="bg-purple-900/20 border border-purple-700/40 rounded-lg p-4">
+                    <h4 className="text-purple-300 font-medium mb-2">🎯 Tecniche Avanzate</h4>
                     <ul className="text-slate-300 text-sm space-y-1">
-                      <li>• Comprensione dei fondamenti dell'AI applicata al business</li>
-                      <li>• Identificazione delle opportunità di mercato emergenti</li>
-                      <li>• Framework strategico per l'implementazione pratica</li>
-                      <li>• Metodologie per la creazione di valore sostenibile</li>
+                      <li>• Strutturazione di prompt complessi per task articolati</li>
+                      <li>• Tecniche di chain-of-thought e reasoning guidato</li>
+                      <li>• Ottimizzazione del contesto e gestione della memoria</li>
+                      <li>• Strategie per prompt iteration e refinement</li>
+                      <li>• Best practices per diverse tipologie di output</li>
                     </ul>
                   </div>
                 </div>
 
+                {/* Navigation Buttons */}
                 <div className="flex justify-between items-center mt-6">
                   <Button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/ai-tutorial-interactive')}
                     variant="ghost"
                     className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                   >
-                    Torna alla Dashboard
+                    ← Modulo 1.2
                   </Button>
                   <Button
-                    onClick={() => navigate('/llm-fundamentals')}
+                    onClick={() => navigate('/dashboard')}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    Modulo 1 →
+                    Completa Modulo
                   </Button>
                 </div>
               </div>
@@ -197,4 +199,4 @@ const IntroduzioneCourse = () => {
   );
 };
 
-export default IntroduzioneCourse;
+export default PromptingCourse;

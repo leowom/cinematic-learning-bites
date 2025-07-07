@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Play, CheckCircle, Clock, User, BookOpen } from 'lucide-react';
+import { Home, Play, CheckCircle, Clock, User, BookOpen, ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
@@ -7,20 +7,49 @@ import { useNavigate } from 'react-router-dom';
 const IntroduzioneCourse = () => {
   const navigate = useNavigate();
   const [currentLesson, setCurrentLesson] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [expandedModules, setExpandedModules] = useState<string[]>(['introduzione']);
 
-  const lessons = [
+  const allModules = [
     {
-      id: 0,
-      title: "Introduzione all'AI",
-      duration: "13:54",
+      id: 'introduzione',
+      title: 'Introduzione',
+      description: 'Introduzione all\'AI',
+      duration: '13:54',
       completed: false,
-      current: true,
-      description: "Scopri i fondamenti dell'intelligenza artificiale e come può trasformare il tuo business"
+      route: '/introduzione',
+      lessons: [
+        {
+          id: 0,
+          title: "Introduzione all'AI",
+          duration: "13:54",
+          completed: false,
+          current: true,
+          description: "Scopri i fondamenti dell'intelligenza artificiale e come può trasformare il tuo business"
+        }
+      ]
     }
   ];
 
+  const lessons = allModules.find(m => m.id === 'introduzione')?.lessons || [];
   const currentLessonData = lessons[currentLesson];
-  const progressPercentage = (lessons.filter(l => l.completed).length / lessons.length) * 100;
+  
+  const totalLessons = allModules.reduce((acc, module) => acc + module.lessons.length, 0);
+  const completedLessons = allModules.reduce((acc, module) => 
+    acc + module.lessons.filter(l => l.completed).length, 0);
+  const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules(prev => 
+      prev.includes(moduleId) 
+        ? prev.filter(id => id !== moduleId)
+        : [...prev, moduleId]
+    );
+  };
+
+  const navigateToModule = (route: string) => {
+    navigate(route);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
@@ -61,66 +90,187 @@ const IntroduzioneCourse = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Sidebar - Lista Lezioni */}
-          <div className="col-span-12 lg:col-span-4">
-            <div className="step-card glassmorphism-base">
-              <div className="section-spacing">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
-                  Contenuti del Corso
-                </h3>
-                
-                <div className="space-y-3">
-                  {lessons.map((lesson, index) => (
-                    <div
-                      key={lesson.id}
-                      className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${
-                        lesson.current 
-                          ? 'bg-blue-900/30 border-blue-500/50 shadow-lg' 
-                          : lesson.completed
-                          ? 'bg-emerald-900/20 border-emerald-700/40 hover:bg-emerald-900/30'
-                          : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50'
-                      }`}
-                      onClick={() => setCurrentLesson(index)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-3">
-                          {lesson.completed ? (
-                            <CheckCircle className="w-5 h-5 text-emerald-400" />
-                          ) : lesson.current ? (
-                            <Play className="w-5 h-5 text-blue-400" />
-                          ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-slate-500" />
-                          )}
-                          <span className={`font-medium text-sm ${
-                            lesson.current ? 'text-blue-300' : lesson.completed ? 'text-emerald-300' : 'text-slate-300'
-                          }`}>
-                            Lezione {index + 1}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-slate-400 text-xs">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {lesson.duration}
-                        </div>
-                      </div>
-                      <h4 className={`font-semibold text-sm mb-1 ${
-                        lesson.current ? 'text-white' : 'text-slate-200'
-                      }`}>
-                        {lesson.title}
-                      </h4>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {lesson.description}
-                      </p>
-                    </div>
-                  ))}
+        <div className="flex gap-6 relative">
+          {/* Collapsible Sidebar - Course Navigation */}
+          <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-80'} flex-shrink-0`}>
+            <div className="step-card glassmorphism-base sticky top-4 h-fit max-h-[calc(100vh-2rem)] overflow-hidden">
+              <div className="section-spacing h-full flex flex-col">
+                {/* Sidebar Header */}
+                <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                  {!sidebarCollapsed && (
+                    <h3 className="text-lg font-semibold text-white flex items-center truncate">
+                      <BookOpen className="w-5 h-5 mr-2 text-blue-400 flex-shrink-0" />
+                      Corso Completo
+                    </h3>
+                  )}
+                  <Button
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 p-2 flex-shrink-0"
+                  >
+                    <Menu className="w-4 h-4" />
+                  </Button>
                 </div>
+
+                {!sidebarCollapsed && (
+                  <div className="flex flex-col flex-1 min-h-0">
+                    {/* Overall Progress */}
+                    <div className="mb-4 p-4 bg-slate-800/40 rounded-lg border border-slate-700/30 flex-shrink-0">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-slate-300 text-sm font-medium">Progresso Totale</span>
+                        <span className="text-emerald-400 text-sm font-bold">{Math.round(progressPercentage)}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700/60 rounded-full h-2 mb-2">
+                        <div 
+                          className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentage}%` }}
+                        />
+                      </div>
+                      <div className="text-xs text-slate-400 text-center">
+                        {completedLessons} di {totalLessons} lezioni completate
+                      </div>
+                    </div>
+
+                    {/* Modules List - Scrollable */}
+                    <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-1">
+                      {allModules.map((module) => (
+                        <div key={module.id} className="border border-slate-700/40 rounded-lg overflow-hidden bg-slate-800/20">
+                          {/* Module Header */}
+                          <div
+                            className={`p-4 cursor-pointer transition-all duration-200 ${
+                              module.id === 'introduzione' 
+                                ? 'bg-blue-900/30 border-l-4 border-blue-400' 
+                                : module.completed
+                                ? 'bg-emerald-900/20 hover:bg-emerald-900/30 border-l-4 border-emerald-400'
+                                : 'bg-slate-800/40 hover:bg-slate-700/50 border-l-4 border-slate-600'
+                            }`}
+                            onClick={() => toggleModule(module.id)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-start space-x-3 flex-1 min-w-0">
+                                <div className="flex-shrink-0 mt-0.5">
+                                  {module.completed ? (
+                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                  ) : module.id === 'introduzione' ? (
+                                    <Play className="w-5 h-5 text-blue-400" />
+                                  ) : (
+                                    <div className="w-5 h-5 rounded-full border-2 border-slate-500" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className={`font-semibold text-sm leading-tight mb-1 ${
+                                    module.id === 'introduzione' ? 'text-white' : 'text-slate-200'
+                                  }`}>
+                                    {module.title}
+                                  </h4>
+                                  <p className="text-xs text-slate-400 leading-relaxed">
+                                    {module.description}
+                                  </p>
+                                  <div className="flex items-center text-slate-500 text-xs mt-2">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    {module.duration}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex-shrink-0 ml-2">
+                                {expandedModules.includes(module.id) ? (
+                                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Module Lessons */}
+                          {expandedModules.includes(module.id) && (
+                            <div className="border-t border-slate-700/40 bg-slate-900/30">
+                              {module.lessons.map((lesson, index) => (
+                                <div
+                                  key={lesson.id}
+                                  className={`p-4 pl-16 cursor-pointer transition-all duration-200 border-l-4 ${
+                                    lesson.current && module.id === 'introduzione'
+                                      ? 'bg-blue-800/20 border-blue-400'
+                                      : lesson.completed
+                                      ? 'bg-emerald-800/10 hover:bg-emerald-800/20 border-emerald-400/50'
+                                      : 'hover:bg-slate-700/20 border-transparent'
+                                  }`}
+                                  onClick={() => {
+                                    if (module.id === 'introduzione') {
+                                      setCurrentLesson(index);
+                                    } else {
+                                      navigateToModule(module.route);
+                                    }
+                                  }}
+                                >
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1 min-w-0 pr-3">
+                                      <h5 className={`text-sm font-medium leading-tight ${
+                                        lesson.current && module.id === 'introduzione' ? 'text-blue-300' : 'text-slate-300'
+                                      }`}>
+                                        {lesson.title}
+                                      </h5>
+                                    </div>
+                                    <div className="flex items-center text-slate-500 text-xs flex-shrink-0">
+                                      <Clock className="w-3 h-3 mr-1" />
+                                      {lesson.duration}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Collapsed State Content */}
+                {sidebarCollapsed && (
+                  <div className="flex flex-col items-center space-y-4 flex-1">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <span className="text-emerald-400 text-xs font-bold">{Math.round(progressPercentage)}%</span>
+                    </div>
+                    <div className="space-y-2">
+                      {allModules.map((module) => (
+                        <div
+                          key={module.id}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                            module.id === 'introduzione' 
+                              ? 'bg-blue-900/40 border border-blue-400/50' 
+                              : module.completed
+                              ? 'bg-emerald-900/40 border border-emerald-400/50'
+                              : 'bg-slate-800/40 border border-slate-600/50 hover:bg-slate-700/50'
+                          }`}
+                          onClick={() => {
+                            if (module.id === 'introduzione') {
+                              // Already on this module
+                            } else {
+                              navigateToModule(module.route);
+                            }
+                          }}
+                          title={module.title}
+                        >
+                          {module.completed ? (
+                            <CheckCircle className="w-4 h-4 text-emerald-400" />
+                          ) : module.id === 'introduzione' ? (
+                            <Play className="w-4 h-4 text-blue-400" />
+                          ) : (
+                            <div className="w-3 h-3 rounded-full border border-slate-500" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Main Content - Video Player */}
-          <div className="col-span-12 lg:col-span-8">
+          <div className="flex-1 min-w-0">
             <div className="step-card glassmorphism-base">
               <div className="section-spacing">
                 <div className="mb-4">

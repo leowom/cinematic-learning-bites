@@ -324,10 +324,10 @@ const RoleInstruction = () => {
         <div className="flex gap-6 relative">
           {/* Collapsible Sidebar - Course Navigation */}
           <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-80'} flex-shrink-0`}>
-            <div className="step-card glassmorphism-base sticky top-4 h-[calc(100vh-2rem)] flex flex-col">
-              <div className="p-6 flex-shrink-0">
+            <div className="step-card glassmorphism-base sticky top-4 h-fit max-h-[calc(100vh-2rem)] overflow-hidden">
+              <div className="section-spacing h-full flex flex-col">
                 {/* Sidebar Header */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 flex-shrink-0">
                   {!sidebarCollapsed && (
                     <h3 className="text-lg font-semibold text-white flex items-center truncate">
                       <BookOpen className="w-5 h-5 mr-2 text-blue-400 flex-shrink-0" />
@@ -345,9 +345,9 @@ const RoleInstruction = () => {
                 </div>
 
                 {!sidebarCollapsed && (
-                  <>
+                  <div className="flex flex-col flex-1 min-h-0">
                     {/* Overall Progress */}
-                    <div className="mb-4 p-4 bg-slate-800/40 rounded-lg border border-slate-700/30">
+                    <div className="mb-4 p-4 bg-slate-800/40 rounded-lg border border-slate-700/30 flex-shrink-0">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-slate-300 text-sm font-medium">Progresso Totale</span>
                         <span className="text-emerald-400 text-sm font-bold">{Math.round(progressPercentage)}%</span>
@@ -362,17 +362,9 @@ const RoleInstruction = () => {
                         {completedLessons} di {totalLessons} lezioni completate
                       </div>
                     </div>
-                  </>
-                )}
-              </div>
 
-              {!sidebarCollapsed && (
-                <div className="flex-1 overflow-y-auto px-6 pb-6" style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgb(71 85 105) rgb(30 41 59)'
-                }}>
-                  {/* Modules List - Scrollable */}
-                  <div className="space-y-3">
+                    {/* Modules List - Scrollable */}
+                    <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
                       {allModules.map((module) => (
                         <div key={module.id} className="border border-slate-700/40 rounded-lg overflow-hidden bg-slate-800/20">
                           {/* Module Header */}
@@ -476,9 +468,9 @@ const RoleInstruction = () => {
                   </div>
                 )}
 
-              {/* Collapsed State Content */}
-              {sidebarCollapsed && (
-                  <div className="flex flex-col items-center space-y-4 flex-1 p-6">
+                {/* Collapsed State Content */}
+                {sidebarCollapsed && (
+                  <div className="flex flex-col items-center space-y-4 flex-1">
                     <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
                       <span className="text-emerald-400 text-xs font-bold">{Math.round(progressPercentage)}%</span>
                     </div>
@@ -698,15 +690,16 @@ const RoleInstruction = () => {
                       >
                         Modulo 2.4 →
                       </Button>
-                     </div>
-                   </div>
-                 )}
-               </div>
-             </div>
-           </div>
-         </div>
-       </div>
-     );
-   };
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default RoleInstruction;

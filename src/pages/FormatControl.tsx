@@ -339,10 +339,10 @@ const FormatControl = () => {
         <div className="flex gap-6 relative">
           {/* Collapsible Sidebar - Course Navigation */}
           <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-80'} flex-shrink-0`}>
-            <div className="step-card glassmorphism-base sticky top-4 h-[calc(100vh-2rem)] flex flex-col">
-              <div className="p-6 flex-shrink-0">
+            <div className="step-card glassmorphism-base sticky top-4 h-fit max-h-[calc(100vh-2rem)] overflow-hidden">
+              <div className="section-spacing h-full flex flex-col">
                 {/* Sidebar Header */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 flex-shrink-0">
                   {!sidebarCollapsed && (
                     <h3 className="text-lg font-semibold text-white flex items-center truncate">
                       <BookOpen className="w-5 h-5 mr-2 text-blue-400 flex-shrink-0" />

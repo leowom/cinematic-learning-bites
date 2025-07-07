@@ -1,12 +1,132 @@
 import React, { useState } from 'react';
-import { Home, Play, CheckCircle, Clock, User, BookOpen } from 'lucide-react';
+import { Home, Play, CheckCircle, Clock, User, BookOpen, Award, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 
 const LLMFundamentals = () => {
   const navigate = useNavigate();
   const [currentLesson, setCurrentLesson] = useState(0);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [score, setScore] = useState(0);
+
+  const quizQuestions = [
+    {
+      id: 0,
+      question: "ChatGPT è come:",
+      options: [
+        { id: 'A', text: 'Un motore di ricerca che trova risposte su internet' },
+        { id: 'B', text: 'Un assistente che genera risposte basandosi sul suo training' },
+        { id: 'C', text: 'Una persona che sa tutto' }
+      ],
+      correct: 'B'
+    },
+    {
+      id: 1,
+      question: "Quando ChatGPT non capisce, è meglio:",
+      options: [
+        { id: 'A', text: 'Ripetere la stessa domanda più volte' },
+        { id: 'B', text: 'Riformulare con più dettagli' },
+        { id: 'C', text: 'Arrabbiarsi e cambiare argomento' }
+      ],
+      correct: 'B'
+    },
+    {
+      id: 2,
+      question: "Chiarezza nella comunicazione: Quale richiesta è più efficace?",
+      options: [
+        { id: 'A', text: '"Aiutami con il lavoro"' },
+        { id: 'B', text: '"Scrivi un riassunto di 200 parole su..."' },
+        { id: 'C', text: '"Puoi fare quella cosa che serve?"' }
+      ],
+      correct: 'B'
+    },
+    {
+      id: 3,
+      question: "Per ottenere il formato giusto devi:",
+      options: [
+        { id: 'A', text: 'Sperare che ChatGPT indovini' },
+        { id: 'B', text: 'Specificare chiaramente cosa vuoi' },
+        { id: 'C', text: 'Continuare a provare finché non funziona' }
+      ],
+      correct: 'B'
+    },
+    {
+      id: 4,
+      question: "Gestione aspettative: Se la prima risposta non è perfetta:",
+      options: [
+        { id: 'A', text: 'ChatGPT è rotto' },
+        { id: 'B', text: 'È normale, posso guidarlo verso quello che voglio' },
+        { id: 'C', text: 'Devo cambiare strumento' }
+      ],
+      correct: 'B'
+    },
+    {
+      id: 5,
+      question: "ChatGPT funziona meglio quando:",
+      options: [
+        { id: 'A', text: 'Gli dai istruzioni precise e contesto' },
+        { id: 'B', text: 'Gli parli come a un amico' },
+        { id: 'C', text: 'Gli fai una domanda veloce senza spiegazioni' }
+      ],
+      correct: 'A'
+    },
+    {
+      id: 6,
+      question: "Mentalità corretta: L'AI è uno strumento che:",
+      options: [
+        { id: 'A', text: 'Pensa come un umano' },
+        { id: 'B', text: 'Segue le istruzioni che gli dai' },
+        { id: 'C', text: 'Sa sempre cosa vuoi senza spiegazioni' }
+      ],
+      correct: 'B'
+    },
+    {
+      id: 7,
+      question: "Cosa aspettarsi da ChatGPT:",
+      options: [
+        { id: 'A', text: 'Perfezione al primo tentativo' },
+        { id: 'B', text: 'Un buon punto di partenza da rifinire' },
+        { id: 'C', text: 'Che legga nella tua mente' }
+      ],
+      correct: 'B'
+    }
+  ];
+
+  const handleAnswerChange = (questionId: number, answer: string) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: answer
+    }));
+  };
+
+  const calculateScore = () => {
+    let correct = 0;
+    quizQuestions.forEach(question => {
+      if (answers[question.id] === question.correct) {
+        correct++;
+      }
+    });
+    return correct;
+  };
+
+  const submitQuiz = () => {
+    const finalScore = calculateScore();
+    setScore(finalScore);
+    setQuizCompleted(true);
+  };
+
+  const resetQuiz = () => {
+    setAnswers({});
+    setQuizCompleted(false);
+    setScore(0);
+  };
+
+  const isQuizComplete = Object.keys(answers).length === quizQuestions.length;
 
   const lessons = [
     {
@@ -174,22 +294,136 @@ const LLMFundamentals = () => {
                   </div>
                 </div>
 
-                {/* Navigation Buttons */}
-                <div className="flex justify-between items-center mt-6">
-                  <Button
-                    onClick={() => navigate('/introduzione')}
-                    variant="ghost"
-                    className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-                  >
-                    ← Modulo Precedente
-                  </Button>
-                  <Button
-                    onClick={() => navigate('/dashboard')}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                  >
-                    Completa Modulo
-                  </Button>
-                </div>
+                {/* Quiz Section */}
+                {!showQuiz ? (
+                  <div className="flex justify-between items-center mt-6">
+                    <Button
+                      onClick={() => navigate('/introduzione')}
+                      variant="ghost"
+                      className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                    >
+                      ← Modulo Precedente
+                    </Button>
+                    <Button
+                      onClick={() => setShowQuiz(true)}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    >
+                      Inizia Quiz di Validazione
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="mt-6">
+                    {!quizCompleted ? (
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
+                        <div className="flex items-center mb-6">
+                          <Award className="w-6 h-6 mr-3 text-yellow-400" />
+                          <h3 className="text-xl font-semibold text-white">Quiz di Validazione</h3>
+                        </div>
+                        
+                        <div className="space-y-6">
+                          {quizQuestions.map((question, index) => (
+                            <div key={question.id} className="bg-slate-700/30 border border-slate-600/40 rounded-lg p-5">
+                              <h4 className="text-white font-medium mb-4 text-lg">
+                                {index + 1}. {question.question}
+                              </h4>
+                              
+                              <RadioGroup
+                                value={answers[question.id] || ''}
+                                onValueChange={(value) => handleAnswerChange(question.id, value)}
+                                className="space-y-3"
+                              >
+                                {question.options.map((option) => (
+                                  <div key={option.id} className="flex items-center space-x-3">
+                                    <RadioGroupItem 
+                                      value={option.id} 
+                                      id={`q${question.id}_${option.id}`}
+                                      className="border-slate-400 text-blue-400"
+                                    />
+                                    <Label 
+                                      htmlFor={`q${question.id}_${option.id}`}
+                                      className="text-slate-200 cursor-pointer flex-1 hover:text-white transition-colors"
+                                    >
+                                      <span className="font-medium text-blue-300 mr-2">{option.id})</span>
+                                      {option.text}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </RadioGroup>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-8">
+                          <Button
+                            onClick={() => setShowQuiz(false)}
+                            variant="ghost"
+                            className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                          >
+                            ← Torna al Video
+                          </Button>
+                          <Button
+                            onClick={submitQuiz}
+                            disabled={!isQuizComplete}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Invia Risposte ({Object.keys(answers).length}/{quizQuestions.length})
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6 text-center">
+                        <div className="mb-6">
+                          <Award className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
+                          <h3 className="text-2xl font-bold text-white mb-2">Quiz Completato!</h3>
+                          <p className="text-slate-300 text-lg">
+                            Hai risposto correttamente a <span className="text-emerald-400 font-bold">{score}</span> domande su {quizQuestions.length}
+                          </p>
+                        </div>
+                        
+                        <div className="mb-6">
+                          <div className={`inline-block px-6 py-3 rounded-lg font-semibold text-lg ${
+                            score >= 6 
+                              ? 'bg-emerald-900/30 border border-emerald-600/50 text-emerald-300' 
+                              : score >= 4 
+                              ? 'bg-yellow-900/30 border border-yellow-600/50 text-yellow-300'
+                              : 'bg-red-900/30 border border-red-600/50 text-red-300'
+                          }`}>
+                            {score >= 6 ? '🎉 Eccellente!' : score >= 4 ? '👍 Buon Lavoro!' : '📚 Rivedi il Materiale'}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {score < 6 && (
+                            <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4 mb-4">
+                              <p className="text-blue-300 text-sm">
+                                💡 Consiglio: Rivedi il video per consolidare le tue conoscenze sugli LLM
+                              </p>
+                            </div>
+                          )}
+                          
+                          <div className="flex justify-center gap-4">
+                            <Button
+                              onClick={resetQuiz}
+                              variant="ghost"
+                              className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                            >
+                              <RotateCcw className="w-4 h-4 mr-2" />
+                              Riprova Quiz
+                            </Button>
+                            {score >= 4 && (
+                              <Button
+                                onClick={() => navigate('/dashboard')}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                              >
+                                Completa Modulo →
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

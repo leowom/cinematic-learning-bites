@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import PromptEngineeringLab from "./pages/PromptEngineeringLab";
 import AITransformationDay1 from "./pages/AITransformationDay1";
 import IntroduzioneCourse from "./pages/IntroduzioneCourse";
+import LLMFundamentals from "./pages/LLMFundamentals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/prompt-lab" element={<PromptEngineeringLab />} />
             <Route path="/ai-transformation-day1" element={<AITransformationDay1 />} />
             <Route path="/introduzione" element={<IntroduzioneCourse />} />
+            <Route path="/llm-fundamentals" element={<LLMFundamentals />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

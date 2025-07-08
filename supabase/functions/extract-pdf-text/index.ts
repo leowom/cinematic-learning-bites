@@ -120,67 +120,99 @@ L'AI farà del suo meglio per aiutarti basandosi sul documento caricato.`;
 
 async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
   const uint8Array = new Uint8Array(arrayBuffer);
-  const textDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: false });
   
   try {
-    // Try to find readable text in the PDF
-    const pdfString = textDecoder.decode(uint8Array);
+    // Convert to string for pattern matching
+    const pdfString = Array.from(uint8Array)
+      .map(byte => String.fromCharCode(byte))
+      .join('');
     
-    // Enhanced text extraction patterns
-    const patterns = [
-      // Standard PDF text objects
-      /\(([^)]+)\)/g,
-      // Alternative text patterns
-      /BT\s+.*?ET/gs,
-      // Stream content
-      /\/Length\s+\d+\s*>>\s*stream\s*(.*?)\s*endstream/gs
-    ];
+    console.log('📄 PDF size:', uint8Array.length, 'bytes');
     
-    let extractedText = '';
+    // Method 1: Extract text between parentheses (most common PDF text storage)
+    const textInParentheses = [];
+    const parenthesesRegex = /\(([^)]+)\)/g;
+    let match;
     
-    for (const pattern of patterns) {
-      const matches = pdfString.match(pattern);
-      if (matches && matches.length > 0) {
-        const text = matches
-          .map(match => {
-            // Clean up the match
-            return match
-              .replace(/^\(|\)$/g, '') // Remove parentheses
-              .replace(/BT\s+|ET/g, '') // Remove BT/ET commands
-              .replace(/\/Length\s+\d+\s*>>\s*stream\s*|\s*endstream/g, '') // Remove stream markers
-              .replace(/\\[rn]/g, ' ') // Replace escaped newlines
-              .replace(/\s+/g, ' ') // Normalize whitespace
-              .trim();
-          })
-          .filter(text => text.length > 2 && /[a-zA-Z]/.test(text)) // Filter meaningful text
-          .join(' ');
-        
-        if (text.length > extractedText.length) {
-          extractedText = text;
-        }
-      }
-    }
-    
-    // If no text found with patterns, try ASCII extraction
-    if (!extractedText || extractedText.length < 50) {
-      const asciiText = Array.from(uint8Array)
-        .map(byte => (byte >= 32 && byte <= 126) ? String.fromCharCode(byte) : ' ')
-        .join('')
+    while ((match = parenthesesRegex.exec(pdfString)) !== null) {
+      const text = match[1]
+        .replace(/\\n/g, ' ')
+        .replace(/\\r/g, ' ')
+        .replace(/\\t/g, ' ')
+        .replace(/\\\\/g, '\\')
+        .replace(/\\\)/g, ')')
+        .replace(/\\\(/g, '(')
         .replace(/\s+/g, ' ')
         .trim();
       
-      // Extract meaningful words
-      const words = asciiText.match(/[a-zA-Z]{3,}/g);
-      if (words && words.length > 10) {
-        extractedText = words.slice(0, 200).join(' '); // Limit to first 200 words
+      if (text.length > 2 && /[a-zA-Z]/.test(text)) {
+        textInParentheses.push(text);
       }
+    }
+    
+    // Method 2: Extract text from TJ arrays (text showing operations)
+    const tjRegex = /\[(.*?)\]\s*TJ/g;
+    const tjTexts = [];
+    
+    while ((match = tjRegex.exec(pdfString)) !== null) {
+      const content = match[1];
+      const textMatches = content.match(/\(([^)]+)\)/g);
+      if (textMatches) {
+        textMatches.forEach(textMatch => {
+          const text = textMatch.slice(1, -1)
+            .replace(/\\n/g, ' ')
+            .replace(/\\r/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          if (text.length > 2 && /[a-zA-Z]/.test(text)) {
+            tjTexts.push(text);
+          }
+        });
+      }
+    }
+    
+    // Method 3: Extract readable ASCII sequences
+    const readableChars = [];
+    for (let i = 0; i < uint8Array.length; i++) {
+      const byte = uint8Array[i];
+      if (byte >= 32 && byte <= 126) {
+        readableChars.push(String.fromCharCode(byte));
+      } else if (byte === 10 || byte === 13) {
+        readableChars.push(' ');
+      } else {
+        readableChars.push('');
+      }
+    }
+    
+    const asciiText = readableChars.join('').replace(/\s+/g, ' ').trim();
+    const asciiWords = asciiText.match(/[a-zA-Z]{3,}/g) || [];
+    
+    // Combine all extraction methods
+    let allTexts = [...textInParentheses, ...tjTexts];
+    
+    // If we didn't get much from structured methods, use ASCII words
+    if (allTexts.length < 10 && asciiWords.length > 20) {
+      allTexts = [...allTexts, ...asciiWords.slice(0, 100)];
+    }
+    
+    const extractedText = allTexts.join(' ').replace(/\s+/g, ' ').trim();
+    
+    console.log(`✅ Extracted ${extractedText.length} characters, ${allTexts.length} text segments`);
+    
+    // Validate extracted text quality
+    const wordCount = extractedText.split(/\s+/).filter(word => word.length > 2).length;
+    console.log(`📊 Text quality: ${wordCount} meaningful words`);
+    
+    if (extractedText.length < 20 || wordCount < 5) {
+      console.warn('⚠️ Low quality text extraction');
+      throw new Error('Testo estratto insufficiente');
     }
     
     return extractedText;
     
   } catch (error) {
-    console.error('❌ Error in text extraction:', error);
-    throw new Error('Estrazione testo fallita');
+    console.error('❌ Error in PDF text extraction:', error);
+    throw error;
   }
 }
 

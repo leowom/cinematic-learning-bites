@@ -23,47 +23,90 @@ serve(async (req) => {
     });
 
     let systemPrompt;
+    let userPrompt;
     let aiResponse;
 
-    // Gestisci diversi tipi di richieste
     if (testCase?.type === 'pdf_analysis') {
-      // Per l'analisi PDF, usa il prompt direttamente
-      console.log('📄 Processing PDF analysis request');
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openAIApiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [
-            {
-              role: 'system',
-              content: 'Sei un assistente esperto nell\'analisi di documenti. Rispondi seguendo esattamente le istruzioni dell\'utente basandoti sul contenuto del documento fornito.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 1500,
-          temperature: 0.3
-        })
+      // Validazione del contenuto PDF
+      const cleanPrompt = prompt.replace(/Il contenuto del PDF è:\s*"([^"]*)"/, (match, content) => {
+        console.log('📄 PDF content preview:', content.substring(0, 200) + '...');
+        
+        // Verifica che il contenuto sia leggibile
+        const wordCount = content.split(/\s+/).filter(word => word.length > 2).length;
+        console.log(`📊 PDF content quality: ${wordCount} meaningful words`);
+        
+        if (wordCount < 10) {
+          console.warn('⚠️ Poor quality PDF content detected');
+          return `Il documento PDF caricato contiene informazioni che potrebbero non essere completamente leggibili. Analizza comunque il contenuto disponibile: "${content}"`;
+        }
+        
+        return match;
       });
+      
+      systemPrompt = `Sei un esperto analista di documenti. Il tuo compito è analizzare il contenuto del PDF fornito e rispondere precisamente alla richiesta dell'utente. 
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ OpenAI API Error:', errorData);  
-        throw new Error(`OpenAI API Error: ${errorData.error?.message || 'Unknown error'}`);
+IMPORTANTE: 
+- Concentrati SOLO sul contenuto del documento fornito
+- Se il contenuto non è chiaro, menzionalo esplicitamente
+- Fornisci sempre una risposta utile basata su quello che riesci a leggere
+- Non inventare informazioni non presenti nel documento`;
+
+      userPrompt = cleanPrompt;
+      
+      console.log('📄 Processing PDF analysis with content validation');
+    } else {
+      // Logica originale per customer service
+      systemPrompt = `Sei un esperto di customer service che deve rispondere a questa email seguendo il prompt fornito. Rispondi SOLO con la risposta del customer service, senza commenti aggiuntivi.
+
+PROMPT DA SEGUIRE:
+${prompt}
+
+EMAIL CLIENTE:
+${testCase.email}`;
+      
+      userPrompt = '';
+    }
+
+    const messages = [
+      {
+        role: 'system',
+        content: systemPrompt
       }
+    ];
+    
+    if (userPrompt) {
+      messages.push({
+        role: 'user',
+        content: userPrompt
+      });
+    }
 
-      const data = await response.json();
-      aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openAIApiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-2025-04-14',
+        messages,
+        max_tokens: testCase?.type === 'pdf_analysis' ? 1500 : 1000,
+        temperature: testCase?.type === 'pdf_analysis' ? 0.3 : 0.7
+      })
+    });
 
-      console.log('✅ PDF analysis completed');
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ OpenAI API Error:', errorData);
+      throw new Error(`OpenAI API Error: ${errorData.error?.message || 'Unknown error'}`);
+    }
 
+    const data = await response.json();
+    aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
+
+    if (testCase?.type === 'pdf_analysis') {
+      console.log('✅ PDF analysis completed successfully');
+      
       // Per l'analisi PDF, restituisci una risposta semplificata
       return new Response(JSON.stringify({
         response: aiResponse,
@@ -79,46 +122,8 @@ serve(async (req) => {
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
-
     } else {
-      // Logica originale per customer service
-      systemPrompt = `Sei un esperto di customer service che deve rispondere a questa email seguendo il prompt fornito. Rispondi SOLO con la risposta del customer service, senza commenti aggiuntivi.
-
-PROMPT DA SEGUIRE:
-${prompt}
-
-EMAIL CLIENTE:
-${testCase.email}`;
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openAIApiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt
-            }
-          ],
-          max_tokens: 1000,
-          temperature: 0.7
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ OpenAI API Error:', errorData);
-        throw new Error(`OpenAI API Error: ${errorData.error?.message || 'Unknown error'}`);
-      }
-
-      const data = await response.json();
-      aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
-
-      console.log('✅ GPT-4.1 response generated, analyzing...');
+      console.log('✅ Customer service response generated, analyzing...');
 
       // Analizza la risposta per customer service
       const analysisResult = await analyzeResponseWithGPT(aiResponse, testCase, prompt, openAIApiKey);

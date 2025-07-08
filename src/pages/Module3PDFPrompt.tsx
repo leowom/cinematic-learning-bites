@@ -163,17 +163,27 @@ Richiesta: ${prompt}`;
                     <Button onClick={() => fileInputRef.current?.click()} variant="ghost" size="sm">
                       Cambia PDF
                     </Button>
-                    {pdfText.length > 100 && <Button onClick={() => setShowTextPreview(!showTextPreview)} variant="ghost" size="sm">
-                        {showTextPreview ? 'Nascondi' : 'Mostra'} anteprima
-                      </Button>}
+                    {pdfText.length > 100 && (
+                      <Button
+                        onClick={() => setShowTextPreview(!showTextPreview)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        {showTextPreview ? 'Nascondi' : 'Mostra'} anteprima testo
+                      </Button>
+                    )}
                   </div>
-                  {showTextPreview && pdfText && <div className="mt-3 p-3 bg-slate-800/30 border border-slate-600 rounded text-xs text-slate-300 max-h-40 overflow-y-auto">
-                      <div className="font-medium mb-2">Anteprima testo estratto:</div>
-                      <div className="whitespace-pre-wrap">
-                        {pdfText.substring(0, 500)}
-                        {pdfText.length > 500 && '...'}
+                  {showTextPreview && pdfText && (
+                    <div className="mt-3 p-3 bg-slate-800/30 border border-slate-600 rounded text-xs text-slate-300 max-h-40 overflow-y-auto">
+                      <div className="font-medium mb-2 text-green-400">
+                        ✅ Testo estratto correttamente ({pdfText.split(' ').length} parole):
                       </div>
-                    </div>}
+                      <div className="whitespace-pre-wrap font-mono">
+                        {pdfText.substring(0, 800)}
+                        {pdfText.length > 800 && '...\n\n[Mostra solo i primi 800 caratteri per anteprima]'}
+                      </div>
+                    </div>
+                  )}
                 </div>}
             </div>
           </div>

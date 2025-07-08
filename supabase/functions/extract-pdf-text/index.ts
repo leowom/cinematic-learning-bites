@@ -17,7 +17,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🔍 Starting enhanced PDF text extraction...');
+    console.log('🔍 Starting PDF upload processing...');
     const formData = await req.formData();
     const pdfFile = formData.get('pdf') as File;
     
@@ -38,32 +38,24 @@ serve(async (req) => {
 
     console.log(`📄 Processing PDF: ${pdfFile.name}, Size: ${pdfFile.size} bytes`);
 
-    // Convert file to ArrayBuffer
-    const arrayBuffer = await pdfFile.arrayBuffer();
-    console.log('✅ PDF file read successfully');
-
-    // Convert PDF to base64 for OpenAI processing
-    const base64Content = await convertPDFToBase64(arrayBuffer);
-    
-    console.log(`🎉 PDF successfully converted to base64 for OpenAI processing`);
-    
+    // For now, return an error explaining the limitation
     return new Response(
       JSON.stringify({ 
-        base64Content: base64Content,
-        fileName: pdfFile.name,
-        fileSize: pdfFile.size,
-        ready: true
+        error: 'Estrazione testo PDF non supportata',
+        details: 'Al momento la funzionalità di estrazione automatica del testo dai PDF non è disponibile. Si prega di copiare manualmente il testo dal PDF e incollarlo nella richiesta.',
+        ready: false
       }),
       {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
 
   } catch (error) {
-    console.error('❌ Error extracting PDF text:', error);
+    console.error('❌ Error processing PDF:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Impossibile estrarre il testo dal PDF',
+        error: error.message || 'Impossibile processare il PDF',
         details: error.message 
       }),
       {
@@ -78,15 +70,31 @@ async function convertPDFToBase64(arrayBuffer: ArrayBuffer): Promise<string> {
   try {
     console.log('📄 Converting PDF to base64, size:', arrayBuffer.byteLength, 'bytes');
     
-    // Convert ArrayBuffer to base64
-    const uint8Array = new Uint8Array(arrayBuffer);
-    const base64String = btoa(String.fromCharCode(...uint8Array));
+    if (arrayBuffer.byteLength === 0) {
+      throw new Error('PDF file is empty');
+    }
     
-    console.log('✅ PDF converted to base64 successfully');
+    if (arrayBuffer.byteLength > MAX_FILE_SIZE) {
+      throw new Error(`PDF file too large: ${arrayBuffer.byteLength} bytes`);
+    }
+    
+    // Convert ArrayBuffer to base64 using TextEncoder/TextDecoder for better handling
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
+    // Convert in chunks to avoid memory issues with very large files
+    const chunkSize = 1024 * 1024; // 1MB chunks
+    let base64String = '';
+    
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      const chunk = uint8Array.slice(i, i + chunkSize);
+      base64String += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+    }
+    
+    console.log('✅ PDF converted to base64 successfully, length:', base64String.length);
     return base64String;
     
   } catch (error) {
     console.error('❌ Error converting PDF to base64:', error);
-    throw new Error('Impossibile convertire il PDF in base64');
+    throw new Error(`Impossibile convertire il PDF in base64: ${error.message}`);
   }
 }

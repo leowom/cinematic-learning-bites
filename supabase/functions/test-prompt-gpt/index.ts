@@ -28,7 +28,51 @@ serve(async (req) => {
     let userPrompt;
     let aiResponse;
 
-    if (testCase?.type === 'pdf_analysis') {
+    if (testCase?.type === 'text_analysis') {
+      console.log('📄 Processing text analysis');
+      
+      // Extract text and user request from prompt
+      const textMatch = prompt.match(/DOCUMENTO_TESTO:\s*(.+?)(?=USER_REQUEST:)/s);
+      const requestMatch = prompt.match(/USER_REQUEST:\s*(.+)$/s);
+      
+      if (!textMatch || !requestMatch) {
+        throw new Error('Formato prompt testo non valido');
+      }
+      
+      const documentText = textMatch[1].trim();
+      const userRequest = requestMatch[1].trim();
+      
+      console.log(`📄 Document text length: ${documentText.length} chars`);
+      console.log(`📄 User request: ${userRequest}`);
+      
+      systemPrompt = `Sei un esperto analista di documenti. Ti verrà fornito il testo di un documento e dovrai rispondere alla richiesta dell'utente in modo preciso e dettagliato.
+
+ISTRUZIONI:
+- Analizza attentamente tutto il contenuto del documento fornito
+- Rispondi SOLO basandoti sul contenuto del documento
+- Se alcune parti non sono chiare, menzionalo esplicitamente  
+- Fornisci sempre informazioni utili e specifiche
+- Usa un tono professionale ma accessibile`;
+
+      userPrompt = `Ecco il contenuto del documento da analizzare:
+
+${documentText}
+
+Richiesta dell'utente: ${userRequest}
+
+Per favore, analizza il documento e rispondi alla richiesta in modo dettagliato e preciso.`;
+      
+      messages.push({
+        role: 'system',
+        content: systemPrompt
+      });
+      
+      messages.push({
+        role: 'user', 
+        content: userPrompt
+      });
+      
+    } else if (testCase?.type === 'pdf_analysis') {
       console.log('📄 Processing PDF analysis with base64 content');
       
       // Extract base64 and user request from prompt
@@ -45,22 +89,23 @@ serve(async (req) => {
       console.log(`📄 PDF base64 length: ${base64Content.length} chars`);
       console.log(`📄 User request: ${userRequest}`);
       
-      systemPrompt = `Sei un esperto analista di documenti PDF. Il documento è fornito in formato base64. 
+      systemPrompt = `Sei un esperto analista di documenti PDF. Ti verrà fornito il contenuto di un documento PDF codificato in base64. 
 Analizza il contenuto e rispondi alla richiesta dell'utente in modo preciso e dettagliato.
 
 ISTRUZIONI:
-- Il documento PDF è codificato in base64 
-- Estrai e analizza il contenuto del documento
+- Il documento PDF è fornito in formato base64 
+- Decodifica e analizza attentamente il contenuto del documento
 - Rispondi SOLO basandoti sul contenuto del documento
-- Se alcune parti non sono chiare, menzionalo esplicitamente
+- Se alcune parti non sono chiare, menzionalo esplicitamente  
 - Fornisci sempre informazioni utili e specifiche
 - Usa un tono professionale ma accessibile`;
 
-      userPrompt = `Documento PDF (codificato in base64): ${base64Content}
+      userPrompt = `Documento PDF codificato in base64:
+${base64Content}
 
 Richiesta dell'utente: ${userRequest}
 
-Analizza il documento PDF e rispondi alla richiesta in modo dettagliato e preciso.`;
+Per favore, analizza il documento PDF e rispondi alla richiesta in modo dettagliato e preciso.`;
       
       messages.push({
         role: 'system',
@@ -68,7 +113,7 @@ Analizza il documento PDF e rispondi alla richiesta in modo dettagliato e precis
       });
       
       messages.push({
-        role: 'user',
+        role: 'user', 
         content: userPrompt
       });
       

@@ -8,13 +8,14 @@ import { supabase } from '@/integrations/supabase/client';
 import GlassmorphismCard from '@/components/GlassmorphismCard';
 const Module3PDFPrompt: React.FC = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pdfBase64, setPdfBase64] = useState<string>('');
+  const [pdfText, setPdfText] = useState<string>('');
   const [pdfReady, setPdfReady] = useState(false);
   const [prompt, setPrompt] = useState<string>('');
   const [response, setResponse] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showTextInput, setShowTextInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     toast
@@ -48,9 +49,25 @@ const Module3PDFPrompt: React.FC = () => {
         throw new Error(error.message || 'Errore nella richiesta al server');
       }
       if (data.error) {
+        // Se l'errore indica che l'estrazione PDF non è supportata, mostra un messaggio specifico
+        if (data.error.includes('Estrazione testo PDF non supportata')) {
+          toast({
+            title: "Funzionalità temporaneamente non disponibile",
+            description: "Al momento l'estrazione automatica del testo dai PDF non è supportata. Copia manualmente il testo dal PDF e incollalo nel campo sottostante.",
+            variant: "destructive"
+          });
+          
+          // Mostra un'area di testo per inserire manualmente il contenuto
+          setPdfFile(null);
+          setPdfText('');
+          setPdfReady(false);
+          setShowTextInput(true);
+          return;
+        }
+        
         throw new Error(data.error);
       }
-      setPdfBase64(data.base64Content);
+      setPdfText(data.textContent || '');
       setPdfReady(data.ready);
       toast({
         title: "File caricato!",
@@ -68,10 +85,10 @@ const Module3PDFPrompt: React.FC = () => {
     }
   };
   const handleSendPrompt = async () => {
-    if (!pdfReady || !prompt.trim()) {
+    if ((!pdfReady && !showTextInput) || !prompt.trim()) {
       toast({
         title: "Campi mancanti",
-        description: "Carica un PDF e scrivi un prompt prima di continuare",
+        description: "Inserisci il contenuto del documento e scrivi un prompt prima di continuare",
         variant: "destructive"
       });
       return;
@@ -79,11 +96,11 @@ const Module3PDFPrompt: React.FC = () => {
     setIsProcessing(true);
     setResponse('');
     try {
-      const fullPrompt = `PDF_BASE64_CONTENT: ${pdfBase64}
+      const fullPrompt = `DOCUMENTO_TESTO: ${pdfText}
 USER_REQUEST: ${prompt}`;
       
       const result = await testPromptWithGPT(fullPrompt, {
-        type: 'pdf_analysis',
+        type: 'text_analysis',
         context: 'document_processing'
       });
       setResponse(result.response);
@@ -134,40 +151,92 @@ USER_REQUEST: ${prompt}`;
           <div className="mb-6">
             <h3 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              📎 Carica un documento PDF
+              📎 Carica un documento PDF o inserisci il testo manualmente
             </h3>
             
-            <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors">
-              <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
-              
-              {!pdfFile ? <div>
-                  <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            {!showTextInput ? (
+              <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors">
+                <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
+                
+                {!pdfFile ? (
+                  <div>
+                    <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                     <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="mb-2 hover:bg-slate-700 transition-colors" disabled={isExtracting}>
-                    {isExtracting ? <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Caricamento...
-                      </> : <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Seleziona PDF
-                      </>}
-                  </Button>
-                  <p className="text-slate-400 text-sm">
-                    Carica un documento PDF per iniziare (max 10MB)
-                  </p>
-                </div> : <div className="text-green-400">
-                  <Check className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-medium">{pdfFile.name}</p>
-                  
-                  <div className="flex gap-2 mt-2">
-                    <Button onClick={() => fileInputRef.current?.click()} variant="ghost" size="sm">
-                      Cambia PDF
+                      {isExtracting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Caricamento...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Seleziona PDF
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-slate-400 text-sm mb-2">
+                      Carica un documento PDF per iniziare (max 10MB)
+                    </p>
+                    <Button 
+                      onClick={() => setShowTextInput(true)} 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-purple-400 hover:text-purple-300"
+                    >
+                      Oppure inserisci il testo manualmente
                     </Button>
                   </div>
-                  <p className="text-slate-400 text-xs mt-2">
-                    ✅ PDF pronto per l'analisi AI
+                ) : (
+                  <div className="text-green-400">
+                    <Check className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-medium">{pdfFile.name}</p>
+                    
+                    <div className="flex gap-2 mt-2">
+                      <Button onClick={() => fileInputRef.current?.click()} variant="ghost" size="sm">
+                        Cambia PDF
+                      </Button>
+                    </div>
+                    <p className="text-slate-400 text-xs mt-2">
+                      ✅ PDF pronto per l'analisi AI
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-slate-300 text-sm">
+                    💡 Copia e incolla il testo dal tuo documento PDF qui:
                   </p>
-                </div>}
-            </div>
+                  <Button 
+                    onClick={() => {
+                      setShowTextInput(false);
+                      setPdfText('');
+                      setPdfReady(false);
+                    }} 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-slate-400 hover:text-slate-300"
+                  >
+                    Carica PDF invece
+                  </Button>
+                </div>
+                <Textarea
+                  value={pdfText}
+                  onChange={(e) => {
+                    setPdfText(e.target.value);
+                    setPdfReady(e.target.value.length > 10);
+                  }}
+                  placeholder="Incolla qui il contenuto del tuo documento PDF..."
+                  className="min-h-[200px] bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
+                />
+                {pdfText.length > 10 && (
+                  <p className="text-green-400 text-sm">
+                    ✅ Testo pronto per l'analisi AI ({pdfText.length} caratteri)
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Prompt Section */}
@@ -234,10 +303,11 @@ USER_REQUEST: ${prompt}`;
                   </Button>
                   <Button onClick={() => {
               setPdfFile(null);
-              setPdfBase64('');
+              setPdfText('');
               setPdfReady(false);
               setPrompt('');
               setResponse('');
+              setShowTextInput(false);
             }} variant="outline" size="sm">
                     Nuovo documento
                   </Button>

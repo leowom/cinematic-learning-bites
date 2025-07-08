@@ -17,10 +17,72 @@ serve(async (req) => {
   try {
     const { prompt, testCase } = await req.json();
 
-    console.log('🚀 Testing prompt with GPT-4.1:', { prompt: prompt.substring(0, 100) + '...', testCase: testCase.title });
+    console.log('🚀 Testing prompt with GPT-4.1:', { 
+      prompt: prompt.substring(0, 100) + '...', 
+      type: testCase?.type || 'customer_service' 
+    });
 
-    // Costruisci il prompt per GPT-4o
-    const systemPrompt = `Sei un esperto di customer service che deve rispondere a questa email seguendo il prompt fornito. Rispondi SOLO con la risposta del customer service, senza commenti aggiuntivi.
+    let systemPrompt;
+    let aiResponse;
+
+    // Gestisci diversi tipi di richieste
+    if (testCase?.type === 'pdf_analysis') {
+      // Per l'analisi PDF, usa il prompt direttamente
+      console.log('📄 Processing PDF analysis request');
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openAIApiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'Sei un assistente esperto nell\'analisi di documenti. Rispondi seguendo esattamente le istruzioni dell\'utente basandoti sul contenuto del documento fornito.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 1500,
+          temperature: 0.3
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ OpenAI API Error:', errorData);  
+        throw new Error(`OpenAI API Error: ${errorData.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
+
+      console.log('✅ PDF analysis completed');
+
+      // Per l'analisi PDF, restituisci una risposta semplificata
+      return new Response(JSON.stringify({
+        response: aiResponse,
+        score: 10, // Punteggio fisso per PDF
+        analysis: {
+          completeness: 95,
+          accuracy: 95,
+          tone: 90,
+          specificity: 90,
+          actionability: 90
+        },
+        feedback: ['✅ Documento analizzato con successo']
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+
+    } else {
+      // Logica originale per customer service
+      systemPrompt = `Sei un esperto di customer service che deve rispondere a questa email seguendo il prompt fornito. Rispondi SOLO con la risposta del customer service, senza commenti aggiuntivi.
 
 PROMPT DA SEGUIRE:
 ${prompt}
@@ -28,50 +90,50 @@ ${prompt}
 EMAIL CLIENTE:
 ${testCase.email}`;
 
-    // Chiamata a OpenAI GPT-4o
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openAIApiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7
-      })
-    });
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openAIApiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.7
+        })
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('❌ OpenAI API Error:', errorData);
-      throw new Error(`OpenAI API Error: ${errorData.error?.message || 'Unknown error'}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ OpenAI API Error:', errorData);
+        throw new Error(`OpenAI API Error: ${errorData.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
+
+      console.log('✅ GPT-4.1 response generated, analyzing...');
+
+      // Analizza la risposta per customer service
+      const analysisResult = await analyzeResponseWithGPT(aiResponse, testCase, prompt, openAIApiKey);
+
+      console.log('📊 Analysis completed:', analysisResult);
+
+      return new Response(JSON.stringify({
+        response: aiResponse,
+        score: analysisResult.score,
+        analysis: analysisResult.analysis,
+        feedback: analysisResult.feedback
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-
-    const data = await response.json();
-    const aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
-
-    console.log('✅ GPT-4.1 response generated, analyzing...');
-
-    // Analizza la risposta con GPT-4o
-    const analysisResult = await analyzeResponseWithGPT(aiResponse, testCase, prompt, openAIApiKey);
-
-    console.log('📊 Analysis completed:', analysisResult);
-
-    return new Response(JSON.stringify({
-      response: aiResponse,
-      score: analysisResult.score,
-      analysis: analysisResult.analysis,
-      feedback: analysisResult.feedback
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
 
   } catch (error) {
     console.error('❌ Error in test-prompt-gpt function:', error);

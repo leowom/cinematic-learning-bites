@@ -54,8 +54,8 @@ const Module3PDFPrompt: React.FC = () => {
       setPdfText(data.text);
       setExtractionMethod(data.info?.extractionMethod || 'unknown');
       toast({
-        title: "PDF caricato!",
-        description: `Estratto testo di ${data.text.length} caratteri${data.info?.extractionMethod ? ` (metodo: ${data.info.extractionMethod})` : ''}`
+        title: "File caricato!",
+        description: "PDF caricato completamente e pronto per l'elaborazione"
       });
     } catch (error) {
       console.error('Errore estrazione PDF:', error);
@@ -146,7 +146,7 @@ Richiesta: ${prompt}`;
                     <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="mb-2 hover:bg-slate-700 transition-colors" disabled={isExtracting}>
                     {isExtracting ? <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Estrazione testo...
+                        Caricamento...
                       </> : <>
                         <Upload className="w-4 h-4 mr-2" />
                         Seleziona PDF
@@ -256,12 +256,12 @@ Richiesta: ${prompt}`;
 
         {/* Instructions */}
         <GlassmorphismCard size="small">
-          <h4 className="text-white font-semibold mb-3">🎯 Sistema avanzato di analisi documenti:</h4>
+          <h4 className="text-white font-semibold mb-3">🎯 Come funziona:</h4>
           <ol className="text-slate-300 text-sm space-y-2">
-            <li>1. <strong>Upload intelligente:</strong> Il sistema prova più metodi di estrazione automaticamente</li>
-            <li>2. <strong>AI Analysis:</strong> Usa GPT-4.1 per analisi approfondite del contenuto</li>
-            <li>3. <strong>Fallback robusto:</strong> Se l'estrazione fallisce, l'AI può comunque aiutarti</li>
-            <li>4. <strong>Preview integrata:</strong> Controlla sempre il testo estratto prima dell'analisi</li>
+            <li>1. <strong>Carica il tuo PDF:</strong> Il sistema legge automaticamente il contenuto</li>
+            <li>2. <strong>Descrivi cosa vuoi:</strong> Scrivi la tua richiesta in linguaggio naturale</li>
+            <li>3. <strong>Ricevi la risposta:</strong> L'AI analizza il documento e risponde alla tua richiesta</li>
+            <li>4. <strong>Copia o migliora:</strong> Usa il risultato o affina la richiesta</li>
           </ol>
         </GlassmorphismCard>
       </div>

@@ -24,6 +24,7 @@ import RoleInstruction from "./pages/RoleInstruction";
 import EditOutput from "./pages/EditOutput";
 import Module3PDFPrompt from "./pages/Module3PDFPrompt";
 import Module3ImageGenerator from "./pages/Module3ImageGenerator";
+import Module3CodeByPrompt from "./pages/Module3CodeByPrompt";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/ai-interactive/edit-output" element={<EditOutput />} />
             <Route path="/module3-pdf-prompt" element={<Module3PDFPrompt />} />
             <Route path="/module3-image-generator" element={<Module3ImageGenerator />} />
+            <Route path="/module3-code-by-prompt" element={<Module3CodeByPrompt />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

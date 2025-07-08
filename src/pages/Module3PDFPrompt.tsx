@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useOpenAI } from '@/hooks/useOpenAI';
+import { supabase } from '@/integrations/supabase/client';
 import GlassmorphismCard from '@/components/GlassmorphismCard';
 
 const Module3PDFPrompt: React.FC = () => {
@@ -33,20 +34,32 @@ const Module3PDFPrompt: React.FC = () => {
     setIsExtracting(true);
 
     try {
-      // Importa dinamicamente pdf-parse per il client
-      const pdfParse = await import('pdf-parse');
-      const arrayBuffer = await file.arrayBuffer();
-      const data = await pdfParse.default(arrayBuffer);
+      // Usa l'edge function per estrarre il testo
+      const formData = new FormData();
+      formData.append('pdf', file);
+
+      const { data, error } = await supabase.functions.invoke('extract-pdf-text', {
+        body: formData
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Errore nella richiesta al server');
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setPdfText(data.text);
       toast({
         title: "PDF caricato!",
-        description: `Estratto testo di ${data.text.length} caratteri`
+        description: `Estratto testo di ${data.text.length} caratteri da ${data.pages} pagine`
       });
     } catch (error) {
       console.error('Errore estrazione PDF:', error);
       toast({
         title: "Errore",
-        description: "Impossibile estrarre il testo dal PDF",
+        description: error.message || "Impossibile estrarre il testo dal PDF",
         variant: "destructive"
       });
     } finally {

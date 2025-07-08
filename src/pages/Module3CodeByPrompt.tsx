@@ -17,6 +17,7 @@ const Module3CodeByPrompt: React.FC = () => {
   const [showCode, setShowCode] = useState(false);
   const [typewriterText, setTypewriterText] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showGuide, setShowGuide] = useState(true);
   const { toast } = useToast();
   const calculatorRef = useRef<HTMLDivElement>(null);
 
@@ -276,24 +277,24 @@ const Module3CodeByPrompt: React.FC = () => {
     setShowCode(false);
     setGeneratedCode('');
     
-    // Simulazione loading
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Simulazione loading ridotta
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Effetto typewriter
-    await typewriterEffect(calculatorCode, 20);
+    // Effetto typewriter più veloce
+    await typewriterEffect(calculatorCode, 8);
     
     setGeneratedCode(calculatorCode);
     setIsGenerating(false);
     setShowCode(true);
     
-    // Mostra preview dopo un po'
+    // Mostra preview subito
     setTimeout(() => {
       setShowPreview(true);
       toast({
         title: "Codice generato!",
         description: "La tua calcolatrice è pronta e funzionante"
       });
-    }, 1000);
+    }, 500);
   };
 
   const copyCode = () => {
@@ -320,13 +321,6 @@ const Module3CodeByPrompt: React.FC = () => {
     });
   };
 
-  const suggestedPrompts = [
-    "Crea una to-do list interattiva con HTML/CSS/JS",
-    "Genera una landing page per un prodotto",
-    "Scrivi il codice per un sistema di login",
-    "Crea un portfolio personale responsive",
-    "Genera un timer/cronometro funzionante"
-  ];
 
   // Calculator component for preview
   const CalculatorPreview = () => {
@@ -627,21 +621,40 @@ const Module3CodeByPrompt: React.FC = () => {
                   className="min-h-[120px] mb-4 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400" 
                 />
 
-                <div className="mb-4">
-                  <p className="text-slate-400 text-sm mb-2">💡 Altri esempi da provare:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestedPrompts.map((suggestion, index) => (
+                {showGuide && (
+                  <div className="mb-4 p-4 bg-blue-900/20 rounded-lg border border-blue-600/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-blue-300 font-medium flex items-center gap-2">
+                        🎯 Guida Interattiva
+                      </h4>
                       <Button 
-                        key={index} 
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs" 
-                        size="sm" 
-                        onClick={() => setPrompt(suggestion)}
+                        onClick={() => setShowGuide(false)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-blue-400 hover:text-blue-300"
                       >
-                        {suggestion}
+                        ✕
                       </Button>
-                    ))}
+                    </div>
+                    <p className="text-blue-200 text-sm mb-3">
+                      👋 Benvenuto! Segui questa demo guidata per creare la tua prima app con l'AI.
+                    </p>
+                    <Button 
+                      onClick={() => {
+                        setPrompt("Scrivimi il codice HTML, CSS e JavaScript per una calcolatrice semplice con le 4 operazioni base. Voglio che funzioni direttamente in un browser.");
+                        setShowGuide(false);
+                        toast({
+                          title: "Prompt precompilato!",
+                          description: "Ora clicca 'Genera codice' per vedere la magia dell'AI"
+                        });
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      size="sm"
+                    >
+                      🚀 Inizia la demo - Genera Calcolatrice
+                    </Button>
                   </div>
-                </div>
+                )}
 
                 <Button 
                   onClick={generateCode} 
@@ -671,7 +684,7 @@ const Module3CodeByPrompt: React.FC = () => {
                     </h3>
                     {showCode && (
                       <div className="flex gap-2">
-                        <Button onClick={copyCode} variant="outline" size="sm">
+                        <Button onClick={copyCode} className="bg-blue-600 hover:bg-blue-700 text-white" size="sm">
                           {copied ? (
                             <>
                               <Check className="w-4 h-4 mr-2" />
@@ -684,7 +697,7 @@ const Module3CodeByPrompt: React.FC = () => {
                             </>
                           )}
                         </Button>
-                        <Button onClick={exportCode} variant="outline" size="sm">
+                        <Button onClick={exportCode} className="bg-blue-600 hover:bg-blue-700 text-white" size="sm">
                           <Download className="w-4 h-4 mr-2" />
                           ⬇️ Esporta .html
                         </Button>

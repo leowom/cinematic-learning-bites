@@ -10,6 +10,8 @@ import GlassmorphismCard from '@/components/GlassmorphismCard';
 const Module3PDFPrompt: React.FC = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfText, setPdfText] = useState<string>('');
+  const [extractionMethod, setExtractionMethod] = useState<string>('');
+  const [showTextPreview, setShowTextPreview] = useState(false);
   const [prompt, setPrompt] = useState<string>('');
   const [response, setResponse] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -51,9 +53,10 @@ const Module3PDFPrompt: React.FC = () => {
       }
 
       setPdfText(data.text);
+      setExtractionMethod(data.info?.extractionMethod || 'unknown');
       toast({
         title: "PDF caricato!",
-        description: `Estratto testo di ${data.text.length} caratteri da ${data.pages} pagine`
+        description: `Estratto testo di ${data.text.length} caratteri${data.info?.extractionMethod ? ` (metodo: ${data.info.extractionMethod})` : ''}`
       });
     } catch (error) {
       console.error('Errore estrazione PDF:', error);
@@ -121,10 +124,12 @@ Richiesta: ${prompt}`;
 
   const suggestedPrompts = [
     "Riassumilo in 5 punti chiave",
-    "Estrai tutte le date e mettile in tabella", 
+    "Estrai tutte le date e informazioni importanti", 
     "Spiegamelo con linguaggio semplice",
-    "Confronta le sezioni principali",
-    "Riformula per una mail a un collega"
+    "Crea un riassunto esecutivo per il management",
+    "Identifica i rischi e le opportunità principali",
+    "Estrai tutti i numeri e statistiche",
+    "Riformula per una presentazione"
   ];
 
   return (
@@ -151,7 +156,7 @@ Richiesta: ${prompt}`;
               📎 Carica un documento PDF
             </h3>
             
-            <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center">
+            <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -163,12 +168,12 @@ Richiesta: ${prompt}`;
               {!pdfFile ? (
                 <div>
                   <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    variant="outline"
-                    className="mb-2"
-                    disabled={isExtracting}
-                  >
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="outline"
+                      className="mb-2 hover:bg-slate-700 transition-colors"
+                      disabled={isExtracting}
+                    >
                     {isExtracting ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -182,7 +187,7 @@ Richiesta: ${prompt}`;
                     )}
                   </Button>
                   <p className="text-slate-400 text-sm">
-                    Carica un documento PDF per iniziare
+                    Carica un documento PDF per iniziare (max 10MB)
                   </p>
                 </div>
               ) : (
@@ -191,15 +196,35 @@ Richiesta: ${prompt}`;
                   <p className="font-medium">{pdfFile.name}</p>
                   <p className="text-sm text-slate-400">
                     Testo estratto: {pdfText.length} caratteri
+                    {extractionMethod && ` • Metodo: ${extractionMethod}`}
                   </p>
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    variant="ghost"
-                    size="sm"
-                    className="mt-2"
-                  >
-                    Cambia PDF
-                  </Button>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      Cambia PDF
+                    </Button>
+                    {pdfText.length > 100 && (
+                      <Button
+                        onClick={() => setShowTextPreview(!showTextPreview)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        {showTextPreview ? 'Nascondi' : 'Mostra'} anteprima
+                      </Button>
+                    )}
+                  </div>
+                  {showTextPreview && pdfText && (
+                    <div className="mt-3 p-3 bg-slate-800/30 border border-slate-600 rounded text-xs text-slate-300 max-h-40 overflow-y-auto">
+                      <div className="font-medium mb-2">Anteprima testo estratto:</div>
+                      <div className="whitespace-pre-wrap">
+                        {pdfText.substring(0, 500)}
+                        {pdfText.length > 500 && '...'}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -314,8 +339,10 @@ Richiesta: ${prompt}`;
                     onClick={() => {
                       setPdfFile(null);
                       setPdfText('');
+                      setExtractionMethod('');
                       setPrompt('');
                       setResponse('');
+                      setShowTextPreview(false);
                     }}
                     variant="outline"
                     size="sm"
@@ -330,12 +357,12 @@ Richiesta: ${prompt}`;
 
         {/* Instructions */}
         <GlassmorphismCard size="small">
-          <h4 className="text-white font-semibold mb-3">🎯 Come utilizzare:</h4>
+          <h4 className="text-white font-semibold mb-3">🎯 Sistema avanzato di analisi documenti:</h4>
           <ol className="text-slate-300 text-sm space-y-2">
-            <li>1. Carica un documento PDF reale (report, contratto, articolo...)</li>
-            <li>2. Scrivi un prompt chiaro per ottenere quello che ti serve</li>
-            <li>3. Itera e migliora il prompt per risultati più precisi</li>
-            <li>4. Copia il risultato finale per usarlo nel tuo lavoro</li>
+            <li>1. <strong>Upload intelligente:</strong> Il sistema prova più metodi di estrazione automaticamente</li>
+            <li>2. <strong>AI Analysis:</strong> Usa GPT-4.1 per analisi approfondite del contenuto</li>
+            <li>3. <strong>Fallback robusto:</strong> Se l'estrazione fallisce, l'AI può comunque aiutarti</li>
+            <li>4. <strong>Preview integrata:</strong> Controlla sempre il testo estratto prima dell'analisi</li>
           </ol>
         </GlassmorphismCard>
       </div>

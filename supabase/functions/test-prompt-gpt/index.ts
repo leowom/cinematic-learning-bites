@@ -17,7 +17,7 @@ serve(async (req) => {
   try {
     const { prompt, testCase } = await req.json();
 
-    console.log('🚀 Testing prompt with GPT-4o:', { prompt: prompt.substring(0, 100) + '...', testCase: testCase.title });
+    console.log('🚀 Testing prompt with GPT-4.1:', { prompt: prompt.substring(0, 100) + '...', testCase: testCase.title });
 
     // Costruisci il prompt per GPT-4o
     const systemPrompt = `Sei un esperto di customer service che deve rispondere a questa email seguendo il prompt fornito. Rispondi SOLO con la risposta del customer service, senza commenti aggiuntivi.
@@ -36,7 +36,7 @@ ${testCase.email}`;
         'Authorization': `Bearer ${openAIApiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           {
             role: 'system',
@@ -57,7 +57,7 @@ ${testCase.email}`;
     const data = await response.json();
     const aiResponse = data.choices[0]?.message?.content || 'Nessuna risposta generata';
 
-    console.log('✅ GPT-4o response generated, analyzing...');
+    console.log('✅ GPT-4.1 response generated, analyzing...');
 
     // Analizza la risposta con GPT-4o
     const analysisResult = await analyzeResponseWithGPT(aiResponse, testCase, prompt, openAIApiKey);
@@ -124,7 +124,7 @@ Rispondi in questo formato JSON (solo JSON, niente altro):
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           {
             role: 'system',

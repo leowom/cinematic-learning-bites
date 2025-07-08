@@ -440,7 +440,7 @@ USER_REQUEST: ${prompt}`;
                 {!pdfFile ? (
                   <div>
                     <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="mb-2 hover:bg-slate-700 transition-colors" disabled={isExtracting}>
+                    <Button onClick={() => fileInputRef.current?.click()} className="bg-blue-600 hover:bg-blue-700 text-white mb-2 transition-colors" disabled={isExtracting}>
                       {isExtracting ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -528,7 +528,7 @@ USER_REQUEST: ${prompt}`;
             <div className="mb-4">
               <p className="text-slate-400 text-sm mb-2">💡 Suggerimenti:</p>
               <div className="flex flex-wrap gap-2">
-                {suggestedPrompts.map((suggestion, index) => <Button key={index} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" size="sm" onClick={() => setPrompt(suggestion)} disabled={!pdfReady}>
+                {suggestedPrompts.map((suggestion, index) => <Button key={index} className="bg-blue-600 hover:bg-blue-700 text-white text-xs" size="sm" onClick={() => setPrompt(suggestion)} disabled={!pdfReady}>
                     {suggestion}
                   </Button>)}
               </div>

@@ -18,6 +18,7 @@ serve(async (req) => {
     const pdfFile = formData.get('pdf') as File;
     
     if (!pdfFile) {
+      console.error('❌ No PDF file provided');
       throw new Error('Nessun file PDF fornito');
     }
 
@@ -27,32 +28,57 @@ serve(async (req) => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('✅ PDF file read successfully');
 
-    // Use pdf2pic or another Deno-compatible approach
-    // For now, let's use a simpler text extraction approach
-    // Import pdfjs-dist which is more compatible with Deno
-    const pdfjsLib = await import('https://esm.sh/pdfjs-dist@3.11.174/build/pdf.min.js');
+    // Use OpenAI to extract text from PDF via OCR if needed
+    // For now, let's try a simple approach with basic PDF text extraction
+    const uint8Array = new Uint8Array(arrayBuffer);
     
-    // Initialize PDF.js
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    console.log(`📖 PDF loaded, ${pdf.numPages} pages found`);
+    // Simple text extraction - look for text patterns in PDF
+    const textDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: false });
+    let extractedText = '';
     
-    let fullText = '';
-    
-    // Extract text from each page
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item: any) => item.str).join(' ');
-      fullText += pageText + '\n';
-      console.log(`✅ Page ${pageNum} processed`);
+    try {
+      // Try to find readable text in the PDF
+      const pdfString = textDecoder.decode(uint8Array);
+      
+      // Extract text between common PDF text markers
+      const textMatches = pdfString.match(/\(([^)]+)\)/g);
+      if (textMatches) {
+        extractedText = textMatches
+          .map(match => match.slice(1, -1))
+          .filter(text => text.length > 2)
+          .join(' ');
+      }
+      
+      // Fallback: look for readable ASCII text
+      if (!extractedText || extractedText.length < 50) {
+        const asciiText = Array.from(uint8Array)
+          .map(byte => byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ' ')
+          .join('')
+          .replace(/\s+/g, ' ')
+          .trim();
+        
+        // Extract words that look like real text
+        const words = asciiText.match(/[a-zA-Z]{3,}/g);
+        if (words && words.length > 10) {
+          extractedText = words.join(' ');
+        }
+      }
+      
+    } catch (decodingError) {
+      console.error('❌ Error decoding PDF:', decodingError);
     }
     
-    console.log(`🎉 Text extraction completed, ${fullText.length} characters extracted`);
+    // If we still don't have enough text, return a message
+    if (!extractedText || extractedText.length < 20) {
+      extractedText = `Documento PDF caricato: ${pdfFile.name}. Il PDF potrebbe contenere principalmente immagini o testo non standard. Prova a scrivere un prompt generico come "Analizza questo documento" e l'AI farà del suo meglio per aiutarti.`;
+    }
+    
+    console.log(`🎉 Text extraction completed, ${extractedText.length} characters extracted`);
     
     return new Response(
       JSON.stringify({ 
-        text: fullText.trim(),
-        pages: pdf.numPages,
+        text: extractedText,
+        pages: 1, // Placeholder since we can't reliably count pages
         info: { title: pdfFile.name }
       }),
       {

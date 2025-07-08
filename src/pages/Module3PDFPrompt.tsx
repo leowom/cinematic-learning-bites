@@ -8,9 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import GlassmorphismCard from '@/components/GlassmorphismCard';
 const Module3PDFPrompt: React.FC = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pdfText, setPdfText] = useState<string>('');
-  const [extractionMethod, setExtractionMethod] = useState<string>('');
-  const [showTextPreview, setShowTextPreview] = useState(false);
+  const [pdfBase64, setPdfBase64] = useState<string>('');
+  const [pdfReady, setPdfReady] = useState(false);
   const [prompt, setPrompt] = useState<string>('');
   const [response, setResponse] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -51,11 +50,11 @@ const Module3PDFPrompt: React.FC = () => {
       if (data.error) {
         throw new Error(data.error);
       }
-      setPdfText(data.text);
-      setExtractionMethod(data.info?.extractionMethod || 'unknown');
+      setPdfBase64(data.base64Content);
+      setPdfReady(data.ready);
       toast({
         title: "File caricato!",
-        description: "PDF caricato completamente e pronto per l'elaborazione"
+        description: "PDF pronto per l'analisi AI"
       });
     } catch (error) {
       console.error('Errore estrazione PDF:', error);
@@ -69,7 +68,7 @@ const Module3PDFPrompt: React.FC = () => {
     }
   };
   const handleSendPrompt = async () => {
-    if (!pdfText || !prompt.trim()) {
+    if (!pdfReady || !prompt.trim()) {
       toast({
         title: "Campi mancanti",
         description: "Carica un PDF e scrivi un prompt prima di continuare",
@@ -80,9 +79,9 @@ const Module3PDFPrompt: React.FC = () => {
     setIsProcessing(true);
     setResponse('');
     try {
-      const fullPrompt = `Il contenuto del PDF è: "${pdfText.substring(0, 8000)}..." 
-
-Richiesta: ${prompt}`;
+      const fullPrompt = `PDF_BASE64_CONTENT: ${pdfBase64}
+USER_REQUEST: ${prompt}`;
+      
       const result = await testPromptWithGPT(fullPrompt, {
         type: 'pdf_analysis',
         context: 'document_processing'
@@ -163,27 +162,10 @@ Richiesta: ${prompt}`;
                     <Button onClick={() => fileInputRef.current?.click()} variant="ghost" size="sm">
                       Cambia PDF
                     </Button>
-                    {pdfText.length > 100 && (
-                      <Button
-                        onClick={() => setShowTextPreview(!showTextPreview)}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        {showTextPreview ? 'Nascondi' : 'Mostra'} anteprima testo
-                      </Button>
-                    )}
                   </div>
-                  {showTextPreview && pdfText && (
-                    <div className="mt-3 p-3 bg-slate-800/30 border border-slate-600 rounded text-xs text-slate-300 max-h-40 overflow-y-auto">
-                      <div className="font-medium mb-2 text-green-400">
-                        ✅ Testo estratto correttamente ({pdfText.split(' ').length} parole):
-                      </div>
-                      <div className="whitespace-pre-wrap font-mono">
-                        {pdfText.substring(0, 800)}
-                        {pdfText.length > 800 && '...\n\n[Mostra solo i primi 800 caratteri per anteprima]'}
-                      </div>
-                    </div>
-                  )}
+                  <p className="text-slate-400 text-xs mt-2">
+                    ✅ PDF pronto per l'analisi AI
+                  </p>
                 </div>}
             </div>
           </div>
@@ -194,19 +176,19 @@ Richiesta: ${prompt}`;
               ✍️ Scrivi cosa vuoi ottenere dal documento:
             </h3>
             
-            <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Es: 'Riassumi il PDF in 5 bullet point' o 'Spiegamelo come a un ragazzo di 15 anni'" className="min-h-[100px] mb-4 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400" disabled={!pdfText} />
+            <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Es: 'Riassumi il PDF in 5 bullet point' o 'Spiegamelo come a un ragazzo di 15 anni'" className="min-h-[100px] mb-4 bg-slate-800/50 border-slate-600 text-white placeholder-slate-400" disabled={!pdfReady} />
 
             {/* Prompt Suggestions */}
             <div className="mb-4">
               <p className="text-slate-400 text-sm mb-2">💡 Suggerimenti:</p>
               <div className="flex flex-wrap gap-2">
-                {suggestedPrompts.map((suggestion, index) => <Button key={index} variant="ghost" size="sm" onClick={() => setPrompt(suggestion)} className="text-xs text-slate-300 bg-slate-800/50 hover:bg-slate-700/50" disabled={!pdfText}>
+                {suggestedPrompts.map((suggestion, index) => <Button key={index} variant="ghost" size="sm" onClick={() => setPrompt(suggestion)} className="text-xs text-slate-300 bg-slate-800/50 hover:bg-slate-700/50" disabled={!pdfReady}>
                     {suggestion}
                   </Button>)}
               </div>
             </div>
 
-            <Button onClick={handleSendPrompt} disabled={!pdfText || !prompt.trim() || isProcessing} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+            <Button onClick={handleSendPrompt} disabled={!pdfReady || !prompt.trim() || isProcessing} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
               {isProcessing ? <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Processando...
@@ -252,11 +234,10 @@ Richiesta: ${prompt}`;
                   </Button>
                   <Button onClick={() => {
               setPdfFile(null);
-              setPdfText('');
-              setExtractionMethod('');
+              setPdfBase64('');
+              setPdfReady(false);
               setPrompt('');
               setResponse('');
-              setShowTextPreview(false);
             }} variant="outline" size="sm">
                     Nuovo documento
                   </Button>

@@ -27,33 +27,56 @@ serve(async (req) => {
     let aiResponse;
 
     if (testCase?.type === 'pdf_analysis') {
-      // Validazione del contenuto PDF
-      const cleanPrompt = prompt.replace(/Il contenuto del PDF è:\s*"([^"]*)"/, (match, content) => {
-        console.log('📄 PDF content preview:', content.substring(0, 200) + '...');
-        
-        // Verifica che il contenuto sia leggibile
-        const wordCount = content.split(/\s+/).filter(word => word.length > 2).length;
-        console.log(`📊 PDF content quality: ${wordCount} meaningful words`);
-        
-        if (wordCount < 10) {
-          console.warn('⚠️ Poor quality PDF content detected');
-          return `Il documento PDF caricato contiene informazioni che potrebbero non essere completamente leggibili. Analizza comunque il contenuto disponibile: "${content}"`;
-        }
-        
-        return match;
+      console.log('📄 Processing PDF analysis with base64 content');
+      
+      // Extract base64 and user request from prompt
+      const base64Match = prompt.match(/PDF_BASE64_CONTENT:\s*([A-Za-z0-9+/=]+)/);
+      const requestMatch = prompt.match(/USER_REQUEST:\s*(.+)$/);
+      
+      if (!base64Match || !requestMatch) {
+        throw new Error('Formato prompt PDF non valido');
+      }
+      
+      const base64Content = base64Match[1];
+      const userRequest = requestMatch[1];
+      
+      console.log(`📄 PDF base64 length: ${base64Content.length} chars`);
+      console.log(`📄 User request: ${userRequest}`);
+      
+      systemPrompt = `Sei un esperto analista di documenti PDF. Analizza il documento fornito e rispondi alla richiesta dell'utente in modo preciso e dettagliato.
+
+ISTRUZIONI:
+- Leggi attentamente tutto il contenuto del PDF
+- Rispondi SOLO basandoti sul contenuto del documento
+- Se alcune parti non sono chiare, menzionalo esplicitamente
+- Fornisci sempre informazioni utili e specifiche
+- Usa un tono professionale ma accessibile`;
+
+      userPrompt = `Ecco un documento PDF da analizzare:
+
+[DOCUMENTO PDF IN BASE64]
+
+Richiesta dell'utente: ${userRequest}
+
+Analizza il documento e rispondi alla richiesta in modo dettagliato e preciso.`;
+      
+      // Add PDF as base64 to the message
+      messages.push({
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: userPrompt
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:application/pdf;base64,${base64Content}`
+            }
+          }
+        ]
       });
       
-      systemPrompt = `Sei un esperto analista di documenti. Il tuo compito è analizzare il contenuto del PDF fornito e rispondere precisamente alla richiesta dell'utente. 
-
-IMPORTANTE: 
-- Concentrati SOLO sul contenuto del documento fornito
-- Se il contenuto non è chiaro, menzionalo esplicitamente
-- Fornisci sempre una risposta utile basata su quello che riesci a leggere
-- Non inventare informazioni non presenti nel documento`;
-
-      userPrompt = cleanPrompt;
-      
-      console.log('📄 Processing PDF analysis with content validation');
     } else {
       // Logica originale per customer service
       systemPrompt = `Sei un esperto di customer service che deve rispondere a questa email seguendo il prompt fornito. Rispondi SOLO con la risposta del customer service, senza commenti aggiuntivi.
@@ -74,7 +97,8 @@ ${testCase.email}`;
       }
     ];
     
-    if (userPrompt) {
+    // For PDF analysis, messages are already added above
+    if (testCase?.type !== 'pdf_analysis' && userPrompt) {
       messages.push({
         role: 'user',
         content: userPrompt

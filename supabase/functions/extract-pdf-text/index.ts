@@ -13,6 +13,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log('🔍 Starting PDF text extraction...');
     const formData = await req.formData();
     const pdfFile = formData.get('pdf') as File;
     
@@ -20,21 +21,39 @@ serve(async (req) => {
       throw new Error('Nessun file PDF fornito');
     }
 
+    console.log(`📄 Processing PDF: ${pdfFile.name}, Size: ${pdfFile.size} bytes`);
+
     // Convert file to ArrayBuffer
     const arrayBuffer = await pdfFile.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    console.log('✅ PDF file read successfully');
 
-    // Import pdf-parse dinamically for Deno
-    const { default: pdfParse } = await import('https://esm.sh/pdf-parse@1.1.1');
+    // Use pdf2pic or another Deno-compatible approach
+    // For now, let's use a simpler text extraction approach
+    // Import pdfjs-dist which is more compatible with Deno
+    const pdfjsLib = await import('https://esm.sh/pdfjs-dist@3.11.174/build/pdf.min.js');
     
-    // Extract text from PDF
-    const data = await pdfParse(uint8Array);
+    // Initialize PDF.js
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    console.log(`📖 PDF loaded, ${pdf.numPages} pages found`);
+    
+    let fullText = '';
+    
+    // Extract text from each page
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(' ');
+      fullText += pageText + '\n';
+      console.log(`✅ Page ${pageNum} processed`);
+    }
+    
+    console.log(`🎉 Text extraction completed, ${fullText.length} characters extracted`);
     
     return new Response(
       JSON.stringify({ 
-        text: data.text,
-        pages: data.numpages,
-        info: data.info
+        text: fullText.trim(),
+        pages: pdf.numPages,
+        info: { title: pdfFile.name }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -42,7 +61,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error extracting PDF text:', error);
+    console.error('❌ Error extracting PDF text:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Impossibile estrarre il testo dal PDF',

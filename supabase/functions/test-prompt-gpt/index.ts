@@ -22,6 +22,8 @@ serve(async (req) => {
       type: testCase?.type || 'customer_service' 
     });
 
+    // Initialize messages array at the beginning
+    const messages = [];
     let systemPrompt;
     let userPrompt;
     let aiResponse;
@@ -43,38 +45,31 @@ serve(async (req) => {
       console.log(`📄 PDF base64 length: ${base64Content.length} chars`);
       console.log(`📄 User request: ${userRequest}`);
       
-      systemPrompt = `Sei un esperto analista di documenti PDF. Analizza il documento fornito e rispondi alla richiesta dell'utente in modo preciso e dettagliato.
+      systemPrompt = `Sei un esperto analista di documenti PDF. Il documento è fornito in formato base64. 
+Analizza il contenuto e rispondi alla richiesta dell'utente in modo preciso e dettagliato.
 
 ISTRUZIONI:
-- Leggi attentamente tutto il contenuto del PDF
+- Il documento PDF è codificato in base64 
+- Estrai e analizza il contenuto del documento
 - Rispondi SOLO basandoti sul contenuto del documento
 - Se alcune parti non sono chiare, menzionalo esplicitamente
 - Fornisci sempre informazioni utili e specifiche
 - Usa un tono professionale ma accessibile`;
 
-      userPrompt = `Ecco un documento PDF da analizzare:
-
-[DOCUMENTO PDF IN BASE64]
+      userPrompt = `Documento PDF (codificato in base64): ${base64Content}
 
 Richiesta dell'utente: ${userRequest}
 
-Analizza il documento e rispondi alla richiesta in modo dettagliato e preciso.`;
+Analizza il documento PDF e rispondi alla richiesta in modo dettagliato e preciso.`;
       
-      // Add PDF as base64 to the message
+      messages.push({
+        role: 'system',
+        content: systemPrompt
+      });
+      
       messages.push({
         role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: userPrompt
-          },
-          {
-            type: 'image_url',
-            image_url: {
-              url: `data:application/pdf;base64,${base64Content}`
-            }
-          }
-        ]
+        content: userPrompt
       });
       
     } else {
@@ -88,21 +83,18 @@ EMAIL CLIENTE:
 ${testCase.email}`;
       
       userPrompt = '';
-    }
-
-    const messages = [
-      {
+      
+      messages.push({
         role: 'system',
         content: systemPrompt
-      }
-    ];
-    
-    // For PDF analysis, messages are already added above
-    if (testCase?.type !== 'pdf_analysis' && userPrompt) {
-      messages.push({
-        role: 'user',
-        content: userPrompt
       });
+      
+      if (userPrompt) {
+        messages.push({
+          role: 'user',
+          content: userPrompt
+        });
+      }
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

@@ -22,6 +22,7 @@ import ContestoExercise from "./pages/ContestoExercise";
 import FormatControl from "./pages/FormatControl";
 import RoleInstruction from "./pages/RoleInstruction";
 import EditOutput from "./pages/EditOutput";
+import Module3PDFPrompt from "./pages/Module3PDFPrompt";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/ai-interactive/format-control" element={<FormatControl />} />
             <Route path="/ai-interactive/role-instruction" element={<RoleInstruction />} />
             <Route path="/ai-interactive/edit-output" element={<EditOutput />} />
+            <Route path="/module3-pdf-prompt" element={<Module3PDFPrompt />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

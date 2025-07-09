@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import GlassmorphismCard from '@/components/GlassmorphismCard';
-import { BookOpen, BarChart3, Zap, Award } from 'lucide-react';
+import { BookOpen, BarChart3, Zap, Award, LogIn } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -105,6 +105,16 @@ const Index = () => {
           >
             <BarChart3 className="w-5 h-5 mr-2" />
             Analytics
+          </Button>
+
+          <Button 
+            onClick={() => navigate('/auth')}
+            size="lg"
+            variant="outline" 
+            className="text-xl px-12 py-4 border-2 border-white/20 text-white hover:bg-white/10 transition-all duration-200"
+          >
+            <LogIn className="w-5 h-5 mr-2" />
+            Accedi
           </Button>
         </div>
 

@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import LoadingScreen from "./components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AuthGuard } from "./components/AuthGuard";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
@@ -41,9 +42,9 @@ const App = () => (
         <BrowserRouter>
           <Suspense fallback={<LoadingScreen onComplete={() => {}} />}>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/landing" element={<Landing />} />
+              <Route path="/" element={<AuthGuard />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/landing" element={<Landing />} />
               <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />

@@ -75,7 +75,21 @@ const SocialButton: React.FC<{
   fullWidth,
   children,
   onClick
-}) => {};
+}) => (
+  <button
+    onClick={onClick}
+    className={`relative z-0 flex items-center justify-center gap-2 overflow-hidden rounded-md 
+    border border-border bg-secondary hover:bg-secondary/80
+    px-4 py-2 font-semibold text-foreground transition-all duration-500
+    before:absolute before:inset-0 before:-z-10 before:translate-x-[150%] before:translate-y-[150%] before:scale-[2.5]
+    before:rounded-[100%] before:bg-primary before:transition-transform before:duration-1000 before:content-[""]
+    hover:scale-105 hover:text-primary-foreground hover:before:translate-x-[0%] hover:before:translate-y-[0%] active:scale-95
+    ${fullWidth ? "w-full" : ""}`}
+  >
+    {icon}
+    <span>{children}</span>
+  </button>
+);
 const Divider: React.FC = () => <div className="my-6 flex items-center gap-3">
     <div className="h-[1px] w-full bg-border" />
     <span className="text-muted-foreground">OPPURE</span>
@@ -103,9 +117,7 @@ const LoginForm: React.FC = () => {
         if (!firstName.trim()) {
           throw new Error("Per favore, inserisci il tuo nome");
         }
-        const {
-          error
-        } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {

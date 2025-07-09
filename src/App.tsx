@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import LoadingScreen from "./components/LoadingScreen";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
@@ -43,23 +44,23 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/landing" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/prompt-lab" element={<PromptEngineeringLab />} />
-              <Route path="/ai-transformation-day1" element={<AITransformationDay1 />} />
-              <Route path="/introduzione" element={<IntroduzioneCourse />} />
-              <Route path="/llm-fundamentals" element={<LLMFundamentals />} />
-              <Route path="/ai-tutorial-interactive" element={<AITutorialInteractive />} />
-              <Route path="/prompting" element={<PromptingCourse />} />
-              <Route path="/contesto" element={<ContestoExercise />} />
-              <Route path="/ai-interactive/format-control" element={<FormatControl />} />
-              <Route path="/ai-interactive/role-instruction" element={<RoleInstruction />} />
-              <Route path="/ai-interactive/edit-output" element={<EditOutput />} />
-              <Route path="/module3-pdf-prompt" element={<Module3PDFPrompt />} />
-              <Route path="/module3-image-generator" element={<Module3ImageGenerator />} />
-              <Route path="/module3-code-by-prompt" element={<Module3CodeByPrompt />} />
+              <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/prompt-lab" element={<ProtectedRoute><PromptEngineeringLab /></ProtectedRoute>} />
+              <Route path="/ai-transformation-day1" element={<ProtectedRoute><AITransformationDay1 /></ProtectedRoute>} />
+              <Route path="/introduzione" element={<ProtectedRoute><IntroduzioneCourse /></ProtectedRoute>} />
+              <Route path="/llm-fundamentals" element={<ProtectedRoute><LLMFundamentals /></ProtectedRoute>} />
+              <Route path="/ai-tutorial-interactive" element={<ProtectedRoute><AITutorialInteractive /></ProtectedRoute>} />
+              <Route path="/prompting" element={<ProtectedRoute><PromptingCourse /></ProtectedRoute>} />
+              <Route path="/contesto" element={<ProtectedRoute><ContestoExercise /></ProtectedRoute>} />
+              <Route path="/ai-interactive/format-control" element={<ProtectedRoute><FormatControl /></ProtectedRoute>} />
+              <Route path="/ai-interactive/role-instruction" element={<ProtectedRoute><RoleInstruction /></ProtectedRoute>} />
+              <Route path="/ai-interactive/edit-output" element={<ProtectedRoute><EditOutput /></ProtectedRoute>} />
+              <Route path="/module3-pdf-prompt" element={<ProtectedRoute><Module3PDFPrompt /></ProtectedRoute>} />
+              <Route path="/module3-image-generator" element={<ProtectedRoute><Module3ImageGenerator /></ProtectedRoute>} />
+              <Route path="/module3-code-by-prompt" element={<ProtectedRoute><Module3CodeByPrompt /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

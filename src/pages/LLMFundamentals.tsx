@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, RotateCcw } from 'lucide-react';
+import { Home, RotateCcw, User, Clock, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';

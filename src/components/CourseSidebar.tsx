@@ -79,19 +79,59 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     },
     {
       id: 'modulo-2',
-      title: 'Modulo 2 - Prompt Engineering Lab',
-      description: 'Laboratorio di ingegneria dei prompt',
-      duration: '45:00',
+      title: 'Modulo 2 - Prompting',
+      description: 'Tecniche avanzate di prompting',
+      duration: '65:36',
       completed: true,
-      route: '/prompt-lab',
+      route: '/prompting',
       lessons: [
         {
           id: 0,
-          title: "Prompt Engineering Lab Completo",
+          title: "Prompting",
+          duration: "10:00",
+          completed: true,
+          current: location.pathname === '/prompting',
+          description: "Introduzione alle tecniche di prompting"
+        },
+        {
+          id: 1,
+          title: "Il potere del contesto nel prompting",
+          duration: "10:00",
+          completed: true,
+          current: location.pathname === '/contesto',
+          description: "Come utilizzare il contesto per migliorare i prompt"
+        },
+        {
+          id: 2,
+          title: "Prompting Avanzato e Strategie di Comunicazione",
+          duration: "25:36",
+          completed: true,
+          current: location.pathname === '/ai-tutorial-interactive',
+          description: "Tecniche avanzate per una comunicazione efficace con l'AI"
+        },
+        {
+          id: 3,
+          title: "Role Instruction",
+          duration: "10:00",
+          completed: true,
+          current: location.pathname === '/role-instruction',
+          description: "Come definire ruoli specifici per l'AI"
+        },
+        {
+          id: 4,
+          title: "Edit Output",
+          duration: "10:00",
+          completed: true,
+          current: location.pathname === '/edit-output',
+          description: "Tecniche per modificare e migliorare gli output"
+        },
+        {
+          id: 5,
+          title: "Test Finale - Prompt Engineering Lab",
           duration: "45:00",
           completed: true,
           current: location.pathname === '/prompt-lab',
-          description: "Sviluppo professionale di prompt efficaci"
+          description: "Laboratorio completo di ingegneria dei prompt"
         }
       ]
     },
@@ -149,7 +189,14 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
   };
 
   const handleLessonNavigation = (moduleId: string, lessonIndex: number) => {
-    if (moduleId === 'modulo-3') {
+    if (moduleId === 'modulo-2') {
+      if (lessonIndex === 0) navigate('/prompting');
+      if (lessonIndex === 1) navigate('/contesto');
+      if (lessonIndex === 2) navigate('/ai-tutorial-interactive');
+      if (lessonIndex === 3) navigate('/role-instruction');
+      if (lessonIndex === 4) navigate('/edit-output');
+      if (lessonIndex === 5) navigate('/prompt-lab');
+    } else if (moduleId === 'modulo-3') {
       if (lessonIndex === 0) navigate('/module3-pdf-prompt');
       if (lessonIndex === 1) navigate('/module3-image-generator');
       if (lessonIndex === 2) navigate('/module3-code-by-prompt');

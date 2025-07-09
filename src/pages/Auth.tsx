@@ -75,7 +75,17 @@ const SocialButton: React.FC<{
   fullWidth,
   children,
   onClick
-}) => {};
+}) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground ${
+      fullWidth ? 'w-full' : ''
+    }`}
+  >
+    {icon}
+    {children}
+  </button>
+);
 const Divider: React.FC = () => <div className="my-6 flex items-center gap-3">
     <div className="h-[1px] w-full bg-border" />
     <span className="text-muted-foreground">OPPURE</span>

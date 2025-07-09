@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GlassmorphismCard from './GlassmorphismCard';
 import ProgressRing3D from './ProgressRing3D';
 import { Play, BookOpen, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
@@ -16,43 +17,17 @@ interface Course {
 const courses: Course[] = [
   {
     id: 1,
-    title: "Fondamenti di Machine Learning",
-    description: "Scopri i concetti fondamentali dell'apprendimento automatico e implementa algoritmi di classificazione e regressione.",
-    progress: 68,
-    category: "Machine Learning",
-    nextLesson: "Algoritmi di Classificazione",
+    title: "AI & LLM Fundamentals",
+    description: "Impara i concetti fondamentali dell'Intelligenza Artificiale e dei Large Language Models. Scopri come utilizzare e integrare modelli AI nelle tue applicazioni.",
+    progress: 0,
+    category: "AI & LLM",
+    nextLesson: "Introduzione all'AI",
     color: "from-blue-500 to-blue-600"
-  },
-  {
-    id: 2,
-    title: "Data Science con Python",
-    description: "Impara ad analizzare e visualizzare dati utilizzando Python, Pandas e le librerie più avanzate.",
-    progress: 42,
-    category: "Data Science",
-    nextLesson: "Visualizzazione Avanzata",
-    color: "from-green-500 to-green-600"
-  },
-  {
-    id: 3,
-    title: "Deep Learning Fundamentals",
-    description: "Esplora le reti neurali profonde e costruisci modelli AI per computer vision e NLP.",
-    progress: 25,
-    category: "Deep Learning",
-    nextLesson: "Reti Neurali Convoluzionali",
-    color: "from-purple-500 to-purple-600"
-  },
-  {
-    id: 4,
-    title: "Cloud Computing AWS",
-    description: "Padroneggia i servizi AWS per deploying applicazioni scalabili nel cloud.",
-    progress: 85,
-    category: "Cloud Computing",
-    nextLesson: "Kubernetes Avanzato",
-    color: "from-orange-500 to-orange-600"
   }
 ];
 
 const CurrentCourseSection = () => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [expandedDescription, setExpandedDescription] = useState(false);
@@ -178,9 +153,12 @@ const CurrentCourseSection = () => {
                   </div>
                   
                   {/* Action Button - Always Visible */}
-                  <button className={`group flex items-center space-x-3 bg-gradient-to-r ${currentCourse.color} hover:shadow-xl px-5 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-105 mt-4`}>
+                  <button 
+                    onClick={() => navigate('/introduzione')}
+                    className={`group flex items-center space-x-3 bg-gradient-to-r ${currentCourse.color} hover:shadow-xl px-5 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-105 mt-4`}
+                  >
                     <Play className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    <span className="text-sm">Continua: {currentCourse.nextLesson}</span>
+                    <span className="text-sm">Inizia: {currentCourse.nextLesson}</span>
                   </button>
                 </div>
                 

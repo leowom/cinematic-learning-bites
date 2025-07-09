@@ -445,9 +445,9 @@ const Module3CodeByPrompt: React.FC = () => {
 
         <div className="flex gap-6 relative">
           {/* Sidebar */}
-          <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-80'} flex-shrink-0`}>
-            <div className="step-card glassmorphism-base sticky top-4 h-fit max-h-[calc(100vh-2rem)] overflow-hidden">
-              <div className="section-spacing h-full flex flex-col">
+          <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-0 lg:w-16' : 'w-80 lg:w-80'} flex-shrink-0 ${sidebarCollapsed ? 'overflow-hidden' : ''}`}>
+            <div className={`${sidebarCollapsed ? 'hidden lg:block' : 'block'} step-card glassmorphism-base sticky top-4 h-[calc(100vh-2rem)] flex flex-col`}>
+              <div className="section-spacing flex flex-col h-full">
                 <div className="flex items-center justify-between mb-4 flex-shrink-0">
                   {!sidebarCollapsed && (
                     <h3 className="text-lg font-semibold text-white flex items-center truncate">
@@ -459,14 +459,14 @@ const Module3CodeByPrompt: React.FC = () => {
                     onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                     variant="ghost"
                     size="sm"
-                    className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 p-2 flex-shrink-0"
+                    className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 p-2 flex-shrink-0 lg:flex hidden"
                   >
                     <Menu className="w-4 h-4" />
                   </Button>
                 </div>
 
                 {!sidebarCollapsed && (
-                  <div className="flex flex-col flex-1 min-h-0">
+                  <>
                     <div className="mb-4 p-4 bg-slate-800/40 rounded-lg border border-slate-700/30 flex-shrink-0">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-slate-300 text-sm font-medium">Progresso Totale</span>
@@ -483,11 +483,11 @@ const Module3CodeByPrompt: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-1">
+                    <div className="flex-1 overflow-y-auto min-h-0 space-y-3 pr-2 scrollbar-thin scrollbar-track-slate-800 scrollbar-thumb-slate-600">
                       {allModules.map((module) => (
                         <div key={module.id} className="border border-slate-700/40 rounded-lg overflow-hidden bg-slate-800/20">
                           <div
-                            className={`p-4 cursor-pointer transition-all duration-200 ${
+                            className={`p-3 lg:p-4 cursor-pointer transition-all duration-200 ${
                               module.id === 'modulo-3' 
                                 ? 'bg-blue-900/30 border-l-4 border-blue-400' 
                                 : module.completed
@@ -500,15 +500,15 @@ const Module3CodeByPrompt: React.FC = () => {
                               <div className="flex items-start space-x-3 flex-1 min-w-0">
                                 <div className="flex-shrink-0 mt-0.5">
                                   {module.completed ? (
-                                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                    <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-400" />
                                   ) : module.id === 'modulo-3' ? (
-                                    <Play className="w-5 h-5 text-blue-400" />
+                                    <Play className="w-4 h-4 lg:w-5 lg:h-5 text-blue-400" />
                                   ) : (
-                                    <div className="w-5 h-5 rounded-full border-2 border-slate-500" />
+                                    <div className="w-4 h-4 lg:w-5 lg:h-5 rounded-full border-2 border-slate-500" />
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className={`font-semibold text-sm leading-tight mb-1 ${
+                                  <h4 className={`font-semibold text-xs lg:text-sm leading-tight mb-1 ${
                                     module.id === 'modulo-3' ? 'text-white' : 'text-slate-200'
                                   }`}>
                                     {module.title}
@@ -537,7 +537,7 @@ const Module3CodeByPrompt: React.FC = () => {
                               {module.lessons.map((lesson, index) => (
                                 <div
                                   key={lesson.id}
-                                  className={`p-4 pl-16 cursor-pointer transition-all duration-200 border-l-4 ${
+                                  className={`p-3 lg:p-4 pl-12 lg:pl-16 cursor-pointer transition-all duration-200 border-l-4 ${
                                     lesson.current && module.id === 'modulo-3'
                                       ? 'bg-blue-800/20 border-blue-400'
                                       : lesson.completed
@@ -556,7 +556,7 @@ const Module3CodeByPrompt: React.FC = () => {
                                 >
                                   <div className="flex items-start justify-between">
                                     <div className="flex-1 min-w-0 pr-3">
-                                      <h5 className={`text-sm font-medium leading-tight ${
+                                      <h5 className={`text-xs lg:text-sm font-medium leading-tight ${
                                         lesson.current && module.id === 'modulo-3' ? 'text-blue-300' : 'text-slate-300'
                                       }`}>
                                         {lesson.title}
@@ -574,7 +574,7 @@ const Module3CodeByPrompt: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             </div>

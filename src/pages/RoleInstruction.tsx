@@ -3,6 +3,7 @@ import { Home, Play, CheckCircle, Clock, User, BookOpen, Award, ArrowRight, Bot,
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import CourseSidebar from '@/components/CourseSidebar';
 
 const RoleInstruction = () => {
   const navigate = useNavigate();
@@ -10,131 +11,7 @@ const RoleInstruction = () => {
   const [showTutorial, setShowTutorial] = useState(true);
   const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [expandedModules, setExpandedModules] = useState<string[]>(['modulo-2']);
 
-  const allModules = [
-    {
-      id: 'introduzione',
-      title: 'Introduzione',
-      description: 'Introduzione all\'AI',
-      duration: '13:54',
-      completed: true,
-      route: '/introduzione',
-      lessons: [
-        {
-          id: 0,
-          title: "Introduzione all'AI",
-          duration: "13:54",
-          completed: true,
-          current: false,
-          description: "Scopri i fondamenti dell'intelligenza artificiale e come può trasformare il tuo business"
-        }
-      ]
-    },
-    {
-      id: 'modulo-1',
-      title: 'Modulo 1 - LLM Fundamentals',
-      description: 'Fondamenti dei Large Language Models',
-      duration: '8:12',
-      completed: true,
-      route: '/llm-fundamentals',
-      lessons: [
-        {
-          id: 0,
-          title: "Dentro un LLM: cosa fa e come parlarci in modo efficace",
-          duration: "8:12",
-          completed: true,
-          current: false,
-          description: "Esplora il funzionamento interno dei Large Language Models e impara le tecniche più efficaci per comunicare con l'AI"
-        }
-      ]
-    },
-    {
-      id: 'modulo-1-2',
-      title: 'Modulo 1.2 - Tutorial Interattivo',
-      description: 'Esercizio guidato pratico',
-      duration: '15:00',
-      completed: true,
-      route: '/ai-tutorial-interactive',
-      lessons: [
-        {
-          id: 0,
-          title: "Esercizio Guidato Pratico",
-          duration: "15:00", 
-          completed: true,
-          current: false,
-          description: "Metti in pratica le conoscenze acquisite attraverso un esercizio guidato interattivo"
-        }
-      ]
-    },
-    {
-      id: 'modulo-2',
-      title: 'Modulo 2 - Prompting',
-      description: 'Tecniche avanzate di prompting',
-      duration: '65:36',
-      completed: false,
-      route: '/prompting',
-      lessons: [
-        {
-          id: 0,
-          title: "Prompting Avanzato e Strategie di Comunicazione con l'AI",
-          duration: "25:36",
-          completed: true,
-          current: false,
-          description: "Scopri le tecniche avanzate di prompting per massimizzare l'efficacia della comunicazione con l'intelligenza artificiale"
-        },
-        {
-          id: 1,
-          title: "Il potere del contesto nel prompt",
-          duration: "10:00",
-          completed: true,
-          current: false,
-          description: "Esercizio pratico per comprendere l'importanza del contesto nei prompt"
-        },
-        {
-          id: 2,
-          title: "Controllare il formato dell'output",
-          duration: "10:00",
-          completed: true,
-          current: false,
-          description: "Scopri come ottenere output strutturati e utilizzabili specificando il formato desiderato"
-        },
-        {
-          id: 3,
-          title: "Dare un ruolo all'AI nel prompt",
-          duration: "10:00",
-          completed: false,
-          current: true,
-          description: "Impara come assegnare ruoli specifici per ottenere risposte più esperte e specializzate"
-        },
-        {
-          id: 4,
-          title: "Chiedere modifiche all'output",
-          duration: "10:00",
-          completed: false,
-          current: false,
-          description: "Pratica l'interazione iterativa per affinare e migliorare le risposte dell'AI"
-        }
-      ]
-    }
-  ];
-
-  const totalLessons = allModules.reduce((acc, module) => acc + module.lessons.length, 0);
-  const completedLessons = allModules.reduce((acc, module) => 
-    acc + module.lessons.filter(l => l.completed).length, 0);
-  const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
-
-  const toggleModule = (moduleId: string) => {
-    setExpandedModules(prev => 
-      prev.includes(moduleId) 
-        ? prev.filter(id => id !== moduleId)
-        : [...prev, moduleId]
-    );
-  };
-
-  const navigateToModule = (route: string) => {
-    navigate(route);
-  };
 
   const exercises = [
     {

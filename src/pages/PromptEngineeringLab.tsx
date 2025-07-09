@@ -15,6 +15,7 @@ import EnhancedLivePreviewPanel from '@/components/prompt-lab/EnhancedLivePrevie
 import FinalScoring from '@/components/prompt-lab/FinalScoring';
 import PromptLabHeader from '@/components/prompt-lab/PromptLabHeader';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import CourseSidebar from '@/components/CourseSidebar';
 import '../styles/prompt-lab.css';
 
 interface PromptData {
@@ -46,6 +47,7 @@ const PromptEngineeringLab = () => {
   const [startTime] = useState(Date.now());
   const [exerciseScores, setExerciseScores] = useState<number[]>([]);
   const [showFinalScoring, setShowFinalScoring] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   const [promptData, setPromptData] = useState<PromptData>({
     role: '',
@@ -162,89 +164,100 @@ const PromptEngineeringLab = () => {
           canGoBack={currentStep > 0}
         />
 
-        {/* Main content - centered layout for early steps, grid for later steps */}
-        {currentStep < 2 ? (
-          /* Centered layout for steps 0-1 */
-          <div className="max-w-4xl mx-auto">
-            {currentStep === 0 && (
-              <FoundationStep 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-            {currentStep === 1 && (
-              <DisasterDemo 
-                promptData={promptData}
-                updatePromptData={updatePromptData}
-                onComplete={handleStepComplete}
-              />
-            )}
-          </div>
-        ) : currentStep === 7 ? (
-          /* Centered layout for hands-on writing step */
-          <div className="max-w-5xl mx-auto">
-            <HandsOnWritingStep 
-              promptData={promptData}
-              updatePromptData={updatePromptData}
-              onComplete={handleStepComplete}
-            />
-          </div>
-        ) : (
-          /* Grid layout for steps 2-6 and 8 with preview panel */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left column - Steps */}
-            <div className="lg:col-span-2">
-              {currentStep === 2 && (
-                <RoleSelectionStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 3 && (
-                <BusinessContextStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 4 && (
-                <EnhancedTaskDefinitionStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 5 && (
-                <StyleConstraintsStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 6 && (
-                <OutputFormatStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-              {currentStep === 8 && (
-                <AITestingStep 
-                  promptData={promptData}
-                  updatePromptData={updatePromptData}
-                  onComplete={handleStepComplete}
-                />
-              )}
-            </div>
+        <div className="flex gap-6 relative">
+          <CourseSidebar 
+            currentModuleId="modulo-2"
+            currentLessonId={5}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
 
-            {/* Right column - Live Preview */}
-            <div className="lg:col-span-1">
-              <EnhancedLivePreviewPanel promptData={promptData} />
-            </div>
+          <div className="flex-1 min-w-0">
+            {/* Main content - centered layout for early steps, grid for later steps */}
+            {currentStep < 2 ? (
+              /* Centered layout for steps 0-1 */
+              <div className="max-w-4xl mx-auto">
+                {currentStep === 0 && (
+                  <FoundationStep 
+                    promptData={promptData}
+                    updatePromptData={updatePromptData}
+                    onComplete={handleStepComplete}
+                  />
+                )}
+                {currentStep === 1 && (
+                  <DisasterDemo 
+                    promptData={promptData}
+                    updatePromptData={updatePromptData}
+                    onComplete={handleStepComplete}
+                  />
+                )}
+              </div>
+            ) : currentStep === 7 ? (
+              /* Centered layout for hands-on writing step */
+              <div className="max-w-5xl mx-auto">
+                <HandsOnWritingStep 
+                  promptData={promptData}
+                  updatePromptData={updatePromptData}
+                  onComplete={handleStepComplete}
+                />
+              </div>
+            ) : (
+              /* Grid layout for steps 2-6 and 8 with preview panel */
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left column - Steps */}
+                <div className="lg:col-span-2">
+                  {currentStep === 2 && (
+                    <RoleSelectionStep 
+                      promptData={promptData}
+                      updatePromptData={updatePromptData}
+                      onComplete={handleStepComplete}
+                    />
+                  )}
+                  {currentStep === 3 && (
+                    <BusinessContextStep 
+                      promptData={promptData}
+                      updatePromptData={updatePromptData}
+                      onComplete={handleStepComplete}
+                    />
+                  )}
+                  {currentStep === 4 && (
+                    <EnhancedTaskDefinitionStep 
+                      promptData={promptData}
+                      updatePromptData={updatePromptData}
+                      onComplete={handleStepComplete}
+                    />
+                  )}
+                  {currentStep === 5 && (
+                    <StyleConstraintsStep 
+                      promptData={promptData}
+                      updatePromptData={updatePromptData}
+                      onComplete={handleStepComplete}
+                    />
+                  )}
+                  {currentStep === 6 && (
+                    <OutputFormatStep 
+                      promptData={promptData}
+                      updatePromptData={updatePromptData}
+                      onComplete={handleStepComplete}
+                    />
+                  )}
+                  {currentStep === 8 && (
+                    <AITestingStep 
+                      promptData={promptData}
+                      updatePromptData={updatePromptData}
+                      onComplete={handleStepComplete}
+                    />
+                  )}
+                </div>
+
+                {/* Right column - Live Preview */}
+                <div className="lg:col-span-1">
+                  <EnhancedLivePreviewPanel promptData={promptData} />
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Final Scoring */}

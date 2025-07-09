@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import CourseSidebar from '@/components/CourseSidebar';
+
 const AITutorialInteractive = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
@@ -13,6 +15,7 @@ const AITutorialInteractive = () => {
   const [currentPrompt, setCurrentPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showResponse, setShowResponse] = useState<boolean[]>([false, false, false, false, false]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   const steps = [{
     id: 0,
@@ -55,6 +58,7 @@ const AITutorialInteractive = () => {
     feedback: "Fantastico! L'AI può spiegare concetti complessi in modo accessibile e interessante. Puoi sempre chiedere approfondimenti o esempi pratici.",
     tips: "💡 Puoi sempre dire: 'spiegamelo con un esempio', 'rendilo ancora più semplice', 'dammi più dettagli su...'."
   }];
+
   const handlePromptSubmit = async () => {
     if (currentPrompt.trim()) {
       const newPrompts = [...userPrompts];
@@ -79,24 +83,29 @@ const AITutorialInteractive = () => {
       }, delay);
     }
   };
+
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       setCurrentPrompt('');
     }
   };
+
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       setCurrentPrompt('');
     }
   };
+
   const isCompleted = completedSteps.every(step => step);
   const currentStepData = steps[currentStep];
+
   if (showTutorial) {
-    return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-      background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-    }}>
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
+        background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
+      }}>
         <div className="prompt-lab-container">
           {/* Header */}
           <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
@@ -170,8 +179,6 @@ const AITutorialInteractive = () => {
                   </ul>
                 </div>
 
-                
-
                 <Button onClick={() => setShowTutorial(false)} className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3">
                   Inizia il Tutorial
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -180,11 +187,14 @@ const AITutorialInteractive = () => {
             </div>
           </div>
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-    background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-  }}>
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
+      background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
+    }}>
       <div className="prompt-lab-container">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
@@ -210,199 +220,221 @@ const AITutorialInteractive = () => {
             </div>
             <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
               <div className="bg-emerald-500 h-2 rounded-full transition-all duration-300" style={{
-              width: `${completedSteps.filter(Boolean).length / steps.length * 100}%`
-            }} />
+                width: `${completedSteps.filter(Boolean).length / steps.length * 100}%`
+              }} />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Sidebar - Steps Progress */}
-          <div className="col-span-12 lg:col-span-4">
-            <div className="step-card glassmorphism-base">
-              <div className="section-spacing">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                  <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
-                  Esercizi Tutorial
-                </h3>
-                
-                <div className="space-y-3">
-                  {steps.map((step, index) => <div key={step.id} className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${index === currentStep ? 'bg-blue-900/30 border-blue-500/50 shadow-lg' : completedSteps[index] ? 'bg-emerald-900/20 border-emerald-700/40 hover:bg-emerald-900/30' : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50'}`} onClick={() => setCurrentStep(index)}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-3">
-                          {completedSteps[index] ? <CheckCircle className="w-5 h-5 text-emerald-400" /> : index === currentStep ? <Play className="w-5 h-5 text-blue-400" /> : <div className="w-5 h-5 rounded-full border-2 border-slate-500" />}
-                          <span className={`font-medium text-sm ${index === currentStep ? 'text-blue-300' : completedSteps[index] ? 'text-emerald-300' : 'text-slate-300'}`}>
-                            Esercizio {index + 1}
-                          </span>
-                        </div>
-                      </div>
-                      <h4 className={`font-semibold text-sm ${index === currentStep ? 'text-white' : 'text-slate-200'}`}>
-                        {step.title}
-                      </h4>
-                    </div>)}
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex gap-6 relative">
+          <CourseSidebar 
+            currentModuleId="modulo-1-2"
+            currentLessonId={0}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
 
           {/* Main Content - Chat Interface */}
-          <div className="col-span-12 lg:col-span-8">
-            <div className="step-card glassmorphism-base">
-              <div className="section-spacing">
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-white">
-                      {currentStepData.title}
-                    </h2>
-                    <Badge variant="outline" className="text-blue-300 border-blue-500/50">
-                      {currentStep + 1}/{steps.length}
-                    </Badge>
+          <div className="flex-1 min-w-0">
+            <div className="grid grid-cols-12 gap-6">
+              {/* Sidebar - Steps Progress */}
+              <div className="col-span-12 lg:col-span-4">
+                <div className="step-card glassmorphism-base">
+                  <div className="section-spacing">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
+                      Esercizi Tutorial
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      {steps.map((step, index) => (
+                        <div key={step.id} className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${index === currentStep ? 'bg-blue-900/30 border-blue-500/50 shadow-lg' : completedSteps[index] ? 'bg-emerald-900/20 border-emerald-700/40 hover:bg-emerald-900/30' : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50'}`} onClick={() => setCurrentStep(index)}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-3">
+                              {completedSteps[index] ? <CheckCircle className="w-5 h-5 text-emerald-400" /> : index === currentStep ? <Play className="w-5 h-5 text-blue-400" /> : <div className="w-5 h-5 rounded-full border-2 border-slate-500" />}
+                              <span className={`font-medium text-sm ${index === currentStep ? 'text-blue-300' : completedSteps[index] ? 'text-emerald-300' : 'text-slate-300'}`}>
+                                Esercizio {index + 1}
+                              </span>
+                            </div>
+                          </div>
+                          <h4 className={`font-semibold text-sm ${index === currentStep ? 'text-white' : 'text-slate-200'}`}>
+                            {step.title}
+                          </h4>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  
-                  {!completedSteps[currentStep] && <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4 mb-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-blue-300 text-sm mb-2">💡 <strong>Prompt suggerito:</strong></p>
-                          <p className="text-slate-300 text-sm italic">"{currentStepData.suggestedPrompt}"</p>
-                        </div>
-                        <Button 
-                          onClick={() => setCurrentPrompt(currentStepData.suggestedPrompt)} 
-                          variant="outline" 
-                          size="sm" 
-                          className="ml-4 bg-blue-600 hover:bg-blue-700 text-white border-blue-500 hover:border-blue-600 transition-colors"
-                        >
-                          Usa questo
-                        </Button>
-                      </div>
-                    </div>}
                 </div>
+              </div>
 
-                {/* Chat Area */}
-                <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4 min-h-[400px] max-h-[500px] overflow-y-auto">
-                  {userPrompts[currentStep] ? (
-                    <div className="space-y-4 animate-fade-in">
-                      {/* User Message */}
-                      <div className="flex justify-end animate-slide-in-right">
-                        <div className="bg-blue-600 text-white rounded-lg px-4 py-2 max-w-[80%] shadow-lg">
-                          <p className="text-sm">{userPrompts[currentStep]}</p>
-                        </div>
+              {/* Main Content - Chat Interface */}
+              <div className="col-span-12 lg:col-span-8">
+                <div className="step-card glassmorphism-base">
+                  <div className="section-spacing">
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-bold text-white">
+                          {currentStepData.title}
+                        </h2>
+                        <Badge variant="outline" className="text-blue-300 border-blue-500/50">
+                          {currentStep + 1}/{steps.length}
+                        </Badge>
                       </div>
-
-                      {/* Loading State */}
-                      {isLoading && (
-                        <div className="flex justify-start animate-fade-in">
-                          <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%]">
-                            <div className="flex items-center mb-2">
-                              <Bot className="w-4 h-4 mr-2 text-blue-400" />
-                              <span className="text-blue-400 text-sm font-medium">LearningBitesAI</span>
+                      
+                      {!completedSteps[currentStep] && (
+                        <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4 mb-6">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <p className="text-blue-300 text-sm mb-2">💡 <strong>Prompt suggerito:</strong></p>
+                              <p className="text-slate-300 text-sm italic">"{currentStepData.suggestedPrompt}"</p>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <div className="flex space-x-1">
-                                <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
-                                <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                                <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                              </div>
-                              <span className="text-slate-400 text-xs">Sto pensando...</span>
-                            </div>
+                            <Button 
+                              onClick={() => setCurrentPrompt(currentStepData.suggestedPrompt)} 
+                              variant="outline" 
+                              size="sm" 
+                              className="ml-4 bg-blue-600 hover:bg-blue-700 text-white border-blue-500 hover:border-blue-600 transition-colors"
+                            >
+                              Usa questo
+                            </Button>
                           </div>
                         </div>
                       )}
+                    </div>
 
-                      {/* AI Response */}
-                      {showResponse[currentStep] && (
-                        <>
-                          <div className="flex justify-start animate-fade-in">
-                            <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%] shadow-lg">
-                              <div className="flex items-center mb-2">
-                                <Bot className="w-4 h-4 mr-2 text-blue-400" />
-                                <span className="text-blue-400 text-sm font-medium">LearningBitesAI</span>
-                              </div>
-                              <div className="text-sm leading-relaxed whitespace-pre-line">
-                                {currentStepData.simulatedResponse}
-                              </div>
+                    {/* Chat Area */}
+                    <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4 min-h-[400px] max-h-[500px] overflow-y-auto">
+                      {userPrompts[currentStep] ? (
+                        <div className="space-y-4 animate-fade-in">
+                          {/* User Message */}
+                          <div className="flex justify-end animate-slide-in-right">
+                            <div className="bg-blue-600 text-white rounded-lg px-4 py-2 max-w-[80%] shadow-lg">
+                              <p className="text-sm">{userPrompts[currentStep]}</p>
                             </div>
                           </div>
 
-                          {/* Feedback */}
-                          <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 animate-scale-in">
-                            <div className="flex items-start">
-                              <CheckCircle className="w-5 h-5 text-emerald-400 mr-3 mt-0.5 flex-shrink-0" />
-                              <div>
-                                <p className="text-emerald-300 text-sm font-medium mb-2">Ottimo lavoro!</p>
-                                <p className="text-slate-300 text-sm mb-2">{currentStepData.feedback}</p>
-                                <p className="text-slate-400 text-xs">{currentStepData.tips}</p>
+                          {/* Loading State */}
+                          {isLoading && (
+                            <div className="flex justify-start animate-fade-in">
+                              <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%]">
+                                <div className="flex items-center mb-2">
+                                  <Bot className="w-4 h-4 mr-2 text-blue-400" />
+                                  <span className="text-blue-400 text-sm font-medium">LearningBitesAI</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <div className="flex space-x-1">
+                                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></div>
+                                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                                  </div>
+                                  <span className="text-slate-400 text-xs">Sto pensando...</span>
+                                </div>
                               </div>
                             </div>
+                          )}
+
+                          {/* AI Response */}
+                          {showResponse[currentStep] && (
+                            <>
+                              <div className="flex justify-start animate-fade-in">
+                                <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3 max-w-[80%] shadow-lg">
+                                  <div className="flex items-center mb-2">
+                                    <Bot className="w-4 h-4 mr-2 text-blue-400" />
+                                    <span className="text-blue-400 text-sm font-medium">LearningBitesAI</span>
+                                  </div>
+                                  <div className="text-sm leading-relaxed whitespace-pre-line">
+                                    {currentStepData.simulatedResponse}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Feedback */}
+                              <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 animate-scale-in">
+                                <div className="flex items-start">
+                                  <CheckCircle className="w-5 h-5 text-emerald-400 mr-3 mt-0.5 flex-shrink-0" />
+                                  <div>
+                                    <p className="text-emerald-300 text-sm font-medium mb-2">Ottimo lavoro!</p>
+                                    <p className="text-slate-300 text-sm mb-2">{currentStepData.feedback}</p>
+                                    <p className="text-slate-400 text-xs">{currentStepData.tips}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-slate-400">
+                          <div className="text-center">
+                            <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                            <p>Scrivi il tuo prompt qui sotto per iniziare...</p>
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-slate-400">
-                      <div className="text-center">
-                        <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>Scrivi il tuo prompt qui sotto per iniziare...</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
 
-                {/* Input Area - Hide after sending */}
-                {!userPrompts[currentStep] && !isLoading && (
-                  <div className="mb-4 animate-fade-in">
-                    <div className="relative">
-                      <Textarea 
-                        value={currentPrompt} 
-                        onChange={e => setCurrentPrompt(e.target.value)} 
-                        placeholder={currentStepData.placeholder} 
-                        className="bg-slate-800/50 border-slate-700/50 text-slate-200 placeholder:text-slate-400 min-h-[80px] resize-none focus:border-blue-500/50 transition-colors" 
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handlePromptSubmit();
-                          }
-                        }} 
-                      />
-                      <Button 
-                        onClick={handlePromptSubmit} 
-                        disabled={!currentPrompt.trim() || isLoading} 
-                        className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-all hover:scale-105" 
-                        size="sm"
-                      >
-                        Invia
-                      </Button>
-                    </div>
-                    {!completedSteps[currentStep] && (
-                      <Button 
-                        onClick={() => setCurrentPrompt(currentStepData.suggestedPrompt)} 
-                        variant="ghost" 
-                        size="sm" 
-                        className="mt-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 transition-colors"
-                      >
-                        Usa prompt suggerito
-                      </Button>
+                    {/* Input Area - Hide after sending */}
+                    {!userPrompts[currentStep] && !isLoading && (
+                      <div className="mb-4 animate-fade-in">
+                        <div className="relative">
+                          <Textarea 
+                            value={currentPrompt} 
+                            onChange={e => setCurrentPrompt(e.target.value)} 
+                            placeholder={currentStepData.placeholder} 
+                            className="bg-slate-800/50 border-slate-700/50 text-slate-200 placeholder:text-slate-400 min-h-[80px] resize-none focus:border-blue-500/50 transition-colors" 
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handlePromptSubmit();
+                              }
+                            }} 
+                          />
+                          <Button 
+                            onClick={handlePromptSubmit} 
+                            disabled={!currentPrompt.trim() || isLoading} 
+                            className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-all hover:scale-105" 
+                            size="sm"
+                          >
+                            Invia
+                          </Button>
+                        </div>
+                        {!completedSteps[currentStep] && (
+                          <Button 
+                            onClick={() => setCurrentPrompt(currentStepData.suggestedPrompt)} 
+                            variant="ghost" 
+                            size="sm" 
+                            className="mt-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 transition-colors"
+                          >
+                            Usa prompt suggerito
+                          </Button>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
 
-                {/* Navigation */}
-                <div className="flex justify-between items-center">
-                  <Button onClick={() => navigate('/llm-fundamentals')} variant="ghost" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
-                    ← Modulo 1
-                  </Button>
-                  
-                  {isCompleted ? <Button onClick={() => navigate('/prompting')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                      <Award className="w-4 h-4 mr-2" />
-                      Modulo 2 →
-                    </Button> : <Button onClick={nextStep} disabled={currentStep === steps.length - 1 || !completedSteps[currentStep]} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50">
-                      Successivo →
-                    </Button>}
+                    {/* Navigation */}
+                    <div className="flex justify-between items-center">
+                      <Button onClick={() => navigate('/llm-fundamentals')} variant="ghost" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
+                        ← Modulo 1
+                      </Button>
+                      
+                      {isCompleted ? (
+                        <Button onClick={() => navigate('/prompting')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                          <Award className="w-4 h-4 mr-2" />
+                          Modulo 2 →
+                        </Button>
+                      ) : (
+                        <Button onClick={nextStep} disabled={currentStep === steps.length - 1 || !completedSteps[currentStep]} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50">
+                          Successivo →
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AITutorialInteractive;

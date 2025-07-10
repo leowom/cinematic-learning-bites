@@ -63,8 +63,8 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
       id: 'modulo-1',
       title: 'Modulo 1 - LLM Fundamentals',
       description: 'Fondamenti dei Large Language Models',
-      duration: '8:12',
-      completed: true,
+      duration: '33:12',
+      completed: false,
       route: '/llm-fundamentals',
       lessons: [
         {
@@ -74,6 +74,14 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           completed: true,
           current: location.pathname === '/llm-fundamentals',
           description: "Esplora il funzionamento interno dei Large Language Models"
+        },
+        {
+          id: 1,
+          title: "Scopri come l'IA può aiutarti nel tuo lavoro",
+          duration: "25:00",
+          completed: false,
+          current: location.pathname === '/ai-work-helper',
+          description: "Esperienza interattiva per personalizzare l'AI al tuo lavoro"
         }
       ]
     },
@@ -189,7 +197,10 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
   };
 
   const handleLessonNavigation = (moduleId: string, lessonIndex: number) => {
-    if (moduleId === 'modulo-2') {
+    if (moduleId === 'modulo-1') {
+      if (lessonIndex === 0) navigate('/llm-fundamentals');
+      if (lessonIndex === 1) navigate('/ai-work-helper');
+    } else if (moduleId === 'modulo-2') {
       if (lessonIndex === 0) navigate('/prompting');
       if (lessonIndex === 1) navigate('/contesto');
       if (lessonIndex === 2) navigate('/ai-tutorial-interactive');

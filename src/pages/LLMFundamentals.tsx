@@ -410,7 +410,7 @@ const LLMFundamentals = () => {
                             </Button>
                             {score >= 4 && (
                               <Button
-                                onClick={() => navigate('/ai-tutorial-interactive')}
+                                onClick={() => navigate('/ai-work-helper')}
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
                               >
                                 Modulo 1.2 →

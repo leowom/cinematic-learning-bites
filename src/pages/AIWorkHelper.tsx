@@ -380,12 +380,12 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
 
               {/* Main Chat Interface */}
               <div className="col-span-12 lg:col-span-8">
-                <div className="step-card glassmorphism-base h-[600px] flex flex-col">
-                  <div className="section-spacing flex-1 flex flex-col">
+                <div className="step-card glassmorphism-base flex flex-col h-[600px]">
+                  <div className="section-spacing flex-1 flex flex-col min-h-0">
                     {!allStepsCompleted ? (
                       <>
                         {/* Current Step Question */}
-                        <div className="mb-6">
+                        <div className="mb-6 flex-shrink-0">
                           <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-bold text-white">
                               {currentStepData.title}
@@ -406,12 +406,12 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
                         </div>
 
                         {/* Input Area */}
-                        <div className="mt-auto">
+                        <div className="mt-auto flex-shrink-0">
                           <Textarea
                             value={currentInput}
                             onChange={(e) => setCurrentInput(e.target.value)}
                             placeholder={currentStepData.placeholder}
-                            className="bg-slate-800/50 border-slate-700 text-slate-200 mb-4 min-h-[100px]"
+                            className="bg-slate-800/50 border-slate-700 text-slate-200 mb-4 min-h-[100px] resize-none"
                           />
                           <div className="flex justify-between">
                             <Button
@@ -439,40 +439,44 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
                       </>
                     ) : (
                       <>
-                        {/* Chat History */}
-                        <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-                          {chatHistory.map((message, index) => (
-                            <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                              <div className={`max-w-[80%] rounded-lg p-4 ${
-                                message.type === 'user' 
-                                  ? 'bg-emerald-600 text-white' 
-                                  : 'bg-slate-800/50 border border-slate-700 text-slate-200'
-                              }`}>
-                                {message.type === 'ai' && (
-                                  <div className="flex items-center mb-2">
-                                    <Bot className="w-4 h-4 mr-2 text-emerald-400" />
-                                    <span className="text-xs text-emerald-400 font-medium">LearningBites AI</span>
+                        {/* Chat History - Scrollable */}
+                        <div className="flex-1 min-h-0 mb-4">
+                          <div className="h-full overflow-y-auto pr-2 space-y-4 scroll-smooth">
+                            {chatHistory.map((message, index) => (
+                              <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                                <div className={`max-w-[85%] rounded-lg p-4 shadow-lg ${
+                                  message.type === 'user' 
+                                    ? 'bg-emerald-600 text-white' 
+                                    : 'bg-slate-800/70 border border-slate-700/50 text-slate-200'
+                                }`}>
+                                  {message.type === 'ai' && (
+                                    <div className="flex items-center mb-2">
+                                      <Bot className="w-4 h-4 mr-2 text-emerald-400" />
+                                      <span className="text-xs text-emerald-400 font-medium">LearningBites AI</span>
+                                    </div>
+                                  )}
+                                  <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                                    {message.content.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1')}
                                   </div>
-                                )}
-                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                              </div>
-                            </div>
-                          ))}
-                          {isLoading && (
-                            <div className="flex justify-start">
-                              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                                <div className="flex items-center">
-                                  <Bot className="w-4 h-4 mr-2 text-emerald-400" />
-                                  <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
-                                  <span className="ml-2 text-slate-300 text-sm">L'IA sta elaborando...</span>
                                 </div>
                               </div>
-                            </div>
-                          )}
+                            ))}
+                            {isLoading && (
+                              <div className="flex justify-start animate-fade-in">
+                                <div className="bg-slate-800/70 border border-slate-700/50 rounded-lg p-4">
+                                  <div className="flex items-center">
+                                    <Bot className="w-4 h-4 mr-2 text-emerald-400" />
+                                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                                    <span className="ml-2 text-slate-300 text-sm">L'IA sta elaborando...</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Input Area */}
-                        <div className="border-t border-slate-700/50 pt-4">
+                        {/* Input Area - Fixed at bottom */}
+                        <div className="border-t border-slate-700/50 pt-4 flex-shrink-0">
                           {generatedPrompt && !finalResponse ? (
                             <div className="mb-4">
                               <Button
@@ -500,12 +504,12 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
                                   value={currentInput}
                                   onChange={(e) => setCurrentInput(e.target.value)}
                                   placeholder="Chiedi approfondimenti su una delle soluzioni..."
-                                  className="bg-slate-800/50 border-slate-700 text-slate-200 flex-1"
+                                  className="bg-slate-800/50 border-slate-700 text-slate-200 flex-1 resize-none min-h-[60px]"
                                 />
                                 <Button
                                   onClick={askFollowUpQuestion}
                                   disabled={!currentInput.trim() || isLoading}
-                                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white self-end"
                                 >
                                   <Send className="w-4 h-4" />
                                 </Button>

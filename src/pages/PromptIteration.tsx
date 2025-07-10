@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Bot, Send, MessageCircle, CheckCircle, ArrowRight, User, Loader2, RefreshCw, Target, Lightbulb, AlertTriangle, Edit3, Zap } from 'lucide-react';
+import { Home, Bot, Send, MessageCircle, CheckCircle, ArrowRight, User, Loader2, RefreshCw, Target, Lightbulb, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -18,11 +18,9 @@ const PromptIteration = () => {
   const [userInput, setUserInput] = useState('');
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
   const [improvedPrompt, setImprovedPrompt] = useState('');
-  const [apiResponse, setApiResponse] = useState('');
   const [promptHistory, setPromptHistory] = useState<Array<{prompt: string, response: string}>>([]);
   const [reflection, setReflection] = useState('');
 
-  // Mockup data for Phase 1
   const mockupData = {
     initialPrompt: "Scrivi una mail di follow-up per un potenziale cliente",
     badOutput: `Gentile Cliente,
@@ -95,7 +93,6 @@ A presto,
         .replace(/\*/g, '')
         .trim();
 
-      setApiResponse(cleanResponse);
       setPromptHistory(prev => [...prev, { prompt: userInput, response: cleanResponse }]);
       setUserInput('');
       toast.success("Risposta generata con successo!");
@@ -116,50 +113,32 @@ A presto,
     toast.success("Esercizio completato con successo!");
   };
 
-  const renderIntro = () => (
-    <div className="h-screen overflow-y-auto">
-      <div className="prompt-lab-container">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
-          <div className="flex items-center space-x-4">
-            <Button
-              onClick={() => navigate('/dashboard')}
-              variant="ghost"
-              size="sm"
-              className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-          </div>
-
-          <div className="text-center">
-            <div className="text-slate-200 font-medium">
-              Modulo 1.3 – Iterazione e Miglioramento dei Prompt
+  const renderContent = () => {
+    if (currentPhase === 'intro') {
+      return (
+        <div className="prompt-lab-container">
+          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+            <div className="flex items-center space-x-4">
+              <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
+                <Home className="w-4 h-4 mr-2" />Dashboard
+              </Button>
             </div>
-            <div className="text-slate-400 text-sm">
-              Esercizio Prima & Dopo + Pratica Reale
+            <div className="text-center">
+              <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
+              <div className="text-slate-400 text-sm">Esercizio Prima & Dopo + Pratica Reale</div>
+            </div>
+            <div className="text-right">
+              <div className="text-slate-300 text-sm">2 Fasi Guidate</div>
             </div>
           </div>
 
-          <div className="text-right">
-            <div className="text-slate-300 text-sm">
-              2 Fasi Guidate
-            </div>
-          </div>
-        </div>
-
-        {/* Tutorial Modal */}
-        <div className="max-w-4xl mx-auto">
           <div className="step-card glassmorphism-base text-center">
             <div className="section-spacing">
               <div className="mb-8">
                 <div className="w-20 h-20 mx-auto mb-6 bg-blue-500/20 rounded-full flex items-center justify-center">
                   <RefreshCw className="w-10 h-10 text-blue-400" />
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-4">
-                  🔄 Iterazione e Miglioramento dei Prompt
-                </h1>
+                <h1 className="text-3xl font-bold text-white mb-4">🔄 Iterazione e Miglioramento dei Prompt</h1>
                 <p className="text-slate-300 text-lg leading-relaxed max-w-3xl mx-auto mb-8">
                   Impara che un prompt spesso non è sufficiente e che il valore si genera tramite <strong>prompt engineering iterativo</strong>. 
                   Sperimenterai come affinare le richieste in base al contesto e agli errori.
@@ -169,8 +148,7 @@ A presto,
               <div className="grid md:grid-cols-2 gap-6 mb-8">
                 <div className="bg-green-900/20 border border-green-700/40 rounded-lg p-6 text-left">
                   <h3 className="text-green-300 font-semibold mb-4 flex items-center">
-                    <Target className="w-5 h-5 mr-2" />
-                    🟢 Fase 1: Simulazione Guidata
+                    <Target className="w-5 h-5 mr-2" />🟢 Fase 1: Simulazione Guidata
                   </h3>
                   <ul className="text-slate-300 space-y-2 text-sm">
                     <li>• Analizza un output problematico</li>
@@ -182,8 +160,7 @@ A presto,
                 
                 <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-6 text-left">
                   <h3 className="text-yellow-300 font-semibold mb-4 flex items-center">
-                    <Bot className="w-5 h-5 mr-2" />
-                    🟡 Fase 2: Pratica Autonoma
+                    <Bot className="w-5 h-5 mr-2" />🟡 Fase 2: Pratica Autonoma
                   </h3>
                   <ul className="text-slate-300 space-y-2 text-sm">
                     <li>• Usa l'IA reale con API OpenAI</li>
@@ -194,43 +171,33 @@ A presto,
                 </div>
               </div>
               
-              <Button 
-                onClick={() => handlePhaseChange('phase1')}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3"
-              >
-                Inizia l'Esercizio
-                <ArrowRight className="w-5 h-5 ml-2" />
+              <Button onClick={() => handlePhaseChange('phase1')} className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3">
+                Inizia l'Esercizio <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+    }
 
-  const renderPhase1 = () => {
-    if (currentStep === 0) {
+    if (currentPhase === 'phase1') {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-          background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-        }}>
-          <div className="prompt-lab-container">
-            <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
-              <div className="flex items-center space-x-4">
-                <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
-                  <Home className="w-4 h-4 mr-2" />Dashboard
-                </Button>
-              </div>
-              <div className="text-center">
-                <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
-                <div className="text-slate-400 text-sm">Step 1 - Introduzione</div>
-              </div>
-              <Badge variant="secondary">Fase 1: Simulazione</Badge>
+        <div className="prompt-lab-container">
+          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+            <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
+              <Home className="w-4 h-4 mr-2" />Dashboard
+            </Button>
+            <div className="text-center">
+              <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
+              <div className="text-slate-400 text-sm">Fase 1: Simulazione Guidata</div>
             </div>
-            
-            <div className="max-w-4xl mx-auto">
-              <div className="step-card glassmorphism-base">
-                <div className="section-spacing">
+            <Badge variant="secondary">Step {currentStep + 1}</Badge>
+          </div>
+          
+          <div className="step-card glassmorphism-base">
+            <div className="section-spacing">
+              {currentStep === 0 && (
+                <>
                   <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
                     <div className="flex items-start gap-3">
                       <AlertTriangle className="h-5 w-5 text-yellow-400 mt-0.5" />
@@ -249,21 +216,116 @@ A presto,
                   </ul>
                   
                   <Button onClick={() => setCurrentStep(1)} className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3">
-                    Procedi al Mockup ChatGPT
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    Procedi al Mockup ChatGPT <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
-                </div>
-              </div>
+                </>
+              )}
+              
+              {currentStep === 1 && (
+                <>
+                  <h2 className="text-2xl font-bold text-white mb-6 text-center">Mockup ChatGPT</h2>
+                  <div className="space-y-4 mb-8">
+                    <div className="flex justify-end">
+                      <div className="bg-blue-600 text-white rounded-lg p-4 max-w-xs">
+                        <div className="flex items-center gap-2 mb-2">
+                          <User className="h-4 w-4" /><span className="text-sm font-medium">Tu</span>
+                        </div>
+                        <p>{mockupData.initialPrompt}</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-start">
+                      <div className="bg-gray-600 text-white rounded-lg p-4 max-w-2xl">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Bot className="h-4 w-4" /><span className="text-sm font-medium">ChatGPT</span>
+                        </div>
+                        <div className="text-sm whitespace-pre-line">{mockupData.badOutput}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-slate-300 mb-6 text-center">Questa è una risposta <strong>volutamente problematica</strong>.</p>
+                  <div className="text-center">
+                    <Button onClick={() => setCurrentStep(2)} className="bg-blue-600 hover:bg-blue-700">
+                      Analizza i Problemi <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
+              
+              {currentStep === 2 && (
+                <>
+                  <h2 className="text-2xl font-bold text-white mb-6 text-center">Identificazione Problemi</h2>
+                  <h3 className="text-lg font-semibold mb-4 text-white">Cosa c'è che non va in questa risposta?</h3>
+                  <div className="space-y-3 mb-8">
+                    {issues.map((issue, index) => (
+                      <label key={index} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors">
+                        <input type="checkbox" checked={selectedIssues.includes(issue)} onChange={() => handleIssueToggle(issue)} className="w-4 h-4" />
+                        <span className="text-slate-300">{issue}</span>
+                      </label>
+                    ))}
+                  </div>
+                  
+                  <div className="bg-blue-500/20 rounded-lg p-4 mb-6">
+                    <h4 className="font-semibold mb-2 text-blue-300">💡 Concetto Chiave: Refining Prompt</h4>
+                    <p className="text-sm text-slate-300">Ora dovrai scrivere un prompt migliorato che risolva questi problemi.</p>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium mb-2 text-white">Scrivi un prompt migliorato:</label>
+                    <Textarea value={improvedPrompt} onChange={(e) => setImprovedPrompt(e.target.value)} placeholder="Es: Scrivi una mail di follow-up più concisa..." className="bg-slate-700/30 border-slate-600 text-white placeholder:text-slate-400" rows={4} />
+                  </div>
+                  
+                  <div className="text-center">
+                    <Button onClick={() => setCurrentStep(3)} disabled={selectedIssues.length === 0 || !improvedPrompt.trim()} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+                      Vedi il Risultato Migliorato <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
+              
+              {currentStep === 3 && (
+                <>
+                  <h2 className="text-2xl font-bold text-white mb-6 text-center">Output Migliorato</h2>
+                  <div className="space-y-6 mb-8">
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h3 className="text-white font-semibold mb-3">Prompt Migliorato</h3>
+                      <div className="bg-blue-600 text-white rounded-lg p-4">
+                        <p className="text-sm">{mockupData.improvedPrompt}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h3 className="text-white font-semibold mb-3">Output ChatGPT Migliorato</h3>
+                      <div className="bg-gray-600 text-white rounded-lg p-4 mb-4">
+                        <div className="text-sm whitespace-pre-line">{mockupData.goodOutput}</div>
+                      </div>
+                      
+                      <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
+                        <h4 className="font-semibold text-green-400 mb-3">✅ Miglioramenti Ottenuti:</h4>
+                        <ul className="space-y-2 text-sm text-slate-300">
+                          <li className="flex items-center gap-2"><CheckCircle className="h-3 w-3 text-green-400" />Tono più diretto e informale</li>
+                          <li className="flex items-center gap-2"><CheckCircle className="h-3 w-3 text-green-400" />Riferimento specifico al precedente incontro</li>
+                          <li className="flex items-center gap-2"><CheckCircle className="h-3 w-3 text-green-400" />Messaggio più conciso e focalizzato</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <p className="text-slate-300 mb-6">Eccellente! Ora passiamo alla fase pratica con l'IA reale.</p>
+                    <Button onClick={() => handlePhaseChange('phase2')} className="bg-blue-600 hover:bg-blue-700 px-8 py-3">
+                      Procedi alla Fase 2 <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
       );
     }
-    
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-        background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-      }}>
+
+    if (currentPhase === 'phase2') {
+      return (
         <div className="prompt-lab-container">
           <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
             <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
@@ -271,136 +333,11 @@ A presto,
             </Button>
             <div className="text-center">
               <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
-              <div className="text-slate-400 text-sm">Fase 1: Simulazione Guidata</div>
+              <div className="text-slate-400 text-sm">Fase 2: Pratica Autonoma</div>
             </div>
-            <Badge variant="secondary">Step {currentStep + 1}</Badge>
+            <Badge variant="outline" className="border-yellow-500 text-yellow-500">Pratica Reale</Badge>
           </div>
           
-          <div className="max-w-4xl mx-auto">
-            <div className="step-card glassmorphism-base">
-              <div className="section-spacing">
-                {currentStep === 1 && (
-                  <>
-                    <h2 className="text-2xl font-bold text-white mb-6 text-center">Mockup ChatGPT</h2>
-                    <div className="space-y-4 mb-8">
-                      <div className="flex justify-end">
-                        <div className="bg-blue-600 text-white rounded-lg p-4 max-w-xs">
-                          <div className="flex items-center gap-2 mb-2">
-                            <User className="h-4 w-4" /><span className="text-sm font-medium">Tu</span>
-                          </div>
-                          <p>{mockupData.initialPrompt}</p>
-                        </div>
-                      </div>
-                      <div className="flex justify-start">
-                        <div className="bg-gray-600 text-white rounded-lg p-4 max-w-2xl">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Bot className="h-4 w-4" /><span className="text-sm font-medium">ChatGPT</span>
-                          </div>
-                          <div className="text-sm whitespace-pre-line">{mockupData.badOutput}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-slate-300 mb-6 text-center">Questa è una risposta <strong>volutamente problematica</strong>.</p>
-                    <div className="text-center">
-                      <Button onClick={() => setCurrentStep(2)} className="bg-blue-600 hover:bg-blue-700">
-                        Analizza i Problemi <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </>
-                )}
-                
-                {currentStep === 2 && (
-                  <>
-                    <h2 className="text-2xl font-bold text-white mb-6 text-center">Identificazione Problemi</h2>
-                    <h3 className="text-lg font-semibold mb-4 text-white">Cosa c'è che non va in questa risposta?</h3>
-                    <div className="space-y-3 mb-8">
-                      {issues.map((issue, index) => (
-                        <label key={index} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors">
-                          <input type="checkbox" checked={selectedIssues.includes(issue)} onChange={() => handleIssueToggle(issue)} className="w-4 h-4" />
-                          <span className="text-slate-300">{issue}</span>
-                        </label>
-                      ))}
-                    </div>
-                    
-                    <div className="bg-blue-500/20 rounded-lg p-4 mb-6">
-                      <h4 className="font-semibold mb-2 text-blue-300">💡 Concetto Chiave: Refining Prompt</h4>
-                      <p className="text-sm text-slate-300">Ora dovrai scrivere un prompt migliorato che risolva questi problemi.</p>
-                    </div>
-                    
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium mb-2 text-white">Scrivi un prompt migliorato:</label>
-                      <Textarea value={improvedPrompt} onChange={(e) => setImprovedPrompt(e.target.value)} placeholder="Es: Scrivi una mail di follow-up più concisa..." className="bg-slate-700/30 border-slate-600 text-white placeholder:text-slate-400" rows={4} />
-                    </div>
-                    
-                    <div className="text-center">
-                      <Button onClick={() => setCurrentStep(3)} disabled={selectedIssues.length === 0 || !improvedPrompt.trim()} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
-                        Vedi il Risultato Migliorato <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </>
-                )}
-                
-                {currentStep === 3 && (
-                  <>
-                    <h2 className="text-2xl font-bold text-white mb-6 text-center">Output Migliorato</h2>
-                    <div className="space-y-6 mb-8">
-                      <div className="bg-slate-700/30 rounded-lg p-4">
-                        <h3 className="text-white font-semibold mb-3">Prompt Migliorato</h3>
-                        <div className="bg-blue-600 text-white rounded-lg p-4">
-                          <p className="text-sm">{mockupData.improvedPrompt}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-slate-700/30 rounded-lg p-4">
-                        <h3 className="text-white font-semibold mb-3">Output ChatGPT Migliorato</h3>
-                        <div className="bg-gray-600 text-white rounded-lg p-4 mb-4">
-                          <div className="text-sm whitespace-pre-line">{mockupData.goodOutput}</div>
-                        </div>
-                        
-                        <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
-                          <h4 className="font-semibold text-green-400 mb-3">✅ Miglioramenti Ottenuti:</h4>
-                          <ul className="space-y-2 text-sm text-slate-300">
-                            <li className="flex items-center gap-2"><CheckCircle className="h-3 w-3 text-green-400" />Tono più diretto e informale</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="h-3 w-3 text-green-400" />Riferimento specifico al precedente incontro</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="h-3 w-3 text-green-400" />Messaggio più conciso e focalizzato</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-center">
-                      <p className="text-slate-300 mb-6">Eccellente! Ora passiamo alla fase pratica con l'IA reale.</p>
-                      <Button onClick={() => handlePhaseChange('phase2')} className="bg-blue-600 hover:bg-blue-700 px-8 py-3">
-                        Procedi alla Fase 2 <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderPhase2 = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-      background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-    }}>
-      <div className="prompt-lab-container">
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
-          <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
-            <Home className="w-4 h-4 mr-2" />Dashboard
-          </Button>
-          <div className="text-center">
-            <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
-            <div className="text-slate-400 text-sm">Fase 2: Pratica Autonoma</div>
-          </div>
-          <Badge variant="outline" className="border-yellow-500 text-yellow-500">Pratica Reale</Badge>
-        </div>
-        
-        <div className="max-w-4xl mx-auto">
           <div className="step-card glassmorphism-base">
             <div className="section-spacing">
               {currentStep === 0 && (
@@ -437,7 +374,7 @@ A presto,
                 </>
               )}
               
-              {currentStep >= 1 && (
+              {currentStep >= 1 && currentStep < 2 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-white text-center">Iterazione Libera con IA Reale</h2>
                   
@@ -522,16 +459,12 @@ A presto,
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+    }
 
-  const renderCompleted = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-      background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-    }}>
-      <div className="prompt-lab-container">
-        <div className="max-w-4xl mx-auto">
+    if (currentPhase === 'completed') {
+      return (
+        <div className="prompt-lab-container">
           <div className="step-card glassmorphism-base text-center">
             <div className="section-spacing">
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -563,9 +496,11 @@ A presto,
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+    }
+
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex" style={{
@@ -577,11 +512,8 @@ A presto,
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       
-      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'} prompt-lab-container`}>
-        {currentPhase === 'intro' && renderIntro()}
-        {currentPhase === 'phase1' && renderPhase1()}
-        {currentPhase === 'phase2' && renderPhase2()}
-        {currentPhase === 'completed' && renderCompleted()}
+      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'} h-screen overflow-y-auto`}>
+        {renderContent()}
       </div>
     </div>
   );

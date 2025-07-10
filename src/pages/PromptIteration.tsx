@@ -116,65 +116,48 @@ A presto,
   const renderContent = () => {
     if (currentPhase === 'intro') {
       return (
-        <div className="prompt-lab-container">
-          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
-                <Home className="w-4 h-4 mr-2" />Dashboard
-              </Button>
-            </div>
-            <div className="text-center">
-              <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
-              <div className="text-slate-400 text-sm">Esercizio Prima & Dopo + Pratica Reale</div>
-            </div>
-            <div className="text-right">
-              <div className="text-slate-300 text-sm">2 Fasi Guidate</div>
-            </div>
-          </div>
-
-          <div className="step-card glassmorphism-base text-center">
-            <div className="section-spacing">
-              <div className="mb-8">
-                <div className="w-20 h-20 mx-auto mb-6 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <RefreshCw className="w-10 h-10 text-blue-400" />
-                </div>
-                <h1 className="text-3xl font-bold text-white mb-4">🔄 Iterazione e Miglioramento dei Prompt</h1>
-                <p className="text-slate-300 text-lg leading-relaxed max-w-3xl mx-auto mb-8">
-                  Impara che un prompt spesso non è sufficiente e che il valore si genera tramite <strong>prompt engineering iterativo</strong>. 
-                  Sperimenterai come affinare le richieste in base al contesto e agli errori.
-                </p>
+        <div className="step-card glassmorphism-base text-center">
+          <div className="section-spacing">
+            <div className="mb-8">
+              <div className="w-20 h-20 mx-auto mb-6 bg-blue-500/20 rounded-full flex items-center justify-center">
+                <RefreshCw className="w-10 h-10 text-blue-400" />
               </div>
+              <h1 className="text-3xl font-bold text-white mb-4">🔄 Iterazione e Miglioramento dei Prompt</h1>
+              <p className="text-slate-300 text-lg leading-relaxed max-w-3xl mx-auto mb-8">
+                Impara che un prompt spesso non è sufficiente e che il valore si genera tramite <strong>prompt engineering iterativo</strong>. 
+                Sperimenterai come affinare le richieste in base al contesto e agli errori.
+              </p>
+            </div>
 
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-green-900/20 border border-green-700/40 rounded-lg p-6 text-left">
-                  <h3 className="text-green-300 font-semibold mb-4 flex items-center">
-                    <Target className="w-5 h-5 mr-2" />🟢 Fase 1: Simulazione Guidata
-                  </h3>
-                  <ul className="text-slate-300 space-y-2 text-sm">
-                    <li>• Analizza un output problematico</li>
-                    <li>• Identifica gli errori comuni</li>
-                    <li>• Correggi il prompt step-by-step</li>
-                    <li>• Confronta Prima vs Dopo</li>
-                  </ul>
-                </div>
-                
-                <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-6 text-left">
-                  <h3 className="text-yellow-300 font-semibold mb-4 flex items-center">
-                    <Bot className="w-5 h-5 mr-2" />🟡 Fase 2: Pratica Autonoma
-                  </h3>
-                  <ul className="text-slate-300 space-y-2 text-sm">
-                    <li>• Usa l'IA reale con API OpenAI</li>
-                    <li>• Itera autonomamente i prompt</li>
-                    <li>• Learn by doing</li>
-                    <li>• Rifletti sull'apprendimento</li>
-                  </ul>
-                </div>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-green-900/20 border border-green-700/40 rounded-lg p-6 text-left">
+                <h3 className="text-green-300 font-semibold mb-4 flex items-center">
+                  <Target className="w-5 h-5 mr-2" />🟢 Fase 1: Simulazione Guidata
+                </h3>
+                <ul className="text-slate-300 space-y-2 text-sm">
+                  <li>• Analizza un output problematico</li>
+                  <li>• Identifica gli errori comuni</li>
+                  <li>• Correggi il prompt step-by-step</li>
+                  <li>• Confronta Prima vs Dopo</li>
+                </ul>
               </div>
               
-              <Button onClick={() => handlePhaseChange('phase1')} className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3">
-                Inizia l'Esercizio <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
+              <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-6 text-left">
+                <h3 className="text-yellow-300 font-semibold mb-4 flex items-center">
+                  <Bot className="w-5 h-5 mr-2" />🟡 Fase 2: Pratica Autonoma
+                </h3>
+                <ul className="text-slate-300 space-y-2 text-sm">
+                  <li>• Usa l'IA reale con API OpenAI</li>
+                  <li>• Itera autonomamente i prompt</li>
+                  <li>• Learn by doing</li>
+                  <li>• Rifletti sull'apprendimento</li>
+                </ul>
+              </div>
             </div>
+            
+            <Button onClick={() => handlePhaseChange('phase1')} className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3">
+              Inizia l'Esercizio <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </div>
         </div>
       );
@@ -182,20 +165,8 @@ A presto,
 
     if (currentPhase === 'phase1') {
       return (
-        <div className="prompt-lab-container">
-          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
-            <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
-              <Home className="w-4 h-4 mr-2" />Dashboard
-            </Button>
-            <div className="text-center">
-              <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
-              <div className="text-slate-400 text-sm">Fase 1: Simulazione Guidata</div>
-            </div>
-            <Badge variant="secondary">Step {currentStep + 1}</Badge>
-          </div>
-          
-          <div className="step-card glassmorphism-base">
-            <div className="section-spacing">
+        <div className="step-card glassmorphism-base">
+          <div className="section-spacing">
               {currentStep === 0 && (
                 <>
                   <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
@@ -320,26 +291,13 @@ A presto,
               )}
             </div>
           </div>
-        </div>
       );
     }
 
     if (currentPhase === 'phase2') {
       return (
-        <div className="prompt-lab-container">
-          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
-            <Button onClick={() => navigate('/dashboard')} variant="ghost" size="sm" className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50">
-              <Home className="w-4 h-4 mr-2" />Dashboard
-            </Button>
-            <div className="text-center">
-              <div className="text-slate-200 font-medium">Modulo 1.3 – Iterazione e Miglioramento dei Prompt</div>
-              <div className="text-slate-400 text-sm">Fase 2: Pratica Autonoma</div>
-            </div>
-            <Badge variant="outline" className="border-yellow-500 text-yellow-500">Pratica Reale</Badge>
-          </div>
-          
-          <div className="step-card glassmorphism-base">
-            <div className="section-spacing">
+        <div className="step-card glassmorphism-base">
+          <div className="section-spacing">
               {currentStep === 0 && (
                 <>
                   <div className="text-center mb-8">
@@ -458,15 +416,13 @@ A presto,
               )}
             </div>
           </div>
-        </div>
       );
     }
 
     if (currentPhase === 'completed') {
       return (
-        <div className="prompt-lab-container">
-          <div className="step-card glassmorphism-base text-center">
-            <div className="section-spacing">
+        <div className="step-card glassmorphism-base text-center">
+          <div className="section-spacing">
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="h-8 w-8 text-green-400" />
               </div>
@@ -495,7 +451,6 @@ A presto,
               </div>
             </div>
           </div>
-        </div>
       );
     }
 
@@ -503,17 +458,55 @@ A presto,
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex" style={{
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
       background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
     }}>
-      <CourseSidebar 
-        currentModuleId="1.3"
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
-      
-      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'} h-screen overflow-y-auto`}>
-        {renderContent()}
+      <div className="prompt-lab-container">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={() => navigate('/dashboard')}
+              variant="ghost"
+              size="sm"
+              className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </div>
+
+          <div className="text-center">
+            <div className="text-slate-200 font-medium">
+              Modulo 1.3 – Iterazione e Miglioramento dei Prompt
+            </div>
+            <div className="text-slate-400 text-sm">
+              Affina i tuoi prompt attraverso iterazioni successive
+            </div>
+          </div>
+
+          <div className="text-right">
+            <div className="text-slate-300 text-sm">
+              {currentPhase === 'intro' ? 'Tutorial' : 
+               currentPhase === 'phase1' ? 'Fase 1' : 
+               currentPhase === 'phase2' ? 'Fase 2' : 'Completato'}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-6 relative">
+          <CourseSidebar 
+            currentModuleId="modulo-1"
+            currentLessonId={3}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            {renderContent()}
+          </div>
+        </div>
       </div>
     </div>
   );

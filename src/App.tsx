@@ -30,6 +30,7 @@ import Module3PDFPrompt from "./pages/Module3PDFPrompt";
 import Module3ImageGenerator from "./pages/Module3ImageGenerator";
 import Module3CodeByPrompt from "./pages/Module3CodeByPrompt";
 import AIWorkHelper from "./pages/AIWorkHelper";
+import PromptIteration from "./pages/PromptIteration";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/module3-image-generator" element={<ProtectedRoute><Module3ImageGenerator /></ProtectedRoute>} />
               <Route path="/module3-code-by-prompt" element={<ProtectedRoute><Module3CodeByPrompt /></ProtectedRoute>} />
               <Route path="/ai-work-helper" element={<ProtectedRoute><AIWorkHelper /></ProtectedRoute>} />
+              <Route path="/prompt-iteration" element={<ProtectedRoute><PromptIteration /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

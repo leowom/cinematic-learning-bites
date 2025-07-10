@@ -82,6 +82,14 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           completed: false,
           current: location.pathname === '/ai-work-helper',
           description: "Esperienza interattiva per personalizzare l'AI al tuo lavoro"
+        },
+        {
+          id: 2,
+          title: "Iterazione e Miglioramento dei Prompt",
+          duration: "30:00",
+          completed: false,
+          current: location.pathname === '/prompt-iteration',
+          description: "Impara l'arte del prompt engineering iterativo"
         }
       ]
     },
@@ -200,6 +208,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     if (moduleId === 'modulo-1') {
       if (lessonIndex === 0) navigate('/llm-fundamentals');
       if (lessonIndex === 1) navigate('/ai-work-helper');
+      if (lessonIndex === 2) navigate('/prompt-iteration');
     } else if (moduleId === 'modulo-2') {
       if (lessonIndex === 0) navigate('/prompting');
       if (lessonIndex === 1) navigate('/contesto');

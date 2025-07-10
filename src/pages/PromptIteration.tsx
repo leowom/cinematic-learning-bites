@@ -117,9 +117,7 @@ A presto,
   };
 
   const renderIntro = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{
-      background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
-    }}>
+    <div className="h-screen overflow-y-auto">
       <div className="prompt-lab-container">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
@@ -570,14 +568,16 @@ A presto,
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex" style={{
+      background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'
+    }}>
       <CourseSidebar 
         currentModuleId="1.3"
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       
-      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'}`}>
+      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'} prompt-lab-container`}>
         {currentPhase === 'intro' && renderIntro()}
         {currentPhase === 'phase1' && renderPhase1()}
         {currentPhase === 'phase2' && renderPhase2()}

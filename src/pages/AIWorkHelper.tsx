@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useOpenAI } from '@/hooks/useOpenAI';
 import CourseSidebar from '@/components/CourseSidebar';
-import { LearningBitesAvatar } from '@/components/LearningBitesAvatar';
 import { toast } from 'sonner';
 
 interface StepData {
@@ -34,7 +33,7 @@ const AIWorkHelper = () => {
     {
       id: 1,
       title: "Il tuo ruolo lavorativo",
-      question: "Per iniziare, descrivi brevemente il tuo ruolo lavorativo attuale.",
+      question: "Per favore, descrivi brevemente il tuo ruolo lavorativo attuale.",
       placeholder: "Es: Sono un manager di marketing che gestisce campagne social...",
       userResponse: '',
       isCompleted: false
@@ -42,7 +41,7 @@ const AIWorkHelper = () => {
     {
       id: 2,
       title: "Attività che richiedono tempo",
-      question: "Ottimo! Ora indicami quali attività svolgi frequentemente e che potrebbero beneficiare dell'aiuto dell'IA.",
+      question: "Quali attività svolgi frequentemente che richiedono molto tempo o potrebbero essere svolte in maniera più efficiente?",
       placeholder: "Es: Scrivere email ai clienti, creare report settimanali...",
       userResponse: '',
       isCompleted: false
@@ -50,27 +49,12 @@ const AIWorkHelper = () => {
     {
       id: 3,
       title: "Principali sfide",
-      question: "Grazie per le informazioni. Potresti ora indicare quali sono le principali sfide che incontri nello svolgimento di queste attività?",
+      question: "Quali sono le principali difficoltà o sfide che incontri nello svolgimento di queste attività?",
       placeholder: "Es: Trovo difficile personalizzare le comunicazioni per diversi clienti...",
       userResponse: '',
       isCompleted: false
     }
   ]);
-
-  const getAvatarMessage = (step: number) => {
-    switch (step) {
-      case 0:
-        return "Ciao! Sono qui per guidarti attraverso questo esercizio interattivo e mostrarti concretamente come l'Intelligenza Artificiale può facilitare il tuo lavoro. Ti accompagnerò passo passo per personalizzare al massimo la tua esperienza.";
-      case 1:
-        return "Per iniziare, descrivi brevemente il tuo ruolo lavorativo attuale.";
-      case 2:
-        return "Ottimo! Ora indicami quali attività svolgi frequentemente e che potrebbero beneficiare dell'aiuto dell'IA.";
-      case 3:
-        return "Grazie per le informazioni. Potresti ora indicare quali sono le principali sfide che incontri nello svolgimento di queste attività?";
-      default:
-        return "Perfetto! Sulla base delle tue risposte, ho generato un prompt personalizzato. Copialo e invialo all'IA per ottenere idee specifiche e soluzioni pratiche per migliorare il tuo lavoro.";
-    }
-  };
 
   const currentStepData = stepData[currentStep];
   const allStepsCompleted = stepData.every(step => step.isCompleted);
@@ -122,15 +106,11 @@ const AIWorkHelper = () => {
                   <h1 className="text-3xl font-bold text-white mb-4">
                     Benvenuto in LearningBites AI! 🤖
                   </h1>
-                  
-                  {/* Avatar di presentazione */}
-                  <div className="mb-8">
-                    <LearningBitesAvatar 
-                      message={getAvatarMessage(0)}
-                      isVisible={true}
-                      className="max-w-3xl mx-auto"
-                    />
-                  </div>
+                  <p className="text-slate-300 text-lg leading-relaxed max-w-3xl mx-auto mb-8">
+                    In questo esercizio interattivo scoprirai come l'Intelligenza Artificiale può supportarti 
+                    concretamente nel tuo lavoro. Iniziamo con alcune semplici domande per identificare le tue 
+                    esigenze specifiche.
+                  </p>
                 </div>
 
                 <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
@@ -216,7 +196,7 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
       setGeneratedPrompt(result.response);
       
       setChatHistory(prev => [...prev, 
-        { type: 'ai', content: `${getAvatarMessage(4)}\n\n"${result.response}"\n\nVuoi inviarlo per ricevere suggerimenti specifici per il tuo lavoro?` }
+        { type: 'ai', content: `Ho generato un prompt personalizzato per te:\n\n"${result.response}"\n\nVuoi inviarlo per ricevere suggerimenti specifici per il tuo lavoro?` }
       ]);
     } catch (error) {
       console.error('Errore durante la generazione del prompt:', error);
@@ -415,12 +395,14 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
                             </Badge>
                           </div>
                           
-                          {/* Avatar per ogni step */}
-                          <LearningBitesAvatar 
-                            message={getAvatarMessage(currentStep + 1)}
-                            isVisible={true}
-                            className="mb-4"
-                          />
+                          <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4">
+                            <div className="flex items-start space-x-3">
+                              <Bot className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-1" />
+                              <p className="text-slate-300">
+                                {currentStepData.question}
+                              </p>
+                            </div>
+                          </div>
                         </div>
 
                         {/* Input Area */}

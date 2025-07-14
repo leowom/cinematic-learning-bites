@@ -41,7 +41,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [expandedModules, setExpandedModules] = useState<string[]>([currentModuleId || 'modulo-1']);
+  const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   
   const { courseData, loading } = useCourseData(userId);
@@ -54,6 +54,20 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     };
     getUser();
   }, []);
+
+  // Auto-expand the module containing the current lesson
+  useEffect(() => {
+    if (courseData && courseData.modules.length > 0) {
+      // Find which module contains the current route
+      const currentModule = courseData.modules.find(module =>
+        module.lessons.some(lesson => lesson.route === location.pathname)
+      );
+      
+      if (currentModule && !expandedModules.includes(currentModule.id)) {
+        setExpandedModules(prev => [...prev, currentModule.id]);
+      }
+    }
+  }, [courseData, location.pathname, expandedModules]);
 
   // Usa i dati dal database quando disponibili
   const allModules: Module[] = courseData ? courseData.modules.map(module => ({

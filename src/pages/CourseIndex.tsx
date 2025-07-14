@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Clock, CheckCircle, Lock, BookOpen, ChevronRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface Lesson {
   id: number;
@@ -25,6 +27,77 @@ interface Module {
 
 const CourseIndex = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [userProfile, setUserProfile] = useState<{first_name?: string} | null>(null);
+
+  // Motivational phrases array
+  const motivationalPhrases = [
+    "Cosa approfondiamo oggi?",
+    "Il prossimo passo del tuo percorso ti aspetta.",
+    "Continua a costruire le tue competenze, un modulo alla volta.",
+    "Sei a un clic da una nuova scoperta.",
+    "Studiare con costanza è il tuo superpotere.",
+    "Un giorno. Una lezione. Una nuova abilità.",
+    "Ogni sessione conta. Inizia quando vuoi.",
+    "Hai già fatto tanto. Oggi puoi fare ancora meglio.",
+    "Imparare è un viaggio: quale tappa affronti oggi?",
+    "Bentornato al centro di comando del tuo apprendimento."
+  ];
+
+  // Get random motivational phrase
+  const getRandomPhrase = () => {
+    const randomIndex = Math.floor(Math.random() * motivationalPhrases.length);
+    return motivationalPhrases[randomIndex];
+  };
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Fetch user profile when user logs in
+        if (session?.user) {
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
+          }, 0);
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   const modules: Module[] = [
     {
@@ -249,6 +322,22 @@ const CourseIndex = () => {
           </div>
         </div>
       </div>
+
+      {/* Welcome Message */}
+      {user && (
+        <div className="bg-slate-800/40 backdrop-blur-sm border-b border-slate-700/30 py-6 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold text-white">
+                Bentornato, {userProfile?.first_name || 'Studente'}! 👋
+              </h2>
+              <p className="text-slate-300 text-lg">
+                {getRandomPhrase()}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 min-w-0">

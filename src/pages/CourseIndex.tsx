@@ -1,35 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Clock, CheckCircle, Lock, BookOpen, ChevronRight } from 'lucide-react';
+import { Play, Clock, CheckCircle, Lock, BookOpen, ChevronRight, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
-
-interface Lesson {
-  id: number;
-  title: string;
-  duration: string;
-  completed: boolean;
-  locked: boolean;
-  route: string;
-  description: string;
-}
-
-interface Module {
-  id: string;
-  title: string;
-  description: string;
-  totalDuration: string;
-  completionRate: number;
-  status: 'not-started' | 'in-progress' | 'completed';
-  lessons: Lesson[];
-}
+import { useCourseData, type Lesson, type Module } from '@/hooks/useCourseData';
+import { useUserProgress } from '@/hooks/useUserProgress';
 
 const CourseIndex = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<{first_name?: string} | null>(null);
+
+  // Use the custom hooks for course data and progress
+  const { courseData, loading, overallProgress, refetch } = useCourseData(user?.id);
+  const { markLessonComplete, markLessonAccessed } = useUserProgress();
 
   // Motivational phrases array
   const motivationalPhrases = [
@@ -99,175 +85,15 @@ const CourseIndex = () => {
     }
   };
 
-  const modules: Module[] = [
-    {
-      id: 'introduzione',
-      title: 'Introduzione',
-      description: 'Scopri i fondamenti dell\'intelligenza artificiale e come può trasformare il tuo lavoro',
-      totalDuration: '13:54',
-      completionRate: 100,
-      status: 'completed',
-      lessons: [
-        {
-          id: 1,
-          title: "Introduzione all'AI",
-          duration: "13:54",
-          completed: true,
-          locked: false,
-          route: '/introduzione',
-          description: "Scopri i fondamenti dell'intelligenza artificiale"
-        }
-      ]
-    },
-    {
-      id: 'modulo-1',
-      title: 'Modulo 1 - LLM Fundamentals',
-      description: 'Comprendi il funzionamento dei Large Language Models e come utilizzarli efficacemente',
-      totalDuration: '63:12',
-      completionRate: 33,
-      status: 'in-progress',
-      lessons: [
-        {
-          id: 1,
-          title: "Dentro un LLM: cosa fa e come parlarci",
-          duration: "8:12",
-          completed: true,
-          locked: false,
-          route: '/llm-fundamentals',
-          description: "Esplora il funzionamento interno dei Large Language Models"
-        },
-        {
-          id: 2,
-          title: "Scopri come l'IA può aiutarti nel tuo lavoro",
-          duration: "25:00",
-          completed: false,
-          locked: false,
-          route: '/ai-work-helper',
-          description: "Esperienza interattiva per personalizzare l'AI al tuo lavoro"
-        },
-        {
-          id: 3,
-          title: "Iterazione e Miglioramento dei Prompt",
-          duration: "30:00",
-          completed: false,
-          locked: false,
-          route: '/prompt-iteration',
-          description: "Impara l'arte del prompt engineering iterativo"
-        }
-      ]
-    },
-    {
-      id: 'modulo-2',
-      title: 'Modulo 2 - Prompting',
-      description: 'Padroneggia le tecniche avanzate di prompting per ottenere risultati ottimali',
-      totalDuration: '120:36',
-      completionRate: 100,
-      status: 'completed',
-      lessons: [
-        {
-          id: 1,
-          title: "Prompting",
-          duration: "10:00",
-          completed: true,
-          locked: false,
-          route: '/prompting',
-          description: "Introduzione alle tecniche di prompting"
-        },
-        {
-          id: 2,
-          title: "Il potere del contesto nel prompting",
-          duration: "10:00",
-          completed: true,
-          locked: false,
-          route: '/contesto',
-          description: "Come utilizzare il contesto per migliorare i prompt"
-        },
-        {
-          id: 3,
-          title: "Prompting Avanzato e Strategie di Comunicazione",
-          duration: "25:36",
-          completed: true,
-          locked: false,
-          route: '/ai-tutorial-interactive',
-          description: "Tecniche avanzate per una comunicazione efficace con l'AI"
-        },
-        {
-          id: 4,
-          title: "Role Instruction",
-          duration: "10:00",
-          completed: true,
-          locked: false,
-          route: '/role-instruction',
-          description: "Come definire ruoli specifici per l'AI"
-        },
-        {
-          id: 5,
-          title: "Edit Output",
-          duration: "10:00",
-          completed: true,
-          locked: false,
-          route: '/edit-output',
-          description: "Tecniche per modificare e migliorare gli output"
-        },
-        {
-          id: 6,
-          title: "Test Finale - Prompt Engineering Lab",
-          duration: "45:00",
-          completed: true,
-          locked: false,
-          route: '/prompt-lab',
-          description: "Laboratorio completo di ingegneria dei prompt"
-        }
-      ]
-    },
-    {
-      id: 'modulo-3',
-      title: 'Modulo 3 - Applicazioni Avanzate',
-      description: 'Applica l\'AI a casi d\'uso specifici e crea soluzioni innovative',
-      totalDuration: '45:00',
-      completionRate: 67,
-      status: 'in-progress',
-      lessons: [
-        {
-          id: 1,
-          title: "PDF + Prompt Engineering",
-          duration: "15:00",
-          completed: true,
-          locked: false,
-          route: '/module3-pdf-prompt',
-          description: "Analisi intelligente di documenti PDF"
-        },
-        {
-          id: 2,
-          title: "Text-to-Image con AI",
-          duration: "15:00",
-          completed: true,
-          locked: false,
-          route: '/module3-image-generator',
-          description: "Generazione di immagini da prompt testuali"
-        },
-        {
-          id: 3,
-          title: "Code by Prompt",
-          duration: "15:00",
-          completed: false,
-          locked: false,
-          route: '/module3-code-by-prompt',
-          description: "Crea app funzionanti con l'AI"
-        }
-      ]
+  const handleLessonClick = async (lesson: Lesson) => {
+    if (lesson.locked) return;
+    
+    // Mark lesson as accessed
+    if (user?.id) {
+      await markLessonAccessed(lesson.id, user.id);
     }
-  ];
-
-  const totalLessons = modules.reduce((acc, module) => acc + module.lessons.length, 0);
-  const completedLessons = modules.reduce((acc, module) => 
-    acc + module.lessons.filter(l => l.completed).length, 0);
-  const overallProgress = Math.round((completedLessons / totalLessons) * 100);
-
-  const handleLessonClick = (lesson: Lesson) => {
-    if (!lesson.locked) {
-      navigate(lesson.route);
-    }
+    
+    navigate(lesson.route);
   };
 
   const getStatusIcon = (status: Module['status']) => {
@@ -287,6 +113,35 @@ const CourseIndex = () => {
     return 'bg-slate-600';
   };
 
+  if (loading) {
+    return (
+      <div className="prompt-lab-container">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Caricamento corso...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!courseData) {
+    return (
+      <div className="prompt-lab-container">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <p className="text-muted-foreground">Corso non trovato</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const totalLessons = courseData.modules.reduce((acc, module) => acc + module.lessons.length, 0);
+  const completedLessons = courseData.modules.reduce((acc, module) => 
+    acc + module.lessons.filter(lesson => lesson.completed).length, 0);
+
   return (
     <div className="prompt-lab-container">
       {/* Header */}
@@ -303,13 +158,20 @@ const CourseIndex = () => {
                 />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">AI & LLM Fundamentals</h1>
-                <p className="text-slate-300">Corso completo sull'Intelligenza Artificiale</p>
+                <h1 className="text-2xl font-bold text-white">{courseData.title}</h1>
+                <p className="text-slate-300">{courseData.description}</p>
               </div>
             </div>
             
             {/* Right side - Stats */}
             <div className="flex items-center space-x-6">
+              <button
+                onClick={() => navigate('/settings')}
+                className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors text-slate-300 hover:text-white"
+                title="Impostazioni"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">{overallProgress}%</div>
                 <div className="text-sm text-slate-400">Completato</div>
@@ -363,7 +225,7 @@ const CourseIndex = () => {
             </div>
 
             {/* Modules */}
-            {modules.map((module) => (
+            {courseData.modules.map((module) => (
               <div key={module.id} className="step-card glassmorphism-base overflow-hidden">
                 <div className="p-6 border-b border-slate-700/40">
                   <div className="flex items-start justify-between mb-4">
@@ -436,6 +298,19 @@ const CourseIndex = () => {
                             <Clock className="w-3 h-3 mr-1" />
                             {lesson.duration}
                           </div>
+                          {!lesson.locked && !lesson.completed && user && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markLessonComplete(lesson.id, user.id).then((success) => {
+                                  if (success) refetch();
+                                });
+                              }}
+                              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors"
+                            >
+                              Completa
+                            </button>
+                          )}
                           {!lesson.locked && (
                             <ChevronRight className="w-4 h-4 text-slate-400" />
                           )}

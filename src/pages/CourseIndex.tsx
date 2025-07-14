@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Clock, CheckCircle, Lock, BookOpen, ChevronRight } from 'lucide-react';
-import CourseSidebar from '@/components/CourseSidebar';
 
 interface Lesson {
   id: number;
@@ -26,7 +25,6 @@ interface Module {
 
 const CourseIndex = () => {
   const navigate = useNavigate();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const modules: Module[] = [
     {
@@ -221,6 +219,11 @@ const CourseIndex = () => {
       {/* Header */}
       <div className="prompt-lab-header">
         <div className="flex items-center space-x-4">
+          <img 
+            src="/lovable-uploads/17c543ce-dec4-4627-a9ce-63e3c55b7d13.png" 
+            alt="Learning Bites" 
+            className="h-8"
+          />
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
@@ -243,13 +246,8 @@ const CourseIndex = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 min-w-0">
-        <CourseSidebar 
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-
-        <main className="flex-1 min-w-0 p-8">
+      <div className="flex-1 min-w-0">
+        <main className="p-8 max-w-6xl mx-auto">
           <div className="max-w-4xl mx-auto space-y-8">
             {/* Course Overview */}
             <div className="step-card glassmorphism-base p-6">

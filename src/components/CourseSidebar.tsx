@@ -73,11 +73,11 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     }))
   })) : [
     {
-      id: 'introduzione',
-      title: 'Introduzione',
-      description: 'Introduzione all\'AI',
-      duration: '13:54',
-      completed: true,
+      id: 'modulo-1',
+      title: 'Modulo 1 - Fondamenta dell\'AI',
+      description: 'Fondamenti dell\'intelligenza artificiale',
+      duration: '33:12',
+      completed: false,
       route: '/introduzione',
       lessons: [
         {
@@ -86,20 +86,10 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           duration: "13:54",
           completed: true,
           current: location.pathname === '/introduzione',
-          description: "Scopri i fondamenti dell'intelligenza artificiale"
-        }
-      ]
-    },
-    {
-      id: 'modulo-1',
-      title: 'Modulo 1 - LLM Fundamentals',
-      description: 'Fondamenti dei Large Language Models',
-      duration: '33:12',
-      completed: false,
-      route: '/llm-fundamentals',
-      lessons: [
+          description: "Introduzione all'intelligenza artificiale"
+        },
         {
-          id: 0,
+          id: 1,
           title: "Dentro un LLM: cosa fa e come parlarci",
           duration: "8:12",
           completed: true,
@@ -107,7 +97,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           description: "Esplora il funzionamento interno dei Large Language Models"
         },
         {
-          id: 1,
+          id: 2,
           title: "Scopri come l'IA può aiutarti nel tuo lavoro",
           duration: "25:00",
           completed: false,
@@ -115,7 +105,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           description: "Esperienza interattiva per personalizzare l'AI al tuo lavoro"
         },
         {
-          id: 2,
+          id: 3,
           title: "Iterazione e Miglioramento dei Prompt",
           duration: "30:00",
           completed: false,
@@ -126,7 +116,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     },
     {
       id: 'modulo-2',
-      title: 'Modulo 2 - Prompting',
+      title: 'Modulo 2 - Tecniche Avanzate',
       description: 'Tecniche avanzate di prompting',
       duration: '65:36',
       completed: true,
@@ -239,9 +229,10 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     let route = '';
     
     if (moduleId === 'modulo-1') {
-      if (lessonIndex === 0) route = '/llm-fundamentals';
-      if (lessonIndex === 1) route = '/ai-work-helper';
-      if (lessonIndex === 2) route = '/prompt-iteration';
+      if (lessonIndex === 0) route = '/introduzione';
+      if (lessonIndex === 1) route = '/llm-fundamentals';
+      if (lessonIndex === 2) route = '/ai-work-helper';
+      if (lessonIndex === 3) route = '/prompt-iteration';
     } else if (moduleId === 'modulo-2') {
       if (lessonIndex === 0) route = '/prompting';
       if (lessonIndex === 1) route = '/contesto';

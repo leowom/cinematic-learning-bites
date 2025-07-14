@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlassmorphismCard from './GlassmorphismCard';
@@ -154,7 +155,7 @@ const CurrentCourseSection = () => {
                   
                   {/* Action Button - Always Visible */}
                   <button 
-                    onClick={() => navigate('/introduzione')}
+                    onClick={() => navigate('/course-index')}
                     className={`group flex items-center space-x-3 bg-gradient-to-r ${currentCourse.color} hover:shadow-xl px-5 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-105 mt-4`}
                   >
                     <Play className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

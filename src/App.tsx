@@ -31,6 +31,7 @@ import Module3ImageGenerator from "./pages/Module3ImageGenerator";
 import Module3CodeByPrompt from "./pages/Module3CodeByPrompt";
 import AIWorkHelper from "./pages/AIWorkHelper";
 import PromptIteration from "./pages/PromptIteration";
+import CourseIndex from "./pages/CourseIndex";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/course-index" element={<ProtectedRoute><CourseIndex /></ProtectedRoute>} />
               <Route path="/prompt-lab" element={<ProtectedRoute><PromptEngineeringLab /></ProtectedRoute>} />
               <Route path="/ai-transformation-day1" element={<ProtectedRoute><AITransformationDay1 /></ProtectedRoute>} />
               <Route path="/introduzione" element={<ProtectedRoute><IntroduzioneCourse /></ProtectedRoute>} />

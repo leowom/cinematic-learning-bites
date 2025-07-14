@@ -37,11 +37,6 @@ export const useCourseData = (userId: string | null) => {
   const [overallProgress, setOverallProgress] = useState(0);
 
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-
     fetchCourseData();
   }, [userId]);
 
@@ -59,16 +54,20 @@ export const useCourseData = (userId: string | null) => {
             lessons (*)
           )
         `)
-        .eq('id', 'prompting-mastery')
+        .eq('id', 'corso-prompting')
         .single();
 
       if (!courses) return;
 
-      // Fetch user progress
-      const { data: userProgress } = await supabase
-        .from('user_progress')
-        .select('*')
-        .eq('user_id', userId);
+      // Fetch user progress only if user is logged in
+      let userProgress = null;
+      if (userId) {
+        const { data } = await supabase
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', userId);
+        userProgress = data;
+      }
 
       // Process the data
       const processedModules = courses.modules

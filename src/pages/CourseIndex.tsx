@@ -217,36 +217,34 @@ const CourseIndex = () => {
   return (
     <div className="prompt-lab-container">
       {/* Header */}
-      <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 p-6">
+      <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 py-4 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-start justify-between mb-4">
-            <div></div>
-            
-            <div className="text-right">
-              <div className="flex items-center space-x-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{overallProgress}%</div>
-                  <div className="text-sm text-slate-400">Completato</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{completedLessons}</div>
-                  <div className="text-sm text-slate-400">di {totalLessons} lezioni</div>
-                </div>
+          <div className="flex items-center justify-between">
+            {/* Left side - Course info */}
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/85e8a1d7-8421-46a8-88ef-d4a3206a8fe7.png" 
+                  alt="Course Icon" 
+                  className="w-6 h-6"
+                />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">AI & LLM Fundamentals</h1>
+                <p className="text-slate-300">Corso completo sull'Intelligenza Artificiale</p>
               </div>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/74fdc34d-fb77-43b8-81d5-c010f87fe640.png" 
-                alt="Course Icon" 
-                className="w-6 h-6"
-              />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white">AI & LLM Fundamentals</h1>
-              <p className="text-slate-300">Corso completo sull'Intelligenza Artificiale</p>
+            
+            {/* Right side - Stats */}
+            <div className="flex items-center space-x-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">{overallProgress}%</div>
+                <div className="text-sm text-slate-400">Completato</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">{completedLessons}</div>
+                <div className="text-sm text-slate-400">di {totalLessons} lezioni</div>
+              </div>
             </div>
           </div>
         </div>

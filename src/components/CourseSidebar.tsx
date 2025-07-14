@@ -63,11 +63,17 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
         module.lessons.some(lesson => lesson.route === location.pathname)
       );
       
-      if (currentModule && !expandedModules.includes(currentModule.id)) {
-        setExpandedModules(prev => [...prev, currentModule.id]);
+      if (currentModule) {
+        setExpandedModules(prev => {
+          // Only add if not already present
+          if (!prev.includes(currentModule.id)) {
+            return [...prev, currentModule.id];
+          }
+          return prev;
+        });
       }
     }
-  }, [courseData, location.pathname, expandedModules]);
+  }, [courseData, location.pathname]); // Removed expandedModules from dependencies
 
   // Usa i dati dal database quando disponibili
   const allModules: Module[] = courseData ? courseData.modules.map(module => ({

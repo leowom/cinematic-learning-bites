@@ -220,13 +220,7 @@ const CourseIndex = () => {
       <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 p-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <img 
-                src="/lovable-uploads/0b430f45-e53a-4fa3-b548-5921a0b5e40f.png" 
-                alt="Learning Bites" 
-                className="h-10 w-10"
-              />
-            </div>
+            <div></div>
             
             <div className="text-right">
               <div className="flex items-center space-x-6">
@@ -244,7 +238,11 @@ const CourseIndex = () => {
           
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
+              <img 
+                src="/lovable-uploads/74fdc34d-fb77-43b8-81d5-c010f87fe640.png" 
+                alt="Course Icon" 
+                className="w-6 h-6"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">AI & LLM Fundamentals</h1>

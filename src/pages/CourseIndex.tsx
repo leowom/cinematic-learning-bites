@@ -217,30 +217,39 @@ const CourseIndex = () => {
   return (
     <div className="prompt-lab-container">
       {/* Header */}
-      <div className="prompt-lab-header">
-        <div className="flex items-center space-x-4">
-          <img 
-            src="/lovable-uploads/17c543ce-dec4-4627-a9ce-63e3c55b7d13.png" 
-            alt="Learning Bites" 
-            className="h-8"
-          />
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-white" />
+      <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <img 
+                src="/lovable-uploads/0b430f45-e53a-4fa3-b548-5921a0b5e40f.png" 
+                alt="Learning Bites" 
+                className="h-10 w-10"
+              />
+            </div>
+            
+            <div className="text-right">
+              <div className="flex items-center space-x-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">{overallProgress}%</div>
+                  <div className="text-sm text-slate-400">Completato</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-white">{completedLessons}</div>
+                  <div className="text-sm text-slate-400">di {totalLessons} lezioni</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">AI & LLM Fundamentals</h1>
-            <p className="text-slate-300">Corso completo sull'Intelligenza Artificiale</p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">{overallProgress}%</div>
-            <div className="text-sm text-slate-400">Completato</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">{completedLessons}</div>
-            <div className="text-sm text-slate-400">di {totalLessons} lezioni</div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">AI & LLM Fundamentals</h1>
+              <p className="text-slate-300">Corso completo sull'Intelligenza Artificiale</p>
+            </div>
           </div>
         </div>
       </div>

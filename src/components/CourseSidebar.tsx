@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Play, CheckCircle, Clock, BookOpen, ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useCourseData } from '@/hooks/useCourseData';
+import { useUserProgress } from '@/hooks/useUserProgress';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Lesson {
   id: number;
@@ -39,8 +42,36 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [expandedModules, setExpandedModules] = useState<string[]>([currentModuleId || 'modulo-1']);
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  const { courseData, loading } = useCourseData(userId);
+  const { markLessonAccessed } = useUserProgress();
 
-  const allModules: Module[] = [
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    getUser();
+  }, []);
+
+  // Se abbiamo i dati dal database, usiamo quelli, altrimenti fallback ai dati hardcoded
+  const allModules: Module[] = courseData ? courseData.modules.map(module => ({
+    id: module.id,
+    title: module.title,
+    description: module.description,
+    duration: module.totalDuration,
+    completed: module.status === 'completed',
+    route: module.lessons[0]?.route || `/${module.id}`,
+    lessons: module.lessons.map((lesson, index) => ({
+      id: index,
+      title: lesson.title,
+      duration: lesson.duration,
+      completed: lesson.completed,
+      current: location.pathname === lesson.route,
+      description: lesson.description
+    }))
+  })) : [
     {
       id: 'introduzione',
       title: 'Introduzione',
@@ -127,22 +158,30 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
         },
         {
           id: 3,
-          title: "Role Instruction",
+          title: "Format Control",
           duration: "10:00",
           completed: true,
-          current: location.pathname === '/role-instruction',
-          description: "Come definire ruoli specifici per l'AI"
+          current: location.pathname === '/ai-interactive/format-control',
+          description: "Controllo preciso del formato di output"
         },
         {
           id: 4,
-          title: "Edit Output",
+          title: "Role Instruction",
           duration: "10:00",
           completed: true,
-          current: location.pathname === '/edit-output',
-          description: "Tecniche per modificare e migliorare gli output"
+          current: location.pathname === '/ai-interactive/role-instruction',
+          description: "Come definire ruoli specifici per l'AI"
         },
         {
           id: 5,
+          title: "Edit Output",
+          duration: "10:00",
+          completed: true,
+          current: location.pathname === '/ai-interactive/edit-output',
+          description: "Tecniche per modificare e migliorare gli output"
+        },
+        {
+          id: 6,
           title: "Test Finale - Prompt Engineering Lab",
           duration: "45:00",
           completed: true,
@@ -204,27 +243,43 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     navigate(route);
   };
 
-  const handleLessonNavigation = (moduleId: string, lessonIndex: number) => {
+  const handleLessonNavigation = async (moduleId: string, lessonIndex: number) => {
+    let route = '';
+    
     if (moduleId === 'modulo-1') {
-      if (lessonIndex === 0) navigate('/llm-fundamentals');
-      if (lessonIndex === 1) navigate('/ai-work-helper');
-      if (lessonIndex === 2) navigate('/prompt-iteration');
+      if (lessonIndex === 0) route = '/llm-fundamentals';
+      if (lessonIndex === 1) route = '/ai-work-helper';
+      if (lessonIndex === 2) route = '/prompt-iteration';
     } else if (moduleId === 'modulo-2') {
-      if (lessonIndex === 0) navigate('/prompting');
-      if (lessonIndex === 1) navigate('/contesto');
-      if (lessonIndex === 2) navigate('/ai-tutorial-interactive');
-      if (lessonIndex === 3) navigate('/role-instruction');
-      if (lessonIndex === 4) navigate('/edit-output');
-      if (lessonIndex === 5) navigate('/prompt-lab');
+      if (lessonIndex === 0) route = '/prompting';
+      if (lessonIndex === 1) route = '/contesto';
+      if (lessonIndex === 2) route = '/ai-tutorial-interactive';
+      if (lessonIndex === 3) route = '/ai-interactive/format-control';
+      if (lessonIndex === 4) route = '/ai-interactive/role-instruction';
+      if (lessonIndex === 5) route = '/ai-interactive/edit-output';
+      if (lessonIndex === 6) route = '/prompt-lab';
     } else if (moduleId === 'modulo-3') {
-      if (lessonIndex === 0) navigate('/module3-pdf-prompt');
-      if (lessonIndex === 1) navigate('/module3-image-generator');
-      if (lessonIndex === 2) navigate('/module3-code-by-prompt');
+      if (lessonIndex === 0) route = '/module3-pdf-prompt';
+      if (lessonIndex === 1) route = '/module3-image-generator';
+      if (lessonIndex === 2) route = '/module3-code-by-prompt';
     } else {
       const module = allModules.find(m => m.id === moduleId);
       if (module) {
-        navigate(module.route);
+        route = module.route;
       }
+    }
+
+    if (route && userId) {
+      // Trova la lesson corrispondente nel courseData per ottenere l'ID corretto
+      const module = courseData?.modules.find(m => m.id === moduleId);
+      const lesson = module?.lessons[lessonIndex];
+      if (lesson) {
+        await markLessonAccessed(lesson.id, userId);
+      }
+    }
+    
+    if (route) {
+      navigate(route);
     }
   };
 

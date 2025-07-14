@@ -150,14 +150,6 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
         },
         {
           id: 2,
-          title: "Prompting Avanzato e Strategie di Comunicazione",
-          duration: "25:36",
-          completed: true,
-          current: location.pathname === '/ai-tutorial-interactive',
-          description: "Tecniche avanzate per una comunicazione efficace con l'AI"
-        },
-        {
-          id: 3,
           title: "Format Control",
           duration: "10:00",
           completed: true,
@@ -165,7 +157,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           description: "Controllo preciso del formato di output"
         },
         {
-          id: 4,
+          id: 3,
           title: "Role Instruction",
           duration: "10:00",
           completed: true,
@@ -173,7 +165,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           description: "Come definire ruoli specifici per l'AI"
         },
         {
-          id: 5,
+          id: 4,
           title: "Edit Output",
           duration: "10:00",
           completed: true,
@@ -181,7 +173,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           description: "Tecniche per modificare e migliorare gli output"
         },
         {
-          id: 6,
+          id: 5,
           title: "Test Finale - Prompt Engineering Lab",
           duration: "45:00",
           completed: true,
@@ -253,11 +245,10 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     } else if (moduleId === 'modulo-2') {
       if (lessonIndex === 0) route = '/prompting';
       if (lessonIndex === 1) route = '/contesto';
-      if (lessonIndex === 2) route = '/ai-tutorial-interactive';
-      if (lessonIndex === 3) route = '/ai-interactive/format-control';
-      if (lessonIndex === 4) route = '/ai-interactive/role-instruction';
-      if (lessonIndex === 5) route = '/ai-interactive/edit-output';
-      if (lessonIndex === 6) route = '/prompt-lab';
+      if (lessonIndex === 2) route = '/ai-interactive/format-control';
+      if (lessonIndex === 3) route = '/ai-interactive/role-instruction';
+      if (lessonIndex === 4) route = '/ai-interactive/edit-output';
+      if (lessonIndex === 5) route = '/prompt-lab';
     } else if (moduleId === 'modulo-3') {
       if (lessonIndex === 0) route = '/module3-pdf-prompt';
       if (lessonIndex === 1) route = '/module3-image-generator';

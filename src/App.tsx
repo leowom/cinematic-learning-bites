@@ -31,6 +31,7 @@ import Module3ImageGenerator from "./pages/Module3ImageGenerator";
 import Module3CodeByPrompt from "./pages/Module3CodeByPrompt";
 import AIWorkHelper from "./pages/AIWorkHelper";
 import PromptIteration from "./pages/PromptIteration";
+import Settings from "./pages/Settings";
 import CourseIndex from "./pages/CourseIndex";
 import NotFound from "./pages/NotFound";
 
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="/module3-code-by-prompt" element={<ProtectedRoute><Module3CodeByPrompt /></ProtectedRoute>} />
               <Route path="/ai-work-helper" element={<ProtectedRoute><AIWorkHelper /></ProtectedRoute>} />
               <Route path="/prompt-iteration" element={<ProtectedRoute><PromptIteration /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

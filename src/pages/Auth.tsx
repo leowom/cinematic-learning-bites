@@ -1,201 +1,242 @@
-import * as React from "react";
-import { ChevronLeft, Github, Twitter } from "lucide-react";
-import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-const AuthForm: React.FC = () => {
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
+
+const Auth = () => {
   const navigate = useNavigate();
-  return <div className="bg-background py-20 text-foreground selection:bg-accent selection:text-accent-foreground min-h-screen">
-      <BackButton />
-      <motion.div initial={{
-      opacity: 0,
-      y: 25
-    }} animate={{
-      opacity: 1,
-      y: 0
-    }} transition={{
-      duration: 1.25,
-      ease: "easeInOut"
-    }} className="relative z-10 mx-auto w-full max-w-xl p-4">
-        <Logo />
-        <Header />
-        <SocialButtons />
-        <Divider />
-        <LoginForm />
-        <TermsAndConditions />
-      </motion.div>
-      <BackgroundDecoration />
-    </div>;
-};
-const BackButton: React.FC = () => {
-  const navigate = useNavigate();
-  return <SocialButton icon={<ChevronLeft size={16} />} onClick={() => navigate(-1)}>
-      Indietro
-    </SocialButton>;
-};
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  className?: string;
-}
-const Button: React.FC<ButtonProps> = ({
-  children,
-  className,
-  ...props
-}) => <button className={`rounded-md bg-primary text-primary-foreground px-4 py-2 text-lg 
-    ring-2 ring-ring/50 ring-offset-2 ring-offset-background 
-    transition-all hover:scale-[1.02] hover:bg-primary/90 hover:ring-transparent active:scale-[0.98] active:ring-ring/70 ${className}`} {...props}>
-    {children}
-  </button>;
-const Logo: React.FC = () => <div className="mb-6 flex justify-center items-center">
-    <img src="/lovable-uploads/08d7ee17-c8fc-427e-bde8-3335c6fc6927.png" alt="LearningBites" className="h-12" />
-  </div>;
-const Header: React.FC = () => <div className="mb-6 text-center">
-    <h1 className="text-2xl font-semibold text-foreground">Accedi al tuo account</h1>
-    <p className="mt-2 text-muted-foreground">
-      Non hai un account?{" "}
-      <button onClick={() => window.location.hash = "signup"} className="text-primary hover:underline">
-        Creane uno.
-      </button>
-    </p>
-  </div>;
-const SocialButtons: React.FC = () => <div className="mb-6 space-y-3">
-    <div className="grid grid-cols-2 gap-3">
-      <SocialButton icon={<Twitter size={20} />} fullWidth>Accedi con Twitter</SocialButton>
-      <SocialButton icon={<Github size={20} />} fullWidth>Accedi con GitHub</SocialButton>
-    </div>
-  </div>;
-const SocialButton: React.FC<{
-  icon?: React.ReactNode;
-  fullWidth?: boolean;
-  children?: React.ReactNode;
-  onClick?: () => void;
-}> = ({
-  icon,
-  fullWidth,
-  children,
-  onClick
-}) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground ${
-      fullWidth ? 'w-full' : ''
-    }`}
-  >
-    {icon}
-    {children}
-  </button>
-);
-const Divider: React.FC = () => <div className="my-6 flex items-center gap-3">
-    <div className="h-[1px] w-full bg-border" />
-    <span className="text-muted-foreground">OPPURE</span>
-    <div className="h-[1px] w-full bg-border" />
-  </div>;
-const LoginForm: React.FC = () => {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [firstName, setFirstName] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  const [isSignUp, setIsSignUp] = React.useState(() => window.location.hash === "#signup");
-  const navigate = useNavigate();
-  React.useEffect(() => {
-    const handleHashChange = () => {
-      setIsSignUp(window.location.hash === "#signup");
-    };
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/course-index');
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          navigate('/course-index');
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      if (isSignUp) {
-        if (!firstName.trim()) {
-          throw new Error("Per favore, inserisci il tuo nome");
-        }
-        const {
-          error
-        } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: {
-              first_name: firstName
-            }
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/course-index`,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
           }
-        });
-        if (error) throw error;
-        toast.success("Controlla la tua email per verificare l'account");
+        }
+      });
+
+      if (error) {
+        if (error.message.includes('already registered')) {
+          toast.error('Utente già registrato. Prova ad accedere invece.');
+        } else {
+          toast.error(error.message);
+        }
       } else {
-        const {
-          error
-        } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        if (error) throw error;
-        navigate("/dashboard");
+        toast.success('Registrazione completata! Controlla la tua email per confermare l\'account.');
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error('Errore durante la registrazione');
     } finally {
       setLoading(false);
     }
   };
-  return <form onSubmit={handleSubmit}>
-      {isSignUp && <div className="mb-3">
-          <label htmlFor="firstName-input" className="mb-1.5 block text-muted-foreground">
-            Nome
-          </label>
-          <input id="firstName-input" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Il tuo nome" className="w-full rounded-md border border-input 
-            bg-background px-3 py-2 text-foreground
-            placeholder-muted-foreground 
-            ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-ring" />
-        </div>}
-      <div className="mb-3">
-        <label htmlFor="email-input" className="mb-1.5 block text-muted-foreground">
-          Email
-        </label>
-        <input id="email-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="la.tua.email@provider.com" className="w-full rounded-md border border-input 
-          bg-background px-3 py-2 text-foreground
-          placeholder-muted-foreground 
-          ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-ring" />
-      </div>
-      <div className="mb-6">
-        <div className="mb-1.5 flex items-end justify-between">
-          <label htmlFor="password-input" className="block text-muted-foreground">
-            Password
-          </label>
-          <a href="#" className="text-sm text-primary hover:underline">
-            Password dimenticata?
-          </a>
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Credenziali non valide. Controlla email e password.');
+        } else {
+          toast.error(error.message);
+        }
+      }
+    } catch (error) {
+      toast.error('Errore durante l\'accesso');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-4">
+            <img 
+              src="/lovable-uploads/85e8a1d7-8421-46a8-88ef-d4a3206a8fe7.png" 
+              alt="Course Icon" 
+              className="w-8 h-8"
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">AI & LLM Fundamentals</h1>
+          <p className="text-slate-300">Accedi al tuo percorso di apprendimento</p>
         </div>
-        <input id="password-input" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••••••" className="w-full rounded-md border border-input 
-          bg-background px-3 py-2 text-foreground
-          placeholder-muted-foreground 
-          ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-ring" />
+
+        <Card className="glassmorphism-base border-slate-700/50">
+          <CardHeader>
+            <CardTitle className="text-center text-white">Benvenuto</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="signin">Accedi</TabsTrigger>
+                <TabsTrigger value="signup">Registrati</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email" className="text-slate-200">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="La tua email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password" className="text-slate-200">Password</Label>
+                    <Input
+                      id="signin-password"
+                      type="password"
+                      placeholder="La tua password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Accesso in corso...
+                      </>
+                    ) : (
+                      'Accedi'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstname" className="text-slate-200">Nome</Label>
+                      <Input
+                        id="firstname"
+                        type="text"
+                        placeholder="Nome"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                        className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastname" className="text-slate-200">Cognome</Label>
+                      <Input
+                        id="lastname"
+                        type="text"
+                        placeholder="Cognome"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                        className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="text-slate-200">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="La tua email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="text-slate-200">Password</Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      placeholder="Crea una password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Registrazione in corso...
+                      </>
+                    ) : (
+                      'Registrati'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Attendere..." : isSignUp ? "Registrati" : "Accedi"}
-      </Button>
-    </form>;
+    </div>
+  );
 };
-const TermsAndConditions: React.FC = () => <p className="mt-9 text-xs text-muted-foreground">
-    Accedendo, accetti i nostri{" "}
-    <a href="#" className="text-primary hover:underline">
-      Termini & Condizioni
-    </a>{" "}
-    e{" "}
-    <a href="#" className="text-primary hover:underline">
-      Informativa sulla Privacy.
-    </a>
-  </p>;
-const BackgroundDecoration: React.FC = () => {
-  return <div className="absolute right-0 top-0 z-0 size-[50vw] opacity-30" style={{
-    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='hsl(var(--primary) / 0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`
-  }}>
-      <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background" />
-    </div>;
-};
-export default AuthForm;
+
+export default Auth;

@@ -86,7 +86,7 @@ const CourseIndex = () => {
         .from('profiles')
         .select('first_name')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching profile:', error);

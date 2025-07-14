@@ -1,27 +1,67 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GlassmorphismCard from './GlassmorphismCard';
+import { useCourseData } from '@/hooks/useCourseData';
+import { supabase } from '@/integrations/supabase/client';
 import { Play, Search, BarChart3 } from 'lucide-react';
 
 const FloatingActions = () => {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+  const { courseData } = useCourseData(userId);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    getUser();
+  }, []);
+
+  // Get next available lesson
+  const getNextLesson = () => {
+    if (!courseData) return null;
+    
+    for (const module of courseData.modules) {
+      for (const lesson of module.lessons) {
+        if (!lesson.completed && !lesson.locked) {
+          return lesson;
+        }
+      }
+    }
+    return null;
+  };
+
+  const nextLesson = getNextLesson();
+
   const actions = [
     {
       icon: Play,
       label: 'Continua corso',
-      subtitle: 'Machine Learning',
-      gradient: 'from-blue-500 to-blue-600'
+      subtitle: 'Thinking with AI',
+      gradient: 'from-blue-500 to-blue-600',
+      onClick: () => {
+        if (nextLesson) {
+          navigate(nextLesson.route);
+        } else {
+          navigate('/course-index');
+        }
+      }
     },
     {
       icon: Search,
       label: 'Esplora nuovi',
       subtitle: 'Corsi disponibili',
-      gradient: 'from-purple-500 to-purple-600'
+      gradient: 'from-purple-500 to-purple-600',
+      onClick: () => navigate('/course-index')
     },
     {
       icon: BarChart3,
       label: 'Vedi statistiche',
       subtitle: 'I tuoi progressi',
-      gradient: 'from-green-500 to-green-600'
+      gradient: 'from-green-500 to-green-600',
+      onClick: () => navigate('/analytics')
     }
   ];
 
@@ -36,6 +76,7 @@ const FloatingActions = () => {
           {actions.map((action, index) => (
             <button
               key={index}
+              onClick={action.onClick}
               className="group p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
             >
               <div className="flex items-center space-x-4">

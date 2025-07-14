@@ -1,9 +1,21 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import GlassmorphismCard from './GlassmorphismCard';
+import { useCourseData } from '@/hooks/useCourseData';
+import { supabase } from '@/integrations/supabase/client';
 import { BookOpen, Trophy, BarChart3, Target } from 'lucide-react';
 
 const BentoGrid = () => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const { courseData, loading, overallProgress } = useCourseData(userId);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    getUser();
+  }, []);
   return (
     <div className="max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold text-white mb-8 text-center">
@@ -21,21 +33,37 @@ const BentoGrid = () => {
           </div>
           
           <div className="space-y-3">
-            <div className="p-3 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300">
-              <div className="text-white font-medium">Visualizzazione dei Dati</div>
-              <div className="text-sm text-white/60">85% completato</div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
-                <div className="bg-green-400 h-1.5 rounded-full w-[85%]" />
+            {loading ? (
+              <div className="text-white/60 text-sm">Caricamento...</div>
+            ) : courseData ? (
+              <div className="p-3 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300">
+                <div className="text-white font-medium">{courseData.title}</div>
+                <div className="text-sm text-white/60">{overallProgress}% completato</div>
+                <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
+                  <div 
+                    className="bg-blue-400 h-1.5 rounded-full transition-all duration-1000" 
+                    style={{ width: `${overallProgress}%` }}
+                  />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="text-white/60 text-sm">Nessun corso disponibile</div>
+            )}
             
-            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-              <div className="text-white font-medium">Python Avanzato</div>
-              <div className="text-sm text-white/60">42% completato</div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
-                <div className="bg-blue-400 h-1.5 rounded-full w-[42%]" />
+            {courseData && courseData.modules.map((module, index) => (
+              <div key={module.id} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                <div className="text-white font-medium">{module.title}</div>
+                <div className="text-sm text-white/60">{Math.round(module.completionRate)}% completato</div>
+                <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
+                  <div 
+                    className={`h-1.5 rounded-full transition-all duration-1000 ${
+                      index === 0 ? 'bg-green-400' : index === 1 ? 'bg-purple-400' : 'bg-orange-400'
+                    }`}
+                    style={{ width: `${module.completionRate}%` }}
+                  />
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </GlassmorphismCard>
 
@@ -67,22 +95,32 @@ const BentoGrid = () => {
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-white/70">Linguaggio Python</span>
-                <span className="text-white font-medium">35%</span>
+                <span className="text-white/70">Thinking with AI</span>
+                <span className="text-white font-medium">{overallProgress || 0}%</span>
               </div>
               <div className="w-full bg-white/10 rounded-full h-2">
-                <div className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full w-[35%] transition-all duration-1000" />
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-1000" 
+                  style={{ width: `${overallProgress || 0}%` }}
+                />
               </div>
             </div>
             
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-white/70">Settimana Streak</span>
-                <span className="text-green-400 font-medium">7 giorni</span>
+                <span className="text-white/70">Settimane di Studio</span>
+                <span className="text-green-400 font-medium">
+                  {courseData ? Math.ceil(overallProgress / 15) : 0} settimane
+                </span>
               </div>
               <div className="flex space-x-1">
                 {[...Array(7)].map((_, i) => (
-                  <div key={i} className="w-6 h-6 rounded bg-green-400/80" />
+                  <div 
+                    key={i} 
+                    className={`w-6 h-6 rounded ${
+                      i < Math.ceil((overallProgress || 0) / 15) ? 'bg-green-400/80' : 'bg-white/20'
+                    }`} 
+                  />
                 ))}
               </div>
             </div>

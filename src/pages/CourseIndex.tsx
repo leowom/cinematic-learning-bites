@@ -225,7 +225,7 @@ const CourseIndex = () => {
             </div>
 
             {/* Modules */}
-            {courseData.modules.map((module) => (
+            {courseData?.modules.map((module) => (
               <div key={module.id} className="step-card glassmorphism-base overflow-hidden">
                 <div className="p-6 border-b border-slate-700/40">
                   <div className="flex items-start justify-between mb-4">

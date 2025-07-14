@@ -55,11 +55,11 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     getUser();
   }, []);
 
-  // Se abbiamo i dati dal database, usiamo quelli, altrimenti fallback ai dati hardcoded
+  // Usa i dati dal database quando disponibili
   const allModules: Module[] = courseData ? courseData.modules.map(module => ({
     id: module.id,
     title: module.title,
-    description: module.description,
+    description: module.description || '',
     duration: module.totalDuration,
     completed: module.status === 'completed',
     route: module.lessons[0]?.route || `/${module.id}`,
@@ -69,144 +69,9 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
       duration: lesson.duration,
       completed: lesson.completed,
       current: location.pathname === lesson.route,
-      description: lesson.description
+      description: lesson.description || ''
     }))
-  })) : [
-    {
-      id: 'modulo-1',
-      title: 'Modulo 1 - Fondamenta dell\'AI',
-      description: 'Fondamenti dell\'intelligenza artificiale',
-      duration: '33:12',
-      completed: false,
-      route: '/introduzione',
-      lessons: [
-        {
-          id: 0,
-          title: "Introduzione all'AI",
-          duration: "13:54",
-          completed: true,
-          current: location.pathname === '/introduzione',
-          description: "Introduzione all'intelligenza artificiale"
-        },
-        {
-          id: 1,
-          title: "Dentro un LLM: cosa fa e come parlarci",
-          duration: "8:12",
-          completed: true,
-          current: location.pathname === '/llm-fundamentals',
-          description: "Esplora il funzionamento interno dei Large Language Models"
-        },
-        {
-          id: 2,
-          title: "Scopri come l'IA può aiutarti nel tuo lavoro",
-          duration: "25:00",
-          completed: false,
-          current: location.pathname === '/ai-work-helper',
-          description: "Esperienza interattiva per personalizzare l'AI al tuo lavoro"
-        },
-        {
-          id: 3,
-          title: "Iterazione e Miglioramento dei Prompt",
-          duration: "30:00",
-          completed: false,
-          current: location.pathname === '/prompt-iteration',
-          description: "Impara l'arte del prompt engineering iterativo"
-        }
-      ]
-    },
-    {
-      id: 'modulo-2',
-      title: 'Modulo 2 - Tecniche Avanzate',
-      description: 'Tecniche avanzate di prompting',
-      duration: '65:36',
-      completed: true,
-      route: '/prompting',
-      lessons: [
-        {
-          id: 0,
-          title: "Prompting",
-          duration: "10:00",
-          completed: true,
-          current: location.pathname === '/prompting',
-          description: "Introduzione alle tecniche di prompting"
-        },
-        {
-          id: 1,
-          title: "Il potere del contesto nel prompting",
-          duration: "10:00",
-          completed: true,
-          current: location.pathname === '/contesto',
-          description: "Come utilizzare il contesto per migliorare i prompt"
-        },
-        {
-          id: 2,
-          title: "Format Control",
-          duration: "10:00",
-          completed: true,
-          current: location.pathname === '/ai-interactive/format-control',
-          description: "Controllo preciso del formato di output"
-        },
-        {
-          id: 3,
-          title: "Role Instruction",
-          duration: "10:00",
-          completed: true,
-          current: location.pathname === '/ai-interactive/role-instruction',
-          description: "Come definire ruoli specifici per l'AI"
-        },
-        {
-          id: 4,
-          title: "Edit Output",
-          duration: "10:00",
-          completed: true,
-          current: location.pathname === '/ai-interactive/edit-output',
-          description: "Tecniche per modificare e migliorare gli output"
-        },
-        {
-          id: 5,
-          title: "Test Finale - Prompt Engineering Lab",
-          duration: "45:00",
-          completed: true,
-          current: location.pathname === '/prompt-lab',
-          description: "Laboratorio completo di ingegneria dei prompt"
-        }
-      ]
-    },
-    {
-      id: 'modulo-3',
-      title: 'Modulo 3 - Applicazioni Avanzate',
-      description: 'Tecniche avanzate con AI',
-      duration: '45:00',
-      completed: false,
-      route: '/module3-pdf-prompt',
-      lessons: [
-        {
-          id: 0,
-          title: "PDF + Prompt Engineering",
-          duration: "15:00",
-          completed: true,
-          current: location.pathname === '/module3-pdf-prompt',
-          description: "Analisi intelligente di documenti PDF"
-        },
-        {
-          id: 1,
-          title: "Text-to-Image con AI",
-          duration: "15:00",
-          completed: true,
-          current: location.pathname === '/module3-image-generator',
-          description: "Generazione di immagini da prompt testuali"
-        },
-        {
-          id: 2,
-          title: "Code by Prompt",
-          duration: "15:00",
-          completed: location.pathname === '/module3-code-by-prompt',
-          current: location.pathname === '/module3-code-by-prompt',
-          description: "Crea app funzionanti con l'AI"
-        }
-      ]
-    }
-  ];
+  })) : [];
 
   const totalLessons = allModules.reduce((acc, module) => acc + module.lessons.length, 0);
   const completedLessons = allModules.reduce((acc, module) => 
@@ -226,43 +91,19 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
   };
 
   const handleLessonNavigation = async (moduleId: string, lessonIndex: number) => {
-    let route = '';
+    // Trova la lesson usando i dati dal database
+    const module = courseData?.modules.find(m => m.id === moduleId);
+    const lesson = module?.lessons[lessonIndex];
     
-    if (moduleId === 'modulo-1') {
-      if (lessonIndex === 0) route = '/introduzione';
-      if (lessonIndex === 1) route = '/llm-fundamentals';
-      if (lessonIndex === 2) route = '/ai-work-helper';
-      if (lessonIndex === 3) route = '/prompt-iteration';
-    } else if (moduleId === 'modulo-2') {
-      if (lessonIndex === 0) route = '/prompting';
-      if (lessonIndex === 1) route = '/contesto';
-      if (lessonIndex === 2) route = '/ai-interactive/format-control';
-      if (lessonIndex === 3) route = '/ai-interactive/role-instruction';
-      if (lessonIndex === 4) route = '/ai-interactive/edit-output';
-      if (lessonIndex === 5) route = '/prompt-lab';
-    } else if (moduleId === 'modulo-3') {
-      if (lessonIndex === 0) route = '/module3-pdf-prompt';
-      if (lessonIndex === 1) route = '/module3-image-generator';
-      if (lessonIndex === 2) route = '/module3-code-by-prompt';
-    } else {
-      const module = allModules.find(m => m.id === moduleId);
-      if (module) {
-        route = module.route;
-      }
-    }
+    if (!lesson) return;
 
-    if (route && userId) {
-      // Trova la lesson corrispondente nel courseData per ottenere l'ID corretto
-      const module = courseData?.modules.find(m => m.id === moduleId);
-      const lesson = module?.lessons[lessonIndex];
-      if (lesson) {
-        await markLessonAccessed(lesson.id, userId);
-      }
+    // Segna la lezione come acceduta se l'utente è loggato
+    if (userId) {
+      await markLessonAccessed(lesson.id, userId);
     }
     
-    if (route) {
-      navigate(route);
-    }
+    // Naviga alla route della lezione
+    navigate(lesson.route);
   };
 
   return (

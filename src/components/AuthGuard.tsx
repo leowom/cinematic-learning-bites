@@ -19,7 +19,7 @@ export const AuthGuard: React.FC = () => {
         setLoading(false);
         
         if (session) {
-          navigate("/course-index");
+          navigate("/dashboard");
         } else {
           navigate("/auth");
         }
@@ -33,7 +33,7 @@ export const AuthGuard: React.FC = () => {
       setLoading(false);
       
       if (session) {
-        navigate("/course-index");
+        navigate("/dashboard");
       } else {
         navigate("/auth");
       }

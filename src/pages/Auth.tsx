@@ -21,14 +21,14 @@ const Auth = () => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate('/course-index');
+        navigate('/dashboard');
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session) {
-          navigate('/course-index');
+          navigate('/dashboard');
         }
       }
     );
@@ -45,7 +45,7 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/course-index`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             first_name: firstName,
             last_name: lastName,

@@ -55,6 +55,11 @@ const CurrentCourseSection = () => {
     }
   };
 
+  // Check if user is new (no progress or very little progress)
+  const isNewUser = () => {
+    return overallProgress === 0 || overallProgress < 5;
+  };
+
   // Get next available lesson
   const getNextLesson = () => {
     if (!courseData) return null;
@@ -169,7 +174,9 @@ const CurrentCourseSection = () => {
                   {/* Action Button - Always Visible */}
                   <button 
                     onClick={() => {
-                      if (nextLesson) {
+                      if (isNewUser()) {
+                        navigate('/course-index');
+                      } else if (nextLesson) {
                         navigate(nextLesson.route);
                       } else {
                         navigate('/course-index');
@@ -179,7 +186,12 @@ const CurrentCourseSection = () => {
                   >
                     <Play className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     <span className="text-sm">
-                      {nextLesson ? `Continua: ${nextLesson.title}` : 'Visualizza corso'}
+                      {isNewUser() 
+                        ? 'Continua: Introduzione' 
+                        : nextLesson 
+                          ? `Continua: ${nextLesson.title}` 
+                          : 'Visualizza corso'
+                      }
                     </span>
                   </button>
                 </div>

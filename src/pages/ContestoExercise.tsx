@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import CourseSidebar from '@/components/CourseSidebar';
-import { useNavigation } from '@/hooks/useNavigation';
 
 const ContestoExercise = () => {
   const navigate = useNavigate();
-  const { getNextLesson } = useNavigation();
   const [currentStep, setCurrentStep] = useState(0);
   const [showTutorial, setShowTutorial] = useState(true);
   const [userPrompts, setUserPrompts] = useState<string[]>(['', '']);
@@ -85,12 +83,6 @@ const ContestoExercise = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       setCurrentPrompt('');
-    } else {
-      // If it's the last step, go to next lesson
-      const nextLesson = getNextLesson('/contesto');
-      if (nextLesson) {
-        navigate(nextLesson.route);
-      }
     }
   };
 
@@ -475,12 +467,7 @@ const ContestoExercise = () => {
                         ) : (
                           <div className="space-x-4">
                             <Button
-                              onClick={() => {
-                                const nextLesson = getNextLesson('/contesto');
-                                if (nextLesson) {
-                                  navigate(nextLesson.route);
-                                }
-                              }}
+                              onClick={() => navigate('/prompting')}
                               className="bg-emerald-600 hover:bg-emerald-700 text-white"
                             >
                               Completa Esercizio

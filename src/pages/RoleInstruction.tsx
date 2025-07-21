@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import CourseSidebar from '@/components/CourseSidebar';
+import { useNavigation } from '@/hooks/useNavigation';
 
 const RoleInstruction = () => {
   const navigate = useNavigate();
+  const { getNextLesson, getPreviousLesson } = useNavigation();
   const [currentStep, setCurrentStep] = useState(0);
   const [showTutorial, setShowTutorial] = useState(true);
   const [completedSteps, setCompletedSteps] = useState<boolean[]>([false, false]);
@@ -43,6 +45,12 @@ const RoleInstruction = () => {
   const nextStep = () => {
     if (currentStep < exercises.length - 1) {
       setCurrentStep(currentStep + 1);
+    } else {
+      // If it's the last step, go to next lesson
+      const nextLesson = getNextLesson('/ai-interactive/role-instruction');
+      if (nextLesson) {
+        navigate(nextLesson.route);
+      }
     }
   };
 
@@ -376,17 +384,27 @@ const RoleInstruction = () => {
 
                     <div className="flex justify-center space-x-4">
                       <Button
-                        onClick={() => navigate('/ai-interactive/format-control')}
+                        onClick={() => {
+                          const prevLesson = getPreviousLesson('/ai-interactive/role-instruction');
+                          if (prevLesson) {
+                            navigate(prevLesson.route);
+                          }
+                        }}
                         variant="ghost"
                         className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                       >
-                        ← Modulo 2.2
+                        ← Precedente
                       </Button>
                       <Button
-                        onClick={() => navigate('/ai-interactive/edit-output')}
+                        onClick={() => {
+                          const nextLesson = getNextLesson('/ai-interactive/role-instruction');
+                          if (nextLesson) {
+                            navigate(nextLesson.route);
+                          }
+                        }}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white"
                       >
-                        Modulo 2.4 →
+                        Prossimo →
                       </Button>
                     </div>
                   </div>

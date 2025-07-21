@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import CourseSidebar from '@/components/CourseSidebar';
+import { useNavigation } from '@/hooks/useNavigation';
 
 const EditOutput = () => {
   const navigate = useNavigate();
+  const { getNextLesson, getPreviousLesson } = useNavigation();
   const [showTutorial, setShowTutorial] = useState(true);
   const [currentExercise, setCurrentExercise] = useState(0); // 0: first exercise, 1: second exercise, 2: completion
   const [userInput, setUserInput] = useState('');
@@ -102,7 +104,11 @@ const EditOutput = () => {
         { type: 'ai', content: initialResponse }
       ]);
     } else {
-      setCurrentExercise(2); // Completion screen
+      // Go to next lesson in the course
+      const nextLesson = getNextLesson('/ai-interactive/edit-output');
+      if (nextLesson) {
+        navigate(nextLesson.route);
+      }
     }
   };
 
@@ -293,13 +299,18 @@ const EditOutput = () => {
                        <p className="text-emerald-300 text-sm mt-2 font-medium">L'AI ti segue, se la guidi.</p>
                      </div>
 
-                     <Button
-                       onClick={() => navigate('/prompt-lab')}
-                       className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3"
-                     >
-                       Completa Modulo 2
-                       <ArrowRight className="w-5 h-5 ml-2" />
-                     </Button>
+                      <Button
+                        onClick={() => {
+                          const nextLesson = getNextLesson('/ai-interactive/edit-output');
+                          if (nextLesson) {
+                            navigate(nextLesson.route);
+                          }
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3"
+                      >
+                        Prossimo →
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
                    </div>
                  ) : (
                    // Chat Interface
@@ -436,11 +447,16 @@ const EditOutput = () => {
                       {/* Navigation */}
                       <div className="flex justify-between items-center pt-4 border-t border-slate-700/50">
                         <Button
-                          onClick={() => navigate('/ai-interactive/role-instruction')}
+                          onClick={() => {
+                            const prevLesson = getPreviousLesson('/ai-interactive/edit-output');
+                            if (prevLesson) {
+                              navigate(prevLesson.route);
+                            }
+                          }}
                           variant="ghost"
                           className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                         >
-                          ← Modulo 2.3
+                          ← Precedente
                         </Button>
                         
                         {exerciseCompleted ? (

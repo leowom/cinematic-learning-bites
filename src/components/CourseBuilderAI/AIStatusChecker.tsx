@@ -39,11 +39,8 @@ const AIStatusChecker: React.FC = () => {
       });
 
       // Test save course function connectivity (without actually saving)
-      const saveTest = await fetch(`${supabase.supabaseUrl}/functions/v1/save-course`, {
-        method: 'OPTIONS',
-        headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
-        }
+      const saveTest = await fetch(`https://dnircioicebnrdwifmkl.supabase.co/functions/v1/save-course`, {
+        method: 'OPTIONS'
       });
 
       setStatus({

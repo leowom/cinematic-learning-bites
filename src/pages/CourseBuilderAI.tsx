@@ -263,81 +263,31 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
     setProcessingStep('Salvataggio nel database...');
 
     try {
-      // Create course
-      const courseId = `course-${Date.now()}`;
-      const { error: courseError } = await supabase
-        .from('courses')
-        .insert({
-          id: courseId,
-          title: generatedCourse.courseTitle,
-          description: generatedCourse.description,
-          total_duration: generatedCourse.totalDuration,
-          level: config.targetAudience === 'principianti' ? 'beginner' : 
-                config.targetAudience === 'intermedi' ? 'intermediate' : 'advanced'
-        });
+      console.log('Calling save-course function with:', {
+        courseData: generatedCourse,
+        targetAudience: config.targetAudience
+      });
 
-      if (courseError) throw courseError;
-
-      // Create modules and lessons
-      for (let moduleIndex = 0; moduleIndex < generatedCourse.modules.length; moduleIndex++) {
-        const moduleData = generatedCourse.modules[moduleIndex];
-        const moduleId = `module-${Date.now()}-${moduleIndex}`;
-        
-        // Create module
-        const { error: moduleError } = await supabase
-          .from('modules')
-          .insert({
-            id: moduleId,
-            course_id: courseId,
-            title: moduleData.moduleTitle,
-            description: moduleData.description,
-            total_duration: moduleData.duration,
-            order_index: moduleIndex + 1
-          });
-
-        if (moduleError) throw moduleError;
-
-        // Create lessons for this module
-        for (let lessonIndex = 0; lessonIndex < moduleData.lessons.length; lessonIndex++) {
-          const lessonData = moduleData.lessons[lessonIndex];
-          const lessonId = `lesson-${Date.now()}-${moduleIndex}-${lessonIndex}`;
-          
-          const { error: lessonError } = await supabase
-            .from('lessons')
-            .insert({
-              id: lessonId,
-              module_id: moduleId,
-              title: lessonData.lessonTitle,
-              description: lessonData.content.substring(0, 200) + '...',
-              duration: lessonData.duration,
-              route: `/${lessonData.lessonTitle.toLowerCase().replace(/\s+/g, '-')}`,
-              order_index: lessonIndex + 1
-            });
-
-          if (lessonError) throw lessonError;
-
-          // Create quiz questions for this lesson
-          for (let quizIndex = 0; quizIndex < lessonData.quiz.length; quizIndex++) {
-            const quizData = lessonData.quiz[quizIndex];
-            
-            await supabase
-              .from('quiz_questions')
-              .insert({
-                lesson_id: lessonId,
-                question_text: quizData.question,
-                question_type: 'multiple_choice',
-                options: quizData.options,
-                correct_answer: quizData.correctAnswer,
-                explanation: quizData.explanation,
-                order_index: quizIndex + 1
-              });
-          }
+      const response = await supabase.functions.invoke('save-course', {
+        body: {
+          courseData: generatedCourse,
+          targetAudience: config.targetAudience
         }
+      });
+
+      console.log('Save course response:', response);
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Errore nella chiamata alla funzione di salvataggio');
+      }
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || 'Errore durante il salvataggio del corso');
       }
 
       toast({
         title: "🚀 Corso pubblicato!",
-        description: "Il corso è stato salvato e pubblicato con successo",
+        description: response.data.message || "Il corso è stato salvato e pubblicato con successo",
       });
 
       // Navigate to course list or dashboard
@@ -347,7 +297,7 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
       console.error('Error saving course:', error);
       toast({
         title: "Errore",
-        description: "Impossibile salvare il corso nel database",
+        description: error.message || "Impossibile salvare il corso nel database",
         variant: "destructive",
       });
     } finally {

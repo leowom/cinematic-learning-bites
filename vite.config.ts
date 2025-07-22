@@ -2,7 +2,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { splitVendorChunkPlugin } from 'vite';
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
@@ -10,12 +9,15 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    // Simplified server optimizations
+    // Optimizations to reduce file watching
     preTransformRequests: false,
+    watch: {
+      usePolling: false,
+      interval: 1000,
+    }
   },
   plugins: [
     react(), 
-    splitVendorChunkPlugin(),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {

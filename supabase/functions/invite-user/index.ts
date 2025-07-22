@@ -12,7 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    // Create admin client with service role key for user management
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
@@ -27,14 +28,15 @@ serve(async (req) => {
     const inviteToken = crypto.randomUUID()
 
     // Check if user already exists
-    const { data: existingUser } = await supabaseClient.auth.admin.getUserByEmail(email)
+    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers()
+    const userExists = existingUser.users?.find(u => u.email === email)
     
-    if (existingUser.user) {
+    if (userExists) {
       throw new Error('User already exists with this email')
     }
 
     // Create invitation record
-    const { error: inviteError } = await supabaseClient
+    const { error: inviteError } = await supabaseAdmin
       .from('user_invitations')
       .insert([{
         email,
@@ -50,7 +52,7 @@ serve(async (req) => {
     // Create user account with temporary password
     const tempPassword = crypto.randomUUID()
     
-    const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
+    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password: tempPassword,
       email_confirm: true,
@@ -66,7 +68,7 @@ serve(async (req) => {
     }
 
     // Create profile
-    const { error: profileError } = await supabaseClient
+    const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .insert([{
         id: newUser.user!.id,
@@ -80,7 +82,7 @@ serve(async (req) => {
     }
 
     // Mark invitation as used
-    const { error: updateInviteError } = await supabaseClient
+    const { error: updateInviteError } = await supabaseAdmin
       .from('user_invitations')
       .update({ used_at: new Date().toISOString() })
       .eq('invite_token', inviteToken)
@@ -90,7 +92,7 @@ serve(async (req) => {
     }
 
     // Send password reset email for first login
-    const { error: resetError } = await supabaseClient.auth.admin.generateLink({
+    const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email,
     })

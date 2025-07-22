@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, Plus, Edit3, Trash2, GripVertical, 
   FileText, Video, Image, Brain, Save, ArrowLeft,
-  Eye, Users, Clock, Target
+  Eye, Users, Clock, Target, Sparkles, Upload, Wand2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -81,6 +81,13 @@ const CourseBuilder = () => {
     route: '',
     type: 'theory' // theory, exercise, quiz, video
   });
+
+  // AI Content Generation states
+  const [isAIGenerateOpen, setIsAIGenerateOpen] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiContent, setAiContent] = useState('');
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiAudience, setAiAudience] = useState('principianti');
 
   // Redirect if not authorized
   if (!loading && !canManageContent()) {
@@ -268,6 +275,84 @@ const CourseBuilder = () => {
     }
   };
 
+  const generateModulesWithAI = async () => {
+    if (!selectedCourse || !aiContent.trim()) return;
+
+    setAiGenerating(true);
+    try {
+      const response = await fetch(`https://dnircioicebnrdwifmkl.functions.supabase.co/ai-content-generator`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_modules',
+          content: aiContent,
+          topic: aiTopic,
+          targetAudience: aiAudience
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      // Create modules and lessons from AI response
+      for (const moduleData of data.modules) {
+        const moduleOrderIndex = modules.length + 1;
+        
+        const { data: newModule, error: moduleError } = await supabase
+          .from('modules')
+          .insert([{
+            id: `module-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            course_id: selectedCourse.id,
+            title: moduleData.title,
+            description: moduleData.description,
+            total_duration: moduleData.duration,
+            order_index: moduleOrderIndex
+          }])
+          .select()
+          .single();
+
+        if (moduleError) throw moduleError;
+
+        // Create lessons for this module
+        for (let i = 0; i < moduleData.lessons.length; i++) {
+          const lessonData = moduleData.lessons[i];
+          await supabase
+            .from('lessons')
+            .insert([{
+              id: `lesson-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`,
+              module_id: newModule.id,
+              title: lessonData.title,
+              description: lessonData.description,
+              duration: lessonData.duration,
+              route: `/${lessonData.title.toLowerCase().replace(/\s+/g, '-')}`,
+              order_index: i + 1
+            }]);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between modules
+      }
+
+      // Reload data
+      await loadModules(selectedCourse.id);
+      setAiContent('');
+      setIsAIGenerateOpen(false);
+      
+      toast({
+        title: "🎉 Successo",
+        description: `${data.modules.length} moduli generati automaticamente dall'AI!`,
+      });
+    } catch (error) {
+      console.error('Error generating modules:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile generare i moduli con AI",
+        variant: "destructive",
+      });
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
   const getLessonIcon = (type: string) => {
     switch (type) {
       case 'video': return <Video className="w-4 h-4" />;
@@ -448,13 +533,83 @@ const CourseBuilder = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-white">Moduli del Corso</CardTitle>
-                      <Dialog open={isCreateModuleOpen} onOpenChange={setIsCreateModuleOpen}>
-                        <DialogTrigger asChild>
-                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Aggiungi Modulo
-                          </Button>
-                        </DialogTrigger>
+                      <div className="flex space-x-2">
+                        <Dialog open={isAIGenerateOpen} onOpenChange={setIsAIGenerateOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Genera con AI
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-slate-800 border-slate-700 text-slate-200 max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle className="flex items-center">
+                                <Wand2 className="w-5 h-5 mr-2 text-purple-400" />
+                                Genera Moduli con AI
+                              </DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label>Argomento del corso</Label>
+                                <Input 
+                                  value={aiTopic}
+                                  onChange={(e) => setAiTopic(e.target.value)}
+                                  placeholder="es. Prompt Engineering, Marketing Digitale..."
+                                  className="bg-slate-700 border-slate-600"
+                                />
+                              </div>
+                              <div>
+                                <Label>Audience target</Label>
+                                <Select value={aiAudience} onValueChange={setAiAudience}>
+                                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-slate-700 border-slate-600">
+                                    <SelectItem value="principianti">Principianti</SelectItem>
+                                    <SelectItem value="intermedio">Livello Intermedio</SelectItem>
+                                    <SelectItem value="avanzato">Livello Avanzato</SelectItem>
+                                    <SelectItem value="professionisti">Professionisti</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label>Contenuto di base (testo, documenti, obiettivi)</Label>
+                                <Textarea 
+                                  value={aiContent}
+                                  onChange={(e) => setAiContent(e.target.value)}
+                                  placeholder="Incolla qui il testo da cui generare i moduli, oppure descrivi gli obiettivi del corso..."
+                                  rows={8}
+                                  className="bg-slate-700 border-slate-600"
+                                />
+                              </div>
+                              <Button 
+                                onClick={generateModulesWithAI} 
+                                disabled={aiGenerating || !aiContent.trim()}
+                                className="w-full bg-purple-600 hover:bg-purple-700"
+                              >
+                                {aiGenerating ? (
+                                  <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Generazione in corso...
+                                  </div>
+                                ) : (
+                                  <>
+                                    <Sparkles className="w-4 h-4 mr-2" />
+                                    Genera Moduli Automaticamente
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+
+                        <Dialog open={isCreateModuleOpen} onOpenChange={setIsCreateModuleOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Aggiungi Modulo
+                            </Button>
+                          </DialogTrigger>
                         <DialogContent className="bg-slate-800 border-slate-700 text-slate-200">
                           <DialogHeader>
                             <DialogTitle>Crea Nuovo Modulo</DialogTitle>
@@ -493,7 +648,8 @@ const CourseBuilder = () => {
                             </Button>
                           </div>
                         </DialogContent>
-                      </Dialog>
+                         </Dialog>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>

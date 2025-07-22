@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Users, BookOpen, BarChart3, Settings, Plus, FileText, Trophy, Clock, Target, Calendar } from 'lucide-react';
+import { Home, Users, BookOpen, BarChart3, Settings, Plus, FileText, Trophy, Clock, Target, Calendar, Bot, Library, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -191,12 +191,43 @@ const AdminDashboardLMS = () => {
                       </Button>
 
                       <Button 
-                        onClick={() => navigate('/admin/scheduler')}
+                        onClick={() => navigate('/live-sessions')}
                         className="bg-pink-600 hover:bg-pink-700 text-white h-20 flex-col"
                       >
                         <Calendar className="w-6 h-6 mb-2" />
                         Live Sessions
                       </Button>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <h3 className="text-lg font-medium text-slate-200 mb-4">🤖 AI Integration</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Button 
+                          onClick={() => navigate('/ai-tutor')}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white h-20 flex-col"
+                        >
+                          <Bot className="w-6 h-6 mb-2" />
+                          Personal AI Tutor
+                        </Button>
+
+                        <Button 
+                          onClick={() => navigate('/content-library')}
+                          className="bg-amber-600 hover:bg-amber-700 text-white h-20 flex-col"
+                        >
+                          <Library className="w-6 h-6 mb-2" />
+                          Content Library
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-4 mt-4">
+                        <Button 
+                          onClick={() => navigate('/learning-automations')}
+                          className="bg-cyan-600 hover:bg-cyan-700 text-white h-16 flex items-center justify-center"
+                        >
+                          <Sparkles className="w-5 h-5 mr-2" />
+                          Learning Automations
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -261,10 +292,10 @@ const AdminDashboardLMS = () => {
                       <div className="p-4 bg-slate-700/30 rounded-lg border-l-4 border-blue-500">
                         <h4 className="font-medium text-blue-300 mb-2">Fase 2 - AI e Automazione</h4>
                         <ul className="text-sm text-slate-400 space-y-1">
-                          <li>⏳ Personal AI Tutor</li>
-                          <li>⏳ Content Creation AI-Assisted</li>
-                          <li>⏳ Automazioni apprendimento</li>
-                          <li>⏳ Knowledge Base intelligente</li>
+                          <li>✅ Personal AI Tutor</li>
+                          <li>✅ Content Creation AI-Assisted</li>
+                          <li>🔄 Automazioni apprendimento</li>
+                          <li>✅ Knowledge Base intelligente</li>
                         </ul>
                       </div>
 

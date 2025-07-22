@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Target, Plus, Edit3, Trash2, Save, ArrowLeft, 
   FileQuestion, CheckCircle, XCircle, Circle,
-  Brain, Timer, Award, Eye
+  Brain, Timer, Award, Eye, Sparkles, Wand2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,6 +71,13 @@ const QuizBuilder = () => {
 
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [selectedModuleId, setSelectedModuleId] = useState('');
+
+  // AI Quiz Generation states
+  const [isAIQuizOpen, setIsAIQuizOpen] = useState(false);
+  const [aiQuizGenerating, setAiQuizGenerating] = useState(false);
+  const [aiQuizContent, setAiQuizContent] = useState('');
+  const [aiQuestionCount, setAiQuestionCount] = useState(5);
+  const [aiDifficulty, setAiDifficulty] = useState('intermedio');
 
   // Redirect if not authorized
   if (!loading && !canManageContent()) {
@@ -233,6 +240,64 @@ const QuizBuilder = () => {
       correct_answer: '',
       explanation: ''
     });
+  };
+
+  const generateQuestionsWithAI = async () => {
+    if (!selectedLesson || !aiQuizContent.trim()) return;
+
+    setAiQuizGenerating(true);
+    try {
+      const response = await fetch(`https://dnircioicebnrdwifmkl.functions.supabase.co/ai-content-generator`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_quiz',
+          content: aiQuizContent,
+          questionCount: aiQuestionCount,
+          difficulty: aiDifficulty
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      // Create questions from AI response
+      for (let i = 0; i < data.questions.length; i++) {
+        const questionData = data.questions[i];
+        const nextOrderIndex = quizQuestions.length + i + 1;
+        
+        await supabase
+          .from('quiz_questions')
+          .insert([{
+            lesson_id: selectedLesson.id,
+            question_text: questionData.question_text,
+            question_type: questionData.question_type,
+            options: questionData.question_type === 'multiple_choice' ? JSON.stringify(questionData.options) : null,
+            correct_answer: questionData.correct_answer,
+            explanation: questionData.explanation,
+            order_index: nextOrderIndex
+          }]);
+      }
+
+      // Reload questions
+      await loadQuizQuestions(selectedLesson.id);
+      setAiQuizContent('');
+      setIsAIQuizOpen(false);
+      
+      toast({
+        title: "🎉 Successo",
+        description: `${data.questions.length} domande generate automaticamente dall'AI!`,
+      });
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile generare le domande con AI",
+        variant: "destructive",
+      });
+    } finally {
+      setAiQuizGenerating(false);
+    }
   };
 
   const updateOption = (index: number, value: string) => {
@@ -441,13 +506,89 @@ const QuizBuilder = () => {
                           Gestisci le domande per questa lezione
                         </CardDescription>
                       </div>
-                      <Dialog open={isCreateQuestionOpen} onOpenChange={setIsCreateQuestionOpen}>
-                        <DialogTrigger asChild>
-                          <Button className="bg-blue-600 hover:bg-blue-700">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Nuova Domanda
-                          </Button>
-                        </DialogTrigger>
+                      <div className="flex space-x-2">
+                        <Dialog open={isAIQuizOpen} onOpenChange={setIsAIQuizOpen}>
+                          <DialogTrigger asChild>
+                            <Button className="bg-purple-600 hover:bg-purple-700">
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Genera con AI
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-slate-800 border-slate-700 text-slate-200 max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle className="flex items-center">
+                                <Wand2 className="w-5 h-5 mr-2 text-purple-400" />
+                                Genera Quiz con AI
+                              </DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label>Numero di domande</Label>
+                                  <Select value={aiQuestionCount.toString()} onValueChange={(val) => setAiQuestionCount(parseInt(val))}>
+                                    <SelectTrigger className="bg-slate-700 border-slate-600">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-slate-700 border-slate-600">
+                                      <SelectItem value="3">3 domande</SelectItem>
+                                      <SelectItem value="5">5 domande</SelectItem>
+                                      <SelectItem value="10">10 domande</SelectItem>
+                                      <SelectItem value="15">15 domande</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label>Difficoltà</Label>
+                                  <Select value={aiDifficulty} onValueChange={setAiDifficulty}>
+                                    <SelectTrigger className="bg-slate-700 border-slate-600">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-slate-700 border-slate-600">
+                                      <SelectItem value="facile">Facile</SelectItem>
+                                      <SelectItem value="intermedio">Intermedio</SelectItem>
+                                      <SelectItem value="difficile">Difficile</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div>
+                                <Label>Contenuto della lezione</Label>
+                                <Textarea 
+                                  value={aiQuizContent}
+                                  onChange={(e) => setAiQuizContent(e.target.value)}
+                                  placeholder="Incolla qui il contenuto della lezione da cui generare le domande..."
+                                  rows={8}
+                                  className="bg-slate-700 border-slate-600"
+                                />
+                              </div>
+                              <Button 
+                                onClick={generateQuestionsWithAI} 
+                                disabled={aiQuizGenerating || !aiQuizContent.trim()}
+                                className="w-full bg-purple-600 hover:bg-purple-700"
+                              >
+                                {aiQuizGenerating ? (
+                                  <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Generazione in corso...
+                                  </div>
+                                ) : (
+                                  <>
+                                    <Sparkles className="w-4 h-4 mr-2" />
+                                    Genera Domande Automaticamente
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+
+                        <Dialog open={isCreateQuestionOpen} onOpenChange={setIsCreateQuestionOpen}>
+                          <DialogTrigger asChild>
+                            <Button className="bg-blue-600 hover:bg-blue-700">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Nuova Domanda
+                            </Button>
+                          </DialogTrigger>
                         <DialogContent className="bg-slate-800 border-slate-700 text-slate-200 max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Crea Nuova Domanda</DialogTitle>
@@ -584,7 +725,8 @@ const QuizBuilder = () => {
                             </Button>
                           </div>
                         </DialogContent>
-                      </Dialog>
+                       </Dialog>
+                      </div>
                     </div>
                   </CardHeader>
                 </Card>

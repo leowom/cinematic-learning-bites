@@ -141,7 +141,7 @@ USER_REQUEST: ${prompt}`;
     }}>
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -155,21 +155,21 @@ USER_REQUEST: ${prompt}`;
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium">
+            <div className="text-slate-200 font-medium text-sm">
               Modulo 3.0 - PDF + Prompt
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-xs">
               Prompt to Value
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
+            <div className="text-slate-300 text-xs">
               Progresso: 60%
             </div>
-            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+            <div className="w-20 bg-slate-700/60 rounded-full h-1.5 mt-1">
               <div 
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: '60%' }}
               />
             </div>
@@ -189,11 +189,11 @@ USER_REQUEST: ${prompt}`;
           <div className="flex-1 min-w-0">
             <div className="max-w-4xl mx-auto">
               {/* Header */}
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold text-white mb-4">
+              <div className="text-center mb-6">
+                <h1 className="text-3xl font-bold text-white mb-3">
                   🧠 LearningBites AI
                 </h1>
-                <p className="text-slate-300 text-lg">
+                <p className="text-slate-300 text-base">
                   MODULO 3 – Prompt to Value: trasforma i tuoi file in risultati concreti
                 </p>
               </div>

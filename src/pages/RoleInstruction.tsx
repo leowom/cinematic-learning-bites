@@ -76,7 +76,7 @@ const RoleInstruction = () => {
       }}>
         <div className="prompt-lab-container">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
             <div className="flex items-center space-x-4">
               <Button
                 onClick={() => navigate('/dashboard')}
@@ -90,16 +90,16 @@ const RoleInstruction = () => {
             </div>
 
             <div className="text-center">
-              <div className="text-slate-200 font-medium">
+              <div className="text-slate-200 font-medium text-sm">
                 Modulo 2.3 – Dare un ruolo all'AI nel prompt
               </div>
-              <div className="text-slate-400 text-sm">
+              <div className="text-slate-400 text-xs">
                 2 Esercizi Comparativi
               </div>
             </div>
 
             <div className="text-right">
-              <div className="text-slate-300 text-sm">
+              <div className="text-slate-300 text-xs">
                 Ruoli Esperti
               </div>
             </div>
@@ -171,7 +171,7 @@ const RoleInstruction = () => {
     }}>
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -185,21 +185,21 @@ const RoleInstruction = () => {
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium">
+            <div className="text-slate-200 font-medium text-sm">
               Modulo 2.3 – Dare un ruolo all'AI nel prompt
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-xs">
               Esercizio {currentStep + 1} di {exercises.length}
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
+            <div className="text-slate-300 text-xs">
               Progresso: {completedSteps.filter(Boolean).length}/{exercises.length}
             </div>
-            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+            <div className="w-20 bg-slate-700/60 rounded-full h-1.5 mt-1">
               <div
-                className="bg-indigo-500 h-2 rounded-full transition-all duration-300"
+                className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${(completedSteps.filter(Boolean).length / exercises.length) * 100}%` }}
               />
             </div>

@@ -84,7 +84,7 @@ const FormatControl = () => {
       }}>
         <div className="prompt-lab-container">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
             <div className="flex items-center space-x-4">
               <Button
                 onClick={() => navigate('/dashboard')}
@@ -98,16 +98,16 @@ const FormatControl = () => {
             </div>
 
             <div className="text-center">
-              <div className="text-slate-200 font-medium">
+              <div className="text-slate-200 font-medium text-sm">
                 Modulo 2.2 – Controllare il formato dell'output
               </div>
-              <div className="text-slate-400 text-sm">
+              <div className="text-slate-400 text-xs">
                 3 Esercizi Comparativi
               </div>
             </div>
 
             <div className="text-right">
-              <div className="text-slate-300 text-sm">
+              <div className="text-slate-300 text-xs">
                 Prima & Dopo
               </div>
             </div>
@@ -185,7 +185,7 @@ const FormatControl = () => {
     }}>
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -199,21 +199,21 @@ const FormatControl = () => {
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium">
+            <div className="text-slate-200 font-medium text-sm">
               Modulo 2.2 – Controllare il formato dell'output
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-xs">
               Esercizio {currentStep + 1} di {exercises.length}
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
+            <div className="text-slate-300 text-xs">
               Progresso: {completedSteps.filter(Boolean).length}/{exercises.length}
             </div>
-            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+            <div className="w-20 bg-slate-700/60 rounded-full h-1.5 mt-1">
               <div
-                className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+                className="bg-orange-500 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${(completedSteps.filter(Boolean).length / exercises.length) * 100}%` }}
               />
             </div>
@@ -250,69 +250,55 @@ const FormatControl = () => {
                     </div>
 
                     {/* Original Prompt */}
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-white mb-3">📝 Prompt Base (sempre lo stesso)</h3>
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                        <div className="flex items-center mb-3">
-                          <User className="w-5 h-5 mr-2 text-blue-400" />
-                          <span className="text-blue-300 font-medium">Input Utente</span>
-                        </div>
-                        <div className="bg-blue-600 text-white rounded-lg px-4 py-3 inline-block max-w-[90%]">
+                    <div className="demo-horizontal mb-4">
+                      <div className="demo-section">
+                        <h3 className="text-base font-semibold text-white mb-2">📝 Prompt Base</h3>
+                        <div className="bg-blue-600 text-white rounded-lg px-3 py-2">
                           <p className="text-sm">{currentExercise.prompt}</p>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Without Format */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-white">❌ Senza formato specificato</h3>
-                      </div>
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                        <div className="flex items-center mb-3">
-                          <Bot className="w-5 h-5 mr-2 text-red-400" />
-                          <span className="text-red-300 font-medium">Risposta AI</span>
-                        </div>
-                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3">
+                      {/* Without Format */}
+                      <div className="demo-section">
+                        <h3 className="text-base font-semibold text-white mb-2">❌ Senza formato</h3>
+                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-3 py-2 max-h-32 overflow-y-auto">
                           <p className="text-sm whitespace-pre-line">{currentExercise.outputWithoutFormat}</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* With Format Request */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-white">✅ Con formato richiesto</h3>
-                      </div>
+                    {/* With Format */}
+                    <div className="mb-4">
+                      <h3 className="text-base font-semibold text-white mb-2">✅ Con formato richiesto</h3>
                       
                       {/* Format Request */}
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4">
-                        <div className="flex items-center mb-3">
-                          <User className="w-5 h-5 mr-2 text-blue-400" />
-                          <span className="text-blue-300 font-medium">Aggiunta al Prompt</span>
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3 mb-3">
+                        <div className="flex items-center mb-2">
+                          <User className="w-4 h-4 mr-2 text-blue-400" />
+                          <span className="text-blue-300 font-medium text-sm">Aggiunta al Prompt</span>
                         </div>
-                        <div className="bg-blue-600 text-white rounded-lg px-4 py-3 inline-block max-w-[90%]">
+                        <div className="bg-blue-600 text-white rounded-lg px-3 py-2">
                           <p className="text-sm">{currentExercise.formatRequest}</p>
                         </div>
                       </div>
 
                       {/* Formatted Output */}
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                        <div className="flex items-center mb-3">
-                          <Bot className="w-5 h-5 mr-2 text-emerald-400" />
-                          <span className="text-emerald-300 font-medium">Risposta AI Formattata</span>
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
+                        <div className="flex items-center mb-2">
+                          <Bot className="w-4 h-4 mr-2 text-emerald-400" />
+                          <span className="text-emerald-300 font-medium text-sm">Risposta AI Formattata</span>
                         </div>
-                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3">
+                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-3 py-2 max-h-40 overflow-y-auto">
                           <pre className="text-sm whitespace-pre-wrap font-mono">{currentExercise.outputWithFormat}</pre>
                         </div>
                       </div>
                     </div>
 
                     {/* Tooltip */}
-                    <div className={`bg-${currentExercise.color}-900/20 border border-${currentExercise.color}-700/40 rounded-lg p-4 mb-6`}>
+                    <div className={`bg-${currentExercise.color}-900/20 border border-${currentExercise.color}-700/40 rounded-lg p-3 mb-4`}>
                       <div className="flex items-center mb-2">
-                        <Lightbulb className={`w-5 h-5 mr-2 text-${currentExercise.color}-400`} />
-                        <span className={`text-${currentExercise.color}-300 font-medium`}>Perché funziona meglio?</span>
+                        <Lightbulb className={`w-4 h-4 mr-2 text-${currentExercise.color}-400`} />
+                        <span className={`text-${currentExercise.color}-300 font-medium text-sm`}>Perché funziona meglio?</span>
                       </div>
                       <p className="text-slate-300 text-sm">{currentExercise.tooltip}</p>
                     </div>

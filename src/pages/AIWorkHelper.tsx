@@ -89,7 +89,7 @@ const AIWorkHelper = () => {
       }}>
         <div className="prompt-lab-container">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
             <div className="flex items-center space-x-4">
               <Button 
                 onClick={() => navigate('/dashboard')} 
@@ -103,16 +103,16 @@ const AIWorkHelper = () => {
             </div>
 
             <div className="text-center">
-              <div className="text-slate-200 font-medium">
+              <div className="text-slate-200 font-medium text-sm">
                 Modulo 1.2 - Scopri come l'IA può aiutarti nel tuo lavoro
               </div>
-              <div className="text-slate-400 text-sm">
+              <div className="text-slate-400 text-xs">
                 LearningBites AI
               </div>
             </div>
 
             <div className="text-right">
-              <div className="text-slate-300 text-sm">
+              <div className="text-slate-300 text-xs">
                 Esperienza Interattiva
               </div>
             </div>
@@ -296,7 +296,7 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
     }}>
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button 
               onClick={() => navigate('/dashboard')} 
@@ -310,21 +310,21 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium">
+            <div className="text-slate-200 font-medium text-sm">
               LearningBites AI - Scopri come l'IA può aiutarti
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-xs">
               {allStepsCompleted ? 'Conversazione Personalizzata' : `Passo ${currentStep + 1} di ${stepData.length}`}
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
+            <div className="text-slate-300 text-xs">
               Progresso: {stepData.filter(s => s.isCompleted).length}/{stepData.length}
             </div>
-            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+            <div className="w-20 bg-slate-700/60 rounded-full h-1.5 mt-1">
               <div 
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${(stepData.filter(s => s.isCompleted).length / stepData.length) * 100}%` }}
               />
             </div>
@@ -409,17 +409,17 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
 
               {/* Main Chat Interface */}
               <div className="col-span-12 lg:col-span-8">
-                <div className="step-card glassmorphism-base flex flex-col h-[600px]">
+                <div className="step-card glassmorphism-base flex flex-col h-[450px]">
                   <div className="section-spacing flex-1 flex flex-col min-h-0">
                     {!allStepsCompleted ? (
                       <>
                         {/* Current Step Question */}
-                        <div className="mb-6 flex-shrink-0">
-                          <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold text-white">
+                        <div className="mb-4 flex-shrink-0">
+                          <div className="flex items-center justify-between mb-3">
+                            <h2 className="text-lg font-bold text-white">
                               {currentStepData.title}
                             </h2>
-                            <Badge variant="outline" className="text-emerald-300 border-emerald-500/50">
+                            <Badge variant="outline" className="text-emerald-300 border-emerald-500/50 text-xs">
                               {currentStep + 1}/{stepData.length}
                             </Badge>
                           </div>

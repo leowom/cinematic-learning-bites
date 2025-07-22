@@ -193,8 +193,8 @@ const LLMFundamentals = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
       <div className="prompt-lab-container">
-        {/* Header - Same as Prompt Lab */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -208,21 +208,21 @@ const LLMFundamentals = () => {
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium">
+            <div className="text-slate-200 font-medium text-sm">
               LLM Fundamentals
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-xs">
               Passo 1 di 1
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
+            <div className="text-slate-300 text-xs">
               Progresso: {Math.round(progressPercentage)}%
             </div>
-            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+            <div className="w-20 bg-slate-700/60 rounded-full h-1.5 mt-1">
               <div 
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -310,28 +310,28 @@ const LLMFundamentals = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="mt-6">
+                  <div className="mt-4">
                     {!quizCompleted ? (
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
-                        <div className="flex items-center mb-6">
-                          <Award className="w-6 h-6 mr-3 text-yellow-400" />
-                          <h3 className="text-xl font-semibold text-white">Quiz di Validazione</h3>
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                        <div className="flex items-center mb-4">
+                          <Award className="w-5 h-5 mr-2 text-yellow-400" />
+                          <h3 className="text-lg font-semibold text-white">Quiz di Validazione</h3>
                         </div>
                         
-                        <div className="space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                           {quizQuestions.map((question, index) => (
-                            <div key={question.id} className="bg-slate-700/30 border border-slate-600/40 rounded-lg p-5">
-                              <h4 className="text-white font-medium mb-4 text-lg">
+                            <div key={question.id} className="bg-slate-700/30 border border-slate-600/40 rounded-lg p-3">
+                              <h4 className="text-white font-medium mb-3 text-sm">
                                 {index + 1}. {question.question}
                               </h4>
                               
                               <RadioGroup
                                 value={answers[question.id] || ''}
                                 onValueChange={(value) => handleAnswerChange(question.id, value)}
-                                className="space-y-3"
+                                className="space-y-2"
                               >
                                 {question.options.map((option) => (
-                                  <div key={option.id} className="flex items-center space-x-3">
+                                  <div key={option.id} className="flex items-center space-x-2">
                                     <RadioGroupItem 
                                       value={option.id} 
                                       id={`q${question.id}_${option.id}`}
@@ -339,9 +339,9 @@ const LLMFundamentals = () => {
                                     />
                                     <Label 
                                       htmlFor={`q${question.id}_${option.id}`}
-                                      className="text-slate-200 cursor-pointer flex-1 hover:text-white transition-colors"
+                                      className="text-slate-200 cursor-pointer flex-1 hover:text-white transition-colors text-sm"
                                     >
-                                      <span className="font-medium text-blue-300 mr-2">{option.id})</span>
+                                      <span className="font-medium text-blue-300 mr-1">{option.id})</span>
                                       {option.text}
                                     </Label>
                                   </div>
@@ -351,10 +351,11 @@ const LLMFundamentals = () => {
                           ))}
                         </div>
                         
-                        <div className="flex justify-between items-center mt-8">
+                        <div className="flex justify-between items-center mt-6">
                           <Button
                             onClick={() => setShowQuiz(false)}
                             variant="ghost"
+                            size="sm"
                             className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                           >
                             ← Torna al Video
@@ -362,6 +363,7 @@ const LLMFundamentals = () => {
                           <Button
                             onClick={submitQuiz}
                             disabled={!isQuizComplete}
+                            size="sm"
                             className="bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Invia Risposte ({Object.keys(answers).length}/{quizQuestions.length})

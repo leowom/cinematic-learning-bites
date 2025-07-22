@@ -20,8 +20,8 @@ const IntroduzioneCourse = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
       <div className="prompt-lab-container">
-        {/* Header - Same as Prompt Lab */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -35,16 +35,16 @@ const IntroduzioneCourse = () => {
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium">
+            <div className="text-slate-200 font-medium text-sm">
               Introduzione
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-xs">
               Passo 1 di 1
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-sm">
+            <div className="text-slate-300 text-xs">
               Modulo 1
             </div>
           </div>
@@ -94,15 +94,15 @@ const IntroduzioneCourse = () => {
 
                 {/* Descrizione */}
                 <div className="element-spacing">
-                  <h3 className="text-lg font-semibold text-white mb-3">Descrizione della Lezione</h3>
-                  <p className="text-slate-300 leading-relaxed mb-4">
+                  <h3 className="text-lg font-semibold text-white mb-2">Descrizione della Lezione</h3>
+                  <p className="text-slate-300 leading-relaxed mb-3">
                     {currentLessonData.description}. In questo video fondamentale, 
                     esploreremo i concetti chiave che definiranno il tuo percorso verso il successo 
                     nell'ecosistema dell'intelligenza artificiale.
                   </p>
                   
-                  <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4">
-                    <h4 className="text-blue-300 font-medium mb-2">💡 Punti Chiave</h4>
+                  <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3">
+                    <h4 className="text-blue-300 font-medium mb-2 text-sm">💡 Punti Chiave</h4>
                     <ul className="text-slate-300 text-sm space-y-1">
                       <li>• Comprensione dei fondamenti dell'AI applicata al business</li>
                       <li>• Identificazione delle opportunità di mercato emergenti</li>
@@ -112,16 +112,18 @@ const IntroduzioneCourse = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-6">
+                <div className="flex justify-between items-center mt-4">
                   <Button
                     onClick={() => navigate('/dashboard')}
                     variant="ghost"
+                    size="sm"
                     className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                   >
                     Torna alla Dashboard
                   </Button>
                   <Button
                     onClick={() => navigate('/llm-fundamentals')}
+                    size="sm"
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
                     Modulo 1 →

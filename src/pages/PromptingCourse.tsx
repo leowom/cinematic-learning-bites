@@ -3,9 +3,11 @@ import { Home, User, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CourseSidebar from '@/components/CourseSidebar';
+import { useNavigation } from '@/hooks/useNavigation';
 
 const PromptingCourse = () => {
   const navigate = useNavigate();
+  const { goToNextLesson, goToPreviousLesson } = useNavigation();
   const [currentLesson, setCurrentLesson] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -114,17 +116,17 @@ const PromptingCourse = () => {
                 {/* Navigation Buttons */}
                 <div className="flex justify-between items-center mt-6">
                   <Button
-                    onClick={() => navigate('/ai-tutorial-interactive')}
+                    onClick={() => goToPreviousLesson('/prompting')}
                     variant="ghost"
                     className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                   >
-                    ← Modulo 1.2
+                    ← Lezione precedente
                   </Button>
                   <Button
-                    onClick={() => navigate('/contesto')}
+                    onClick={() => goToNextLesson('/prompting')}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    Modulo 2.1 →
+                    Prossima lezione →
                   </Button>
                 </div>
               </div>

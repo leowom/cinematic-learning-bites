@@ -416,7 +416,7 @@ const AITutorialInteractive = () => {
                       </Button>
                       
                       {isCompleted ? (
-                        <Button onClick={() => navigate('/prompting')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <Button onClick={() => navigate('/course/corso-prompting/lesson/prompting')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                           <Award className="w-4 h-4 mr-2" />
                           Modulo 2 →
                         </Button>

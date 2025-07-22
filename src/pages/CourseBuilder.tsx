@@ -528,31 +528,31 @@ const CourseBuilder = () => {
                   {courses.map((course) => (
                     <div
                       key={course.id}
-                      onClick={() => setSelectedCourse(course)}
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${
                         selectedCourse?.id === course.id 
                           ? 'bg-emerald-600/20 border-emerald-500/50' 
                           : 'bg-slate-700/30 hover:bg-slate-700/50'
-                      } border`}
+                      } border group`}
+                      onClick={() => setSelectedCourse(course)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0 pr-2">
                           <div className="font-medium text-slate-200 truncate">{course.title}</div>
                           <div className="text-xs text-slate-400 mt-1">{course.total_duration}</div>
-                          <div className="text-xs text-slate-500 mt-1">
-                            {course.description?.substring(0, 80)}...
+                          <div className="text-xs text-slate-500 mt-1 line-clamp-2">
+                            {course.description?.substring(0, 60)}...
                           </div>
                         </div>
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 ml-2"
+                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 h-8 w-8 p-0"
                           onClick={(e) => {
                             e.stopPropagation();
                             openDeleteDialog(course);
                           }}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3 h-3" />
                         </Button>
                       </div>
                     </div>

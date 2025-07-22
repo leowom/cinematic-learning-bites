@@ -16,6 +16,8 @@ import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminDashboardLMS from "./pages/AdminDashboardLMS";
+import CourseBuilder from "./pages/CourseBuilder";
+import QuizBuilder from "./pages/QuizBuilder";
 import Auth from "./pages/Auth";
 import PromptEngineeringLab from "./pages/PromptEngineeringLab";
 import AITransformationDay1 from "./pages/AITransformationDay1";
@@ -55,6 +57,8 @@ const App = () => (
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin-lms" element={<ProtectedRoute><AdminDashboardLMS /></ProtectedRoute>} />
+              <Route path="/admin/course-builder" element={<ProtectedRoute><CourseBuilder /></ProtectedRoute>} />
+              <Route path="/admin/quiz-builder" element={<ProtectedRoute><QuizBuilder /></ProtectedRoute>} />
               <Route path="/course-index" element={<ProtectedRoute><CourseIndex /></ProtectedRoute>} />
               <Route path="/prompt-lab" element={<ProtectedRoute><PromptEngineeringLab /></ProtectedRoute>} />
               <Route path="/ai-transformation-day1" element={<ProtectedRoute><AITransformationDay1 /></ProtectedRoute>} />

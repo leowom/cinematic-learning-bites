@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Users, ArrowLeft, Search, UserPlus, Shield, 
   BookOpen, Award, Calendar, MoreHorizontal, 
-  Edit3, Trash2, Eye, Filter
+  Edit3, Trash2, Eye, Filter, Settings as SettingsIcon,
+  BarChart3, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,9 +13,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import AdvancedUserManagement from '@/components/AdvancedUserManagement';
+import SystemConfiguration from '@/components/SystemConfiguration';
 
 interface UserProfile {
   id: string;

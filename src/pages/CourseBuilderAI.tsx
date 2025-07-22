@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Upload, FileText, Wand2, Eye, Save, Edit3, 
   ArrowLeft, Plus, Book, Brain, Target, Clock,
-  CheckCircle, AlertCircle, Download, Trash2
+  CheckCircle, AlertCircle, Download, Trash2, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,10 +13,14 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+
+// Import our new enhanced components
+import AIStatusChecker from '@/components/CourseBuilderAI/AIStatusChecker';
+import PDFProcessor from '@/components/CourseBuilderAI/PDFProcessor';
+import CoursePreviewEnhanced from '@/components/CourseBuilderAI/CoursePreviewEnhanced';
 
 interface GeneratedCourse {
   courseTitle: string;
@@ -116,96 +120,6 @@ const CourseBuilderAI = () => {
     });
   };
 
-  const extractTextFromPDF = async (): Promise<string> => {
-    if (!selectedFile) throw new Error('Nessun file selezionato');
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const arrayBuffer = reader.result as ArrayBuffer;
-          const uint8Array = new Uint8Array(arrayBuffer);
-          
-          // Convert to base64 for transmission
-          let binary = '';
-          uint8Array.forEach(byte => binary += String.fromCharCode(byte));
-          const base64 = btoa(binary);
-          
-          // For now, we'll use a simple text extraction approach
-          // In production, you'd want proper PDF parsing
-          const text = `Contenuto estratto dal PDF: ${selectedFile.name}
-          
-Nota: Questo è un esempio di testo estratto. In un'implementazione reale, 
-qui ci sarebbe il contenuto completo del PDF usando una libreria di parsing PDF.
-
-Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'Testo Manuale'.`;
-          
-          resolve(text);
-        } catch (error) {
-          reject(new Error('Errore nell\'estrazione del testo dal PDF'));
-        }
-      };
-      reader.onerror = () => reject(new Error('Errore nella lettura del file'));
-      reader.readAsArrayBuffer(selectedFile);
-    });
-  };
-
-  const parsePDFContent = async () => {
-    if (!selectedFile && !rawText.trim()) {
-      toast({
-        title: "Errore",
-        description: "Inserisci contenuto o carica un PDF",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsProcessing(true);
-    setProcessingStep('Estrazione e pulizia testo...');
-
-    try {
-      let contentToProcess = rawText;
-      
-      if (selectedFile && inputMethod === 'pdf') {
-        contentToProcess = await extractTextFromPDF();
-      }
-
-      const response = await supabase.functions.invoke('ai-content-generator', {
-        body: {
-          action: 'parse_pdf',
-          pdfContent: contentToProcess
-        }
-      });
-
-      if (response.error) throw new Error(response.error.message);
-
-      setParsedContent(response.data);
-      
-      // Auto-populate config with suggestions
-      setConfig(prev => ({
-        ...prev,
-        topic: prev.topic || response.data.suggestedTitle
-      }));
-
-      setActiveTab('generate');
-      toast({
-        title: "✨ Contenuto analizzato",
-        description: `${response.data.wordCount} parole estratte e pulite`,
-      });
-
-    } catch (error) {
-      console.error('Error parsing content:', error);
-      toast({
-        title: "Errore",
-        description: error.message || "Impossibile elaborare il contenuto",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-      setProcessingStep('');
-    }
-  };
-
   const generateFullCourse = async () => {
     if (!parsedContent && !rawText.trim()) {
       toast({
@@ -217,10 +131,12 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
     }
 
     setIsProcessing(true);
-    setProcessingStep('Generazione corso con AI...');
+    setProcessingStep('Generazione corso completo con AI...');
 
     try {
       const contentToUse = parsedContent?.cleanedText || rawText;
+      
+      console.log('🚀 Starting full course generation with enhanced prompts...');
       
       const response = await supabase.functions.invoke('ai-content-generator', {
         body: {
@@ -233,18 +149,32 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
         }
       });
 
-      if (response.error) throw new Error(response.error.message);
+      console.log('🎯 AI Generator Response:', response);
+
+      if (response.error) {
+        console.error('❌ AI Generation Error:', response.error);
+        throw new Error(response.error.message || 'Errore nella generazione AI');
+      }
+
+      if (!response.data) {
+        throw new Error('Nessun dato ricevuto dalla funzione AI');
+      }
+
+      // Validate the generated course structure
+      if (!response.data.courseTitle || !response.data.modules || response.data.modules.length === 0) {
+        throw new Error('Struttura del corso generata non valida');
+      }
 
       setGeneratedCourse(response.data);
       setActiveTab('preview');
       
       toast({
-        title: "🎉 Corso generato!",
-        description: `${response.data.modules.length} moduli con micro-learning`,
+        title: "🎉 Corso generato con successo!",
+        description: `${response.data.modules.length} moduli con micro-learning creati`,
       });
 
     } catch (error) {
-      console.error('Error generating course:', error);
+      console.error('❌ Error generating course:', error);
       toast({
         title: "Errore",
         description: error.message || "Impossibile generare il corso",
@@ -263,10 +193,7 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
     setProcessingStep('Salvataggio nel database...');
 
     try {
-      console.log('Calling save-course function with:', {
-        courseData: generatedCourse,
-        targetAudience: config.targetAudience
-      });
+      console.log('💾 Saving course to database...');
 
       const response = await supabase.functions.invoke('save-course', {
         body: {
@@ -275,7 +202,7 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
         }
       });
 
-      console.log('Save course response:', response);
+      console.log('💾 Save Response:', response);
 
       if (response.error) {
         throw new Error(response.error.message || 'Errore nella chiamata alla funzione di salvataggio');
@@ -287,14 +214,14 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
 
       toast({
         title: "🚀 Corso pubblicato!",
-        description: response.data.message || "Il corso è stato salvato e pubblicato con successo",
+        description: "Il corso è stato salvato e pubblicato con successo nel sistema",
       });
 
-      // Navigate to course list or dashboard
+      // Navigate back to course builder
       navigate('/admin/course-builder');
 
     } catch (error) {
-      console.error('Error saving course:', error);
+      console.error('❌ Error saving course:', error);
       toast({
         title: "Errore",
         description: error.message || "Impossibile salvare il corso nel database",
@@ -348,23 +275,28 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
           <div className="text-center">
             <div className="text-slate-200 font-medium text-xl flex items-center">
               <Brain className="w-6 h-6 mr-2 text-emerald-400" />
-              AI Course Builder
+              AI Course Builder Enhanced
             </div>
             <div className="text-slate-400 text-sm">
-              Genera corsi automaticamente da PDF o testo con micro-learning
+              Generazione automatica avanzata con micro-learning
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
             <Badge variant="outline" className="text-emerald-300 border-emerald-500/50">
-              <Wand2 className="w-3 h-3 mr-1" />
-              AI Powered
+              <Zap className="w-3 h-3 mr-1" />
+              AI Enhanced
             </Badge>
             <Button onClick={resetAll} variant="outline" size="sm" className="text-slate-300 border-slate-600">
               <Trash2 className="w-4 h-4 mr-1" />
               Reset
             </Button>
           </div>
+        </div>
+
+        {/* System Status */}
+        <div className="mb-6">
+          <AIStatusChecker />
         </div>
 
         {/* Processing Overlay */}
@@ -374,7 +306,7 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
               <div className="flex items-center space-x-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                 <div>
-                  <div className="font-medium">Elaborazione in corso...</div>
+                  <div className="font-medium">Elaborazione AI in corso...</div>
                   <div className="text-sm text-slate-400">{processingStep}</div>
                 </div>
               </div>
@@ -409,10 +341,10 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Upload className="w-5 h-5 mr-2" />
-                  Carica Contenuto
+                  Carica Contenuto Avanzato
                 </CardTitle>
                 <CardDescription className="text-slate-400">
-                  Carica un PDF o inserisci il testo manualmente per generare il corso
+                  Upload PDF o inserisci testo per generazione AI avanzata
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -451,51 +383,51 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
                           {selectedFile ? selectedFile.name : 'Clicca per caricare PDF'}
                         </div>
                         <div className="text-sm text-slate-400 mt-2">
-                          Massimo 10MB - Solo file PDF
+                          Massimo 10MB - Elaborazione AI avanzata
                         </div>
                       </label>
                     </div>
 
                     {selectedFile && (
-                      <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg border border-slate-600/50">
-                        <div className="flex items-center space-x-3">
-                          <FileText className="w-5 h-5 text-emerald-400" />
-                          <div>
-                            <div className="font-medium">{selectedFile.name}</div>
-                            <div className="text-sm text-slate-400">
-                              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                            </div>
-                          </div>
-                        </div>
-                        <Button onClick={() => setSelectedFile(null)} variant="ghost" size="sm">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      <PDFProcessor
+                        selectedFile={selectedFile}
+                        onProcessed={(parsedContent) => {
+                          setParsedContent(parsedContent);
+                          setConfig(prev => ({
+                            ...prev,
+                            topic: prev.topic || parsedContent.suggestedTitle
+                          }));
+                          setActiveTab('generate');
+                        }}
+                        isProcessing={isProcessing}
+                        setIsProcessing={setIsProcessing}
+                      />
                     )}
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <Label className="text-slate-300">Incolla il testo del contenuto</Label>
+                    <Label className="text-slate-300">Incolla il contenuto del documento</Label>
                     <Textarea
                       value={rawText}
                       onChange={(e) => setRawText(e.target.value)}
-                      placeholder="Incolla qui il contenuto del documento che vuoi trasformare in corso..."
+                      placeholder="Incolla qui il contenuto che vuoi trasformare in corso..."
                       className="bg-slate-700 border-slate-600 text-slate-200 min-h-[200px]"
                     />
                     <div className="text-sm text-slate-400">
                       Parole: {rawText.split(/\s+/).filter(word => word.length > 0).length}
                     </div>
+                    
+                    {rawText.trim() && (
+                      <Button 
+                        onClick={() => setActiveTab('generate')}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        <Brain className="w-4 h-4 mr-2" />
+                        Procedi alla Generazione
+                      </Button>
+                    )}
                   </div>
                 )}
-
-                <Button 
-                  onClick={parsePDFContent} 
-                  disabled={!selectedFile && !rawText.trim()}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700"
-                >
-                  <Brain className="w-4 h-4 mr-2" />
-                  Analizza Contenuto
-                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -505,9 +437,9 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-slate-800/50 border-slate-700/50 text-slate-200">
                 <CardHeader>
-                  <CardTitle>Configurazione Corso</CardTitle>
+                  <CardTitle>Configurazione Corso Avanzata</CardTitle>
                   <CardDescription className="text-slate-400">
-                    Personalizza la struttura del corso generato
+                    Personalizza la generazione AI del corso
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -574,7 +506,7 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
                     disabled={!parsedContent && !rawText.trim()}
                   >
                     <Wand2 className="w-4 h-4 mr-2" />
-                    Genera Corso Completo
+                    Genera Corso Completo con AI
                   </Button>
                 </CardContent>
               </Card>
@@ -595,7 +527,7 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
                       </div>
                       <div className="bg-slate-700/30 p-3 rounded-lg">
                         <div className="text-sm text-slate-400">Argomenti</div>
-                        <div className="text-xl font-bold text-emerald-400">{parsedContent.mainTopics.length}</div>
+                        <div className="text-xl font-bold text-emerald-400">{parsedContent.mainTopics?.length || 0}</div>
                       </div>
                     </div>
 
@@ -622,184 +554,15 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
             </div>
           </TabsContent>
 
-          {/* Preview Tab */}
+          {/* Preview Tab - Enhanced */}
           <TabsContent value="preview" className="space-y-6">
             {generatedCourse && (
-              <div className="space-y-6">
-                {/* Course Overview */}
-                <Card className="bg-slate-800/50 border-slate-700/50 text-slate-200">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-xl">{generatedCourse.courseTitle}</CardTitle>
-                        <CardDescription className="text-slate-400 mt-2">
-                          {generatedCourse.description}
-                        </CardDescription>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center text-slate-300">
-                          <Clock className="w-4 h-4 mr-2" />
-                          {generatedCourse.totalDuration}
-                        </div>
-                        <div className="text-sm text-slate-400 mt-1">
-                          {generatedCourse.modules.length} moduli • {generatedCourse.modules.reduce((acc, mod) => acc + mod.lessons.length, 0)} lezioni
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-
-                {/* Course Modules */}
-                <Card className="bg-slate-800/50 border-slate-700/50 text-slate-200">
-                  <CardHeader>
-                    <CardTitle>Struttura del Corso</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Accordion type="multiple" className="space-y-4">
-                      {generatedCourse.modules.map((module, moduleIndex) => (
-                        <AccordionItem key={moduleIndex} value={`module-${moduleIndex}`} className="border-slate-600">
-                          <AccordionTrigger className="text-slate-200 hover:text-slate-100">
-                            <div className="flex items-center justify-between w-full pr-4">
-                              <div className="text-left">
-                                <div className="font-medium">{module.moduleTitle}</div>
-                                <div className="text-sm text-slate-400">{module.description}</div>
-                              </div>
-                              <Badge variant="outline" className="text-emerald-300 border-emerald-500/50">
-                                {module.lessons.length} lezioni
-                              </Badge>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="space-y-4 pt-4">
-                            {/* Learning Objectives */}
-                            <div className="bg-slate-700/30 p-4 rounded-lg">
-                              <h4 className="font-medium text-slate-200 mb-2 flex items-center">
-                                <Target className="w-4 h-4 mr-2 text-emerald-400" />
-                                Obiettivi di Apprendimento
-                              </h4>
-                              <ul className="text-sm text-slate-300 space-y-1">
-                                {module.learningObjectives.map((objective, index) => (
-                                  <li key={index} className="flex items-start">
-                                    <span className="text-emerald-400 mr-2">•</span>
-                                    {objective}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            {/* Lessons */}
-                            <div className="space-y-3">
-                              {module.lessons.map((lesson, lessonIndex) => (
-                                <div key={lessonIndex} className="bg-slate-700/20 p-4 rounded-lg border border-slate-600/50">
-                                  <div className="flex items-center justify-between mb-3">
-                                    <h4 className="font-medium text-slate-200">{lesson.lessonTitle}</h4>
-                                    <Badge variant="outline" className="text-slate-300 border-slate-500">
-                                      {lesson.duration}
-                                    </Badge>
-                                  </div>
-                                  
-                                  <div className="text-sm text-slate-300 mb-3 leading-relaxed">
-                                    {lesson.content}
-                                  </div>
-
-                                  {/* Slides */}
-                                  <div className="mb-3">
-                                    <div className="text-sm font-medium text-slate-200 mb-2">📊 Slide Script:</div>
-                                    <ul className="text-sm text-slate-300 space-y-1">
-                                      {lesson.slides.map((slide, slideIndex) => (
-                                        <li key={slideIndex} className="flex items-start">
-                                          <span className="text-emerald-400 mr-2">•</span>
-                                          {slide}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-
-                                  {/* Examples */}
-                                  <div className="mb-3">
-                                    <div className="text-sm font-medium text-slate-200 mb-2">💡 Esempi:</div>
-                                    <div className="text-sm text-slate-300 space-y-2">
-                                      {lesson.examples.map((example, exampleIndex) => (
-                                        <div key={exampleIndex} className="bg-slate-700/30 p-2 rounded text-xs">
-                                          {example}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-
-                                  {/* Quiz */}
-                                  <div>
-                                    <div className="text-sm font-medium text-slate-200 mb-2">❓ Quiz:</div>
-                                    {lesson.quiz.map((quiz, quizIndex) => (
-                                      <div key={quizIndex} className="bg-slate-700/30 p-3 rounded text-sm">
-                                        <div className="text-slate-200 mb-2 font-medium">{quiz.question}</div>
-                                        <div className="space-y-1 mb-2">
-                                          {quiz.options.map((option, optionIndex) => (
-                                            <div key={optionIndex} className={`text-xs p-1 rounded ${
-                                              option === quiz.correctAnswer ? 'bg-emerald-600/20 text-emerald-300' : 'text-slate-400'
-                                            }`}>
-                                              {String.fromCharCode(65 + optionIndex)}) {option}
-                                            </div>
-                                          ))}
-                                        </div>
-                                        <div className="text-xs text-slate-400">
-                                          💬 {quiz.explanation}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </CardContent>
-                </Card>
-
-                {/* Final Test */}
-                <Card className="bg-slate-800/50 border-slate-700/50 text-slate-200">
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Brain className="w-5 h-5 mr-2 text-emerald-400" />
-                      Test Finale
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {generatedCourse.finalTest.map((question, index) => (
-                      <div key={index} className="bg-slate-700/30 p-4 rounded-lg">
-                        <div className="font-medium text-slate-200 mb-3">
-                          {index + 1}. {question.question}
-                        </div>
-                        <div className="space-y-2 mb-3">
-                          {question.options.map((option, optionIndex) => (
-                            <div key={optionIndex} className={`text-sm p-2 rounded ${
-                              option === question.correctAnswer ? 'bg-emerald-600/20 text-emerald-300' : 'text-slate-400'
-                            }`}>
-                              {String.fromCharCode(65 + optionIndex)}) {option}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="text-sm text-slate-400">
-                          💬 {question.explanation}
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Action Buttons */}
-                <div className="flex justify-center space-x-4">
-                  <Button onClick={() => setActiveTab('edit')} variant="outline" className="border-slate-600 text-slate-300">
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Modifica Prima di Salvare
-                  </Button>
-                  <Button onClick={saveCourseToDatabase} className="bg-emerald-600 hover:bg-emerald-700">
-                    <Save className="w-4 h-4 mr-2" />
-                    Salva e Pubblica Corso
-                  </Button>
-                </div>
-              </div>
+              <CoursePreviewEnhanced
+                generatedCourse={generatedCourse}
+                onSave={saveCourseToDatabase}
+                onEdit={() => setActiveTab('edit')}
+                isSaving={isProcessing}
+              />
             )}
           </TabsContent>
 
@@ -807,25 +570,31 @@ Per questo esempio, puoi incollare manualmente il contenuto del PDF nella tab 'T
           <TabsContent value="edit" className="space-y-6">
             <Card className="bg-slate-800/50 border-slate-700/50 text-slate-200">
               <CardHeader>
-                <CardTitle>Modalità Modifica</CardTitle>
+                <CardTitle>Modalità Modifica Avanzata</CardTitle>
                 <CardDescription className="text-slate-400">
-                  Personalizza il corso prima di pubblicarlo
+                  Editor completo per personalizzazione corso
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <Edit3 className="mx-auto h-16 w-16 text-slate-400 mb-4" />
                   <div className="text-lg font-medium text-slate-200 mb-2">
-                    Editor Avanzato
+                    Editor Avanzato in Sviluppo
                   </div>
                   <div className="text-slate-400 mb-4">
                     La modalità di modifica avanzata sarà disponibile nella prossima versione.
-                    Per ora puoi rigenerare il corso con parametri diversi.
+                    Per ora puoi rigenerare il corso con parametri diversi o salvare come è.
                   </div>
-                  <Button onClick={() => setActiveTab('generate')} variant="outline" className="border-slate-600 text-slate-300">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Torna alla Generazione
-                  </Button>
+                  <div className="flex justify-center space-x-4">
+                    <Button onClick={() => setActiveTab('generate')} variant="outline" className="border-slate-600 text-slate-300">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Torna alla Generazione
+                    </Button>
+                    <Button onClick={saveCourseToDatabase} className="bg-emerald-600 hover:bg-emerald-700">
+                      <Save className="w-4 h-4 mr-2" />
+                      Salva Comunque
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

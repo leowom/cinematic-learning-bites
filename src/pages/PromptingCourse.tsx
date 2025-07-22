@@ -18,8 +18,8 @@ const PromptingCourse = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
       <div className="prompt-lab-container">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        {/* Header - Same as Prompt Lab */}
+        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -33,16 +33,16 @@ const PromptingCourse = () => {
           </div>
 
             <div className="text-center">
-              <div className="text-slate-200 font-medium text-sm">
+              <div className="text-slate-200 font-medium">
                 Modulo 2 - Prompting
               </div>
-              <div className="text-slate-400 text-xs">
+              <div className="text-slate-400 text-sm">
                 Passo 1 di 5
               </div>
             </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-xs">
+            <div className="text-slate-300 text-sm">
               Modulo 2 - Prompting
             </div>
           </div>

@@ -191,68 +191,74 @@ const LLMFundamentals = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
-      {/* Compact Header */}
-      <div className="flex items-center justify-between py-2 px-6 bg-slate-800/30 border-b border-slate-700/40">
-        <Button
-          onClick={() => navigate('/dashboard')}
-          variant="ghost"
-          size="sm"
-          className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-        >
-          <Home className="w-4 h-4 mr-2" />
-          Dashboard
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" style={{background: 'linear-gradient(135deg, #1a2434 0%, #0f172a 50%, #1a2434 100%)'}}>
+      <div className="prompt-lab-container">
+        {/* Header - Same as Prompt Lab */}
+        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={() => navigate('/dashboard')}
+              variant="ghost"
+              size="sm"
+              className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </div>
 
-        <div className="text-center">
-          <div className="text-slate-200 font-medium text-sm">LLM Fundamentals</div>
-          <div className="text-slate-400 text-xs">Passo 1 di 1</div>
-        </div>
+          <div className="text-center">
+            <div className="text-slate-200 font-medium">
+              LLM Fundamentals
+            </div>
+            <div className="text-slate-400 text-sm">
+              Passo 1 di 1
+            </div>
+          </div>
 
-        <div className="flex items-center space-x-4">
-          <div className="text-slate-300 text-xs">Progresso: {Math.round(progressPercentage)}%</div>
-          <div className="w-20 bg-slate-700/60 rounded-full h-1.5">
-            <div 
-              className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercentage}%` }}
-            />
+          <div className="text-right">
+            <div className="text-slate-300 text-sm">
+              Progresso: {Math.round(progressPercentage)}%
+            </div>
+            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
+              <div 
+                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex h-[calc(100vh-60px)]">
-        <CourseSidebar 
-          currentModuleId="modulo-1"
-          currentLessonId="0"
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+        <div className="flex gap-6 relative">
+          <CourseSidebar 
+            currentModuleId="modulo-1"
+            currentLessonId="0"
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
 
-        {/* Main Content - Horizontal Layout */}
-        <div className="flex-1 overflow-hidden">
-          <div className="h-full flex">
-            
-            {/* Left Column - Video */}
-            <div className="flex-1 min-w-0 p-4">
-              <div className="bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 h-full flex flex-col">
-                <div className="mb-3">
-                  <h2 className="text-lg font-bold text-white mb-1">
+          {/* Main Content - Video Player */}
+          <div className="flex-1 min-w-0">
+            <div className="step-card glassmorphism-base">
+              <div className="section-spacing">
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white mb-2">
                     {currentLessonData.title}
                   </h2>
-                  <div className="flex items-center space-x-4 text-slate-400 text-xs">
+                  <div className="flex items-center space-x-4 text-slate-400 text-sm">
                     <div className="flex items-center">
-                      <User className="w-3 h-3 mr-1" />
+                      <User className="w-4 h-4 mr-1" />
                       AI Expert
                     </div>
                     <div className="flex items-center">
-                      <Clock className="w-3 h-3 mr-1" />
+                      <Clock className="w-4 h-4 mr-1" />
                       {currentLessonData.duration}
                     </div>
                   </div>
                 </div>
 
-                {/* Video Player - Takes most space */}
-                <div className="flex-1 relative bg-black rounded-lg overflow-hidden mb-3">
+                {/* Video Player */}
+                <div className="relative bg-black rounded-lg overflow-hidden mb-4" style={{ aspectRatio: '16/9' }}>
                   <iframe
                     width="100%"
                     height="100%"
@@ -265,171 +271,155 @@ const LLMFundamentals = () => {
                   />
                 </div>
 
-                {/* Bottom Navigation */}
+                {/* Descrizione */}
+                <div className="element-spacing">
+                  <h3 className="text-lg font-semibold text-white mb-3">Descrizione della Lezione</h3>
+                  <p className="text-slate-300 leading-relaxed mb-4">
+                    {currentLessonData.description}. In questo modulo approfondiremo l'architettura 
+                    e il funzionamento dei Large Language Models, scoprendo le migliori pratiche 
+                    per una comunicazione efficace e strategie avanzate di prompt engineering.
+                  </p>
+                  
+                  <div className="bg-purple-900/20 border border-purple-700/40 rounded-lg p-4">
+                    <h4 className="text-purple-300 font-medium mb-2">🧠 Argomenti Trattati</h4>
+                    <ul className="text-slate-300 text-sm space-y-1">
+                      <li>• Architettura e meccanismi di funzionamento degli LLM</li>
+                      <li>• Tecniche di prompt engineering per risultati ottimali</li>
+                      <li>• Limitazioni e bias dei modelli linguistici</li>
+                      <li>• Strategie per conversazioni più efficaci con l'AI</li>
+                      <li>• Best practices per diverse tipologie di task</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Quiz Section */}
                 {!showQuiz ? (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mt-6">
                     <Button
                       onClick={() => navigate('/introduzione')}
                       variant="ghost"
-                      size="sm"
                       className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                     >
-                      ← Precedente
+                      ← Modulo Precedente
                     </Button>
                     <Button
                       onClick={() => setShowQuiz(true)}
-                      size="sm"
                       className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     >
-                      Inizia Quiz
+                      Inizia Quiz di Validazione
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-center">
-                    <Button
-                      onClick={() => setShowQuiz(false)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-                    >
-                      ← Torna al Video
-                    </Button>
-                    {quizCompleted && score >= 4 && (
-                      <Button
-                        onClick={() => navigate('/ai-work-helper')}
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                      >
-                        Modulo 1.2 →
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right Column - Description & Quiz */}
-            <div className="w-1/2 min-w-0 p-4 overflow-y-auto">
-              <div className="bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 h-full">
-                
-                {!showQuiz ? (
-                  <>
-                    {/* Descrizione Compatta */}
-                    <h3 className="text-lg font-semibold text-white mb-2">Descrizione</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed mb-3">
-                      {currentLessonData.description}. Approfondiremo l'architettura dei Large Language Models 
-                      e le migliori pratiche per una comunicazione efficace.
-                    </p>
-                    
-                    <div className="bg-purple-900/20 border border-purple-700/40 rounded-lg p-3">
-                      <h4 className="text-purple-300 font-medium mb-2 text-sm">🧠 Argomenti</h4>
-                      <ul className="text-slate-300 text-xs space-y-1">
-                        <li>• Architettura e meccanismi degli LLM</li>
-                        <li>• Tecniche di prompt engineering</li>
-                        <li>• Limitazioni e bias dei modelli</li>
-                        <li>• Strategie per conversazioni efficaci</li>
-                        <li>• Best practices per diversi task</li>
-                      </ul>
-                    </div>
-                  </>
-                ) : !quizCompleted ? (
-                  <>
-                    <div className="flex items-center mb-3">
-                      <Award className="w-4 h-4 mr-2 text-yellow-400" />
-                      <h3 className="text-lg font-semibold text-white">Quiz di Validazione</h3>
-                    </div>
-                    
-                    <div className="space-y-3 mb-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-                      {quizQuestions.map((question, index) => (
-                        <div key={question.id} className="bg-slate-700/30 border border-slate-600/40 rounded-lg p-3">
-                          <h4 className="text-white font-medium mb-2 text-sm">
-                            {index + 1}. {question.question}
-                          </h4>
-                          
-                          <RadioGroup
-                            value={answers[question.id] || ''}
-                            onValueChange={(value) => handleAnswerChange(question.id, value)}
-                            className="space-y-1"
-                          >
-                            {question.options.map((option) => (
-                              <div key={option.id} className="flex items-center space-x-2">
-                                <RadioGroupItem 
-                                  value={option.id} 
-                                  id={`q${question.id}_${option.id}`}
-                                  className="border-slate-400 text-blue-400"
-                                />
-                                <Label 
-                                  htmlFor={`q${question.id}_${option.id}`}
-                                  className="text-slate-200 cursor-pointer flex-1 hover:text-white transition-colors text-xs"
-                                >
-                                  <span className="font-medium text-blue-300 mr-1">{option.id})</span>
-                                  {option.text}
-                                </Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
+                  <div className="mt-6">
+                    {!quizCompleted ? (
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
+                        <div className="flex items-center mb-6">
+                          <Award className="w-6 h-6 mr-3 text-yellow-400" />
+                          <h3 className="text-xl font-semibold text-white">Quiz di Validazione</h3>
                         </div>
-                      ))}
-                    </div>
-                    
-                    <Button
-                      onClick={submitQuiz}
-                      disabled={!isQuizComplete}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
-                    >
-                      Invia Risposte ({Object.keys(answers).length}/{quizQuestions.length})
-                    </Button>
-                  </>
-                ) : (
-                  <div className="text-center">
-                    <div className="mb-4">
-                      <Award className="w-12 h-12 mx-auto mb-3 text-yellow-400" />
-                      <h3 className="text-lg font-bold text-white mb-2">Quiz Completato!</h3>
-                      <p className="text-slate-300 text-sm">
-                        Punteggio: <span className="text-emerald-400 font-bold">{score}/{quizQuestions.length}</span>
-                      </p>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <div className={`inline-block px-4 py-2 rounded-lg font-semibold text-sm ${
-                        score >= 6 
-                          ? 'bg-emerald-900/30 border border-emerald-600/50 text-emerald-300' 
-                          : score >= 4 
-                          ? 'bg-yellow-900/30 border border-yellow-600/50 text-yellow-300'
-                          : 'bg-red-900/30 border border-red-600/50 text-red-300'
-                      }`}>
-                        {score >= 6 ? '🎉 Eccellente!' : score >= 4 ? '👍 Buon Lavoro!' : '📚 Rivedi il Materiale'}
+                        
+                        <div className="space-y-6">
+                          {quizQuestions.map((question, index) => (
+                            <div key={question.id} className="bg-slate-700/30 border border-slate-600/40 rounded-lg p-5">
+                              <h4 className="text-white font-medium mb-4 text-lg">
+                                {index + 1}. {question.question}
+                              </h4>
+                              
+                              <RadioGroup
+                                value={answers[question.id] || ''}
+                                onValueChange={(value) => handleAnswerChange(question.id, value)}
+                                className="space-y-3"
+                              >
+                                {question.options.map((option) => (
+                                  <div key={option.id} className="flex items-center space-x-3">
+                                    <RadioGroupItem 
+                                      value={option.id} 
+                                      id={`q${question.id}_${option.id}`}
+                                      className="border-slate-400 text-blue-400"
+                                    />
+                                    <Label 
+                                      htmlFor={`q${question.id}_${option.id}`}
+                                      className="text-slate-200 cursor-pointer flex-1 hover:text-white transition-colors"
+                                    >
+                                      <span className="font-medium text-blue-300 mr-2">{option.id})</span>
+                                      {option.text}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </RadioGroup>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-8">
+                          <Button
+                            onClick={() => setShowQuiz(false)}
+                            variant="ghost"
+                            className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                          >
+                            ← Torna al Video
+                          </Button>
+                          <Button
+                            onClick={submitQuiz}
+                            disabled={!isQuizComplete}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Invia Risposte ({Object.keys(answers).length}/{quizQuestions.length})
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    
-                    {score < 6 && (
-                      <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3 mb-4">
-                        <p className="text-blue-300 text-xs">
-                          💡 Rivedi il video per consolidare le conoscenze
-                        </p>
+                    ) : (
+                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6 text-center">
+                        <div className="mb-6">
+                          <Award className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
+                          <h3 className="text-2xl font-bold text-white mb-2">Quiz Completato!</h3>
+                          <p className="text-slate-300 text-lg">
+                            Hai risposto correttamente a <span className="text-emerald-400 font-bold">{score}</span> domande su {quizQuestions.length}
+                          </p>
+                        </div>
+                        
+                        <div className="mb-6">
+                          <div className={`inline-block px-6 py-3 rounded-lg font-semibold text-lg ${
+                            score >= 6 
+                              ? 'bg-emerald-900/30 border border-emerald-600/50 text-emerald-300' 
+                              : score >= 4 
+                              ? 'bg-yellow-900/30 border border-yellow-600/50 text-yellow-300'
+                              : 'bg-red-900/30 border border-red-600/50 text-red-300'
+                          }`}>
+                            {score >= 6 ? '🎉 Eccellente!' : score >= 4 ? '👍 Buon Lavoro!' : '📚 Rivedi il Materiale'}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {score < 6 && (
+                            <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4 mb-4">
+                              <p className="text-blue-300 text-sm">
+                                💡 Consiglio: Rivedi il video per consolidare le tue conoscenze sugli LLM
+                              </p>
+                            </div>
+                          )}
+                          
+                          <div className="flex justify-center gap-4">
+                            <Button
+                              onClick={resetQuiz}
+                              variant="ghost"
+                              className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
+                            >
+                              <RotateCcw className="w-4 h-4 mr-2" />
+                              Riprova Quiz
+                            </Button>
+                            {score >= 4 && (
+                              <Button
+                                onClick={() => navigate('/ai-work-helper')}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                              >
+                                Modulo 1.2 →
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
-                    
-                    <div className="space-y-2">
-                      <Button
-                        onClick={resetQuiz}
-                        variant="ghost"
-                        size="sm"
-                        className="w-full text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
-                      >
-                        <RotateCcw className="w-3 h-3 mr-2" />
-                        Riprova Quiz
-                      </Button>
-                      {score >= 4 && (
-                        <Button
-                          onClick={() => navigate('/ai-work-helper')}
-                          size="sm"
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                        >
-                          Modulo 1.2 →
-                        </Button>
-                      )}
-                    </div>
                   </div>
                 )}
               </div>

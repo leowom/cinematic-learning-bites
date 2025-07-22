@@ -151,7 +151,7 @@ const EditOutput = () => {
       }}>
         <div className="prompt-lab-container">
           {/* Header */}
-          <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+          <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
             <div className="flex items-center space-x-4">
               <Button
                 onClick={() => navigate('/dashboard')}
@@ -165,16 +165,16 @@ const EditOutput = () => {
             </div>
 
             <div className="text-center">
-              <div className="text-slate-200 font-medium text-sm">
+              <div className="text-slate-200 font-medium">
                 Modulo 2.4 – Chiedere modifiche all'output
               </div>
-              <div className="text-slate-400 text-xs">
+              <div className="text-slate-400 text-sm">
                 Esercizio Interattivo
               </div>
             </div>
 
             <div className="text-right">
-              <div className="text-slate-300 text-xs">
+              <div className="text-slate-300 text-sm">
                 Pratica Guidata
               </div>
             </div>
@@ -246,7 +246,7 @@ const EditOutput = () => {
     }}>
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -260,16 +260,16 @@ const EditOutput = () => {
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium text-sm">
+            <div className="text-slate-200 font-medium">
               {currentExercise === 2 ? 'Modulo 2.4 – Completato!' : exercises[currentExercise]?.title || 'Modulo 2.4 – Chiedere modifiche all\'output'}
             </div>
-            <div className="text-slate-400 text-xs">
+            <div className="text-slate-400 text-sm">
               {currentExercise === 2 ? 'Congratulazioni!' : `Esercizio ${currentExercise + 1} di ${exercises.length}`}
             </div>
           </div>
 
           <div className="text-right">
-            <Badge variant="outline" className={`${exerciseCompleted ? 'text-emerald-300 border-emerald-500/50' : 'text-green-300 border-green-500/50'} text-xs`}>
+            <Badge variant="outline" className={`${exerciseCompleted ? 'text-emerald-300 border-emerald-500/50' : 'text-green-300 border-green-500/50'}`}>
               {exerciseCompleted ? 'Completato!' : 'In Corso'}
             </Badge>
           </div>
@@ -368,7 +368,7 @@ const EditOutput = () => {
                       )}
 
                       {/* Chat Area */}
-                      <div ref={chatContainerRef} className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-3 mb-3 overflow-y-auto chat-compact">
+                      <div ref={chatContainerRef} className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4 overflow-y-auto min-h-[400px] max-h-[500px]">
                         <div className="space-y-4">
                          {chatMessages.map((message, index) => (
                            <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>

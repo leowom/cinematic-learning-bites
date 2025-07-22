@@ -301,7 +301,7 @@ const Module3CodeByPrompt: React.FC = () => {
     }}>
       <div className="prompt-lab-container">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-slate-700/40 rounded-lg">
+        <div className="flex items-center justify-between mb-6 p-4 bg-slate-800/30 border border-slate-700/40 rounded-lg">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => navigate('/dashboard')}
@@ -315,21 +315,21 @@ const Module3CodeByPrompt: React.FC = () => {
           </div>
 
           <div className="text-center">
-            <div className="text-slate-200 font-medium text-sm">
+            <div className="text-slate-200 font-medium">
               Modulo 3.3 - Code by Prompt
             </div>
-            <div className="text-slate-400 text-xs">
+            <div className="text-slate-400 text-sm">
               Crea app funzionanti con l'AI
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-slate-300 text-xs">
+            <div className="text-slate-300 text-sm">
               Progresso: 75%
             </div>
-            <div className="w-20 bg-slate-700/60 rounded-full h-1.5 mt-1">
+            <div className="w-24 bg-slate-700/60 rounded-full h-2 mt-1">
               <div 
-                className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
+                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: '75%' }}
               />
             </div>
@@ -349,11 +349,11 @@ const Module3CodeByPrompt: React.FC = () => {
           <div className="flex-1 min-w-0">
             <div className="max-w-6xl mx-auto">
               {/* Header */}
-              <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold text-white mb-3">
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold text-white mb-4">
                   🧠 LearningBites AI
                 </h1>
-                <p className="text-slate-300 text-base">
+                <p className="text-slate-300 text-lg">
                   MODULO 3.3 – Code by Prompt: crea un'app funzionante con l'AI
                 </p>
               </div>

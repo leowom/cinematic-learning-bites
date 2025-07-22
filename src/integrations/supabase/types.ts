@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      bulk_import_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_log: Json | null
+          failed_imports: number | null
+          filename: string
+          id: string
+          initiated_by: string | null
+          status: string | null
+          successful_imports: number | null
+          total_records: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_log?: Json | null
+          failed_imports?: number | null
+          filename: string
+          id?: string
+          initiated_by?: string | null
+          status?: string | null
+          successful_imports?: number | null
+          total_records: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_log?: Json | null
+          failed_imports?: number | null
+          filename?: string
+          id?: string
+          initiated_by?: string | null
+          status?: string | null
+          successful_imports?: number | null
+          total_records?: number
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           created_at: string
@@ -123,6 +162,72 @@ export type Database = {
             columns: ["module_id"]
             isOneToOne: false
             referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_sessions: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          instructor_id: string
+          lesson_id: string | null
+          max_participants: number | null
+          meeting_link: string | null
+          recording_link: string | null
+          session_date: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          instructor_id: string
+          lesson_id?: string | null
+          max_participants?: number | null
+          meeting_link?: string | null
+          recording_link?: string | null
+          session_date: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          instructor_id?: string
+          lesson_id?: string | null
+          max_participants?: number | null
+          meeting_link?: string | null
+          recording_link?: string | null
+          session_date?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_sessions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "live_sessions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
         ]
@@ -269,6 +374,38 @@ export type Database = {
           },
         ]
       }
+      session_participants: {
+        Row: {
+          attendance_status: string | null
+          id: string
+          registered_at: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          attendance_status?: string | null
+          id?: string
+          registered_at?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          attendance_status?: string | null
+          id?: string
+          registered_at?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_enrollments: {
         Row: {
           completed_at: string | null
@@ -306,6 +443,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_invitations: {
+        Row: {
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          invite_token: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          expires_at?: string
+          id?: string
+          invite_token: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          invite_token?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          used_at?: string | null
+        }
+        Relationships: []
       }
       user_progress: {
         Row: {
@@ -357,6 +527,12 @@ export type Database = {
       is_admin_or_instructor: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      sync_missing_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          synced_count: number
+        }[]
       }
     }
     Enums: {

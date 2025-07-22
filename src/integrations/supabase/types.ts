@@ -19,6 +19,10 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          level: string | null
+          prerequisites: string[] | null
+          tags: string[] | null
+          target_role: string | null
           title: string
           total_duration: string
           updated_at: string
@@ -27,6 +31,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           id: string
+          level?: string | null
+          prerequisites?: string[] | null
+          tags?: string[] | null
+          target_role?: string | null
           title: string
           total_duration: string
           updated_at?: string
@@ -35,9 +43,46 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          level?: string | null
+          prerequisites?: string[] | null
+          tags?: string[] | null
+          target_role?: string | null
           title?: string
           total_duration?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      learning_paths: {
+        Row: {
+          course_sequence: string[]
+          created_at: string | null
+          description: string | null
+          estimated_duration: string | null
+          id: string
+          target_role: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          course_sequence: string[]
+          created_at?: string | null
+          description?: string | null
+          estimated_duration?: string | null
+          id: string
+          target_role?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          course_sequence?: string[]
+          created_at?: string | null
+          description?: string | null
+          estimated_duration?: string | null
+          id?: string
+          target_role?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -220,6 +265,44 @@ export type Database = {
             columns: ["question_id"]
             isOneToOne: false
             referencedRelation: "quiz_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_enrollments: {
+        Row: {
+          completed_at: string | null
+          course_id: string
+          enrolled_at: string | null
+          id: string
+          progress_percentage: number | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: string
+          enrolled_at?: string | null
+          id?: string
+          progress_percentage?: number | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string
+          enrolled_at?: string | null
+          id?: string
+          progress_percentage?: number | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]

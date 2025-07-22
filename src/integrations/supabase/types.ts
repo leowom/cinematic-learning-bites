@@ -526,6 +526,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_course_cascade: {
+        Args: { course_id_param: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _user_id: string

@@ -59,7 +59,10 @@ const CourseBuilder = () => {
   const [isCreateCourseOpen, setIsCreateCourseOpen] = useState(false);
   const [isCreateModuleOpen, setIsCreateModuleOpen] = useState(false);
   const [isCreateLessonOpen, setIsCreateLessonOpen] = useState(false);
+  const [isDeleteCourseOpen, setIsDeleteCourseOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
   const [loadingData, setLoadingData] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [newCourse, setNewCourse] = useState({
@@ -353,6 +356,56 @@ const CourseBuilder = () => {
     }
   };
 
+  const deleteCourse = async () => {
+    if (!courseToDelete) return;
+    
+    setDeleting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const response = await supabase.functions.invoke('delete-course', {
+        body: { courseId: courseToDelete.id }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to delete course');
+      }
+
+      // Remove course from local state
+      setCourses(prev => prev.filter(c => c.id !== courseToDelete.id));
+      
+      // Clear selection if deleted course was selected
+      if (selectedCourse?.id === courseToDelete.id) {
+        setSelectedCourse(null);
+        setModules([]);
+        setLessons([]);
+      }
+      
+      setCourseToDelete(null);
+      setIsDeleteCourseOpen(false);
+      
+      toast({
+        title: "Successo",
+        description: "Corso eliminato con successo",
+      });
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Impossibile eliminare il corso",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const openDeleteDialog = (course: Course) => {
+    setCourseToDelete(course);
+    setIsDeleteCourseOpen(true);
+  };
+
   const getLessonIcon = (type: string) => {
     switch (type) {
       case 'video': return <Video className="w-4 h-4" />;
@@ -482,10 +535,25 @@ const CourseBuilder = () => {
                           : 'bg-slate-700/30 hover:bg-slate-700/50'
                       } border`}
                     >
-                      <div className="font-medium text-slate-200 truncate">{course.title}</div>
-                      <div className="text-xs text-slate-400 mt-1">{course.total_duration}</div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        {course.description?.substring(0, 80)}...
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="font-medium text-slate-200 truncate">{course.title}</div>
+                          <div className="text-xs text-slate-400 mt-1">{course.total_duration}</div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            {course.description?.substring(0, 80)}...
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 ml-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteDialog(course);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -802,6 +870,56 @@ const CourseBuilder = () => {
             )}
           </div>
         </div>
+
+        {/* Delete Course Confirmation Dialog */}
+        <Dialog open={isDeleteCourseOpen} onOpenChange={setIsDeleteCourseOpen}>
+          <DialogContent className="bg-slate-800 border-slate-700 text-slate-200">
+            <DialogHeader>
+              <DialogTitle className="text-red-400">Elimina Corso</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-slate-300">
+                Sei sicuro di voler eliminare il corso <strong>"{courseToDelete?.title}"</strong>?
+              </div>
+              <div className="text-sm text-slate-400 bg-slate-700/50 p-3 rounded-lg">
+                <strong>Attenzione:</strong> Questa azione eliminerà permanentemente:
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Il corso e tutti i suoi moduli</li>
+                  <li>Tutte le lezioni e i contenuti</li>
+                  <li>I quiz e le domande associate</li>
+                  <li>Il progresso degli studenti per questo corso</li>
+                  <li>Le iscrizioni al corso</li>
+                </ul>
+              </div>
+              <div className="flex space-x-2 pt-4">
+                <Button
+                  onClick={() => setIsDeleteCourseOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Annulla
+                </Button>
+                <Button
+                  onClick={deleteCourse}
+                  disabled={deleting}
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                >
+                  {deleting ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Eliminando...
+                    </div>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Elimina Definitivamente
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

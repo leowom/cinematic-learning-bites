@@ -95,6 +95,11 @@ const CourseIndex = () => {
     navigate(lesson.route);
   };
 
+  const handleStartCourse = () => {
+    // Always start from the first lesson
+    navigate('/introduzione');
+  };
+
   const getStatusIcon = (status: Module['status']) => {
     switch (status) {
       case 'completed':
@@ -219,11 +224,22 @@ const CourseIndex = () => {
           <div className="max-w-4xl mx-auto space-y-8">
             {/* Course Overview */}
             <div className="step-card glassmorphism-base p-6">
-              <h2 className="text-xl font-semibold text-white mb-4">Panoramica del Corso</h2>
-              <p className="text-slate-300 mb-6">
-                Impara i concetti fondamentali dell'Intelligenza Artificiale e dei Large Language Models. 
-                Scopri come utilizzare e integrare modelli AI nelle tue applicazioni professionali.
-              </p>
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-white mb-4">Panoramica del Corso</h2>
+                  <p className="text-slate-300 mb-6">
+                    Impara i concetti fondamentali dell'Intelligenza Artificiale e dei Large Language Models. 
+                    Scopri come utilizzare e integrare modelli AI nelle tue applicazioni professionali.
+                  </p>
+                </div>
+                <button
+                  onClick={handleStartCourse}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2 font-medium"
+                >
+                  <Play className="w-5 h-5" />
+                  <span>{overallProgress > 0 ? 'Continua corso' : 'Inizia corso'}</span>
+                </button>
+              </div>
               
               <div className="w-full bg-slate-700/60 rounded-full h-3 mb-2">
                 <div 

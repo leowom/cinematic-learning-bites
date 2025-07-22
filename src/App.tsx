@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import LoadingScreen from "./components/LoadingScreen";
@@ -83,6 +83,12 @@ const App = () => (
 
               {/* Legacy course routes - keep for backward compatibility */}
               <Route path="/corso-prompting" element={<ProtectedRoute><CourseIndex /></ProtectedRoute>} />
+              
+              {/* Redirect specific course access to the first lesson */}
+              <Route path="/course/corso-prompting" element={<Navigate to="/introduzione" replace />} />
+              <Route path="/course/corso-prompting/lesson/introduzione" element={<Navigate to="/introduzione" replace />} />
+              <Route path="/course/corso-prompting/lesson/prompting" element={<Navigate to="/prompting" replace />} />
+              <Route path="/course/corso-prompting/lesson/contesto" element={<Navigate to="/contesto" replace />} />
 
               {/* Other pages */}
               <Route path="/prompt-lab" element={<ProtectedRoute><PromptEngineeringLab /></ProtectedRoute>} />

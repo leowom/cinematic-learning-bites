@@ -294,63 +294,67 @@ const ContestoExercise = () => {
                   </div>
                 </div>
 
-                {/* Demo Steps */}
+                {/* Demo Steps - Horizontal Layout */}
                 {currentStepData.type === 'demo' && (
-                  <div className="space-y-6">
-                    {/* Prompt */}
-                    <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                      <div className="flex items-center mb-3">
-                        <User className="w-5 h-5 mr-2 text-blue-400" />
-                        <span className="text-blue-300 font-medium">Input Utente</span>
+                  <div className="space-y-4">
+                    <div className="demo-horizontal">
+                      {/* Prompt */}
+                      <div className="demo-section">
+                        <div className="flex items-center mb-2">
+                          <User className="w-4 h-4 mr-2 text-blue-400" />
+                          <span className="text-blue-300 font-medium text-sm">Input Utente</span>
+                        </div>
+                        <div className="bg-blue-600 text-white rounded-lg px-3 py-2">
+                          <p className="text-sm">{currentStepData.demoPrompt}</p>
+                        </div>
                       </div>
-                      <div className="bg-blue-600 text-white rounded-lg px-4 py-3 inline-block max-w-[80%]">
-                        <p className="text-sm">{currentStepData.demoPrompt}</p>
+
+                      {/* Response */}
+                      <div className="demo-section">
+                        <div className="flex items-center mb-2">
+                          <Bot className="w-4 h-4 mr-2 text-purple-400" />
+                          <span className="text-purple-300 font-medium text-sm">Risposta AI</span>
+                        </div>
+                        <div className="bg-slate-700/50 text-slate-200 rounded-lg px-3 py-2 max-h-48 overflow-y-auto">
+                          <p className="text-sm whitespace-pre-line">{currentStepData.demoResponse}</p>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Response */}
-                    <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                      <div className="flex items-center mb-3">
-                        <Bot className="w-5 h-5 mr-2 text-purple-400" />
-                        <span className="text-purple-300 font-medium">Risposta AI</span>
-                      </div>
-                      <div className="bg-slate-700/50 text-slate-200 rounded-lg px-4 py-3">
-                        <p className="text-sm whitespace-pre-line">{currentStepData.demoResponse}</p>
-                      </div>
-                    </div>
-
-                    {/* Explanation */}
+                    {/* Explanation - Full Width */}
                     <div className={`${
                       currentStepData.color === 'red' 
                         ? 'bg-red-900/20 border-red-700/40' 
                         : 'bg-emerald-900/20 border-emerald-700/40'
-                    } border rounded-lg p-4`}>
+                    } border rounded-lg p-3`}>
                       <div className="flex items-center mb-2">
                         {currentStepData.color === 'red' ? (
-                          <span className="text-red-400 text-lg mr-2">❌</span>
+                          <span className="text-red-400 text-sm mr-2">❌</span>
                         ) : (
-                          <span className="text-emerald-400 text-lg mr-2">✅</span>
+                          <span className="text-emerald-400 text-sm mr-2">✅</span>
                         )}
                         <span className={`${
                           currentStepData.color === 'red' ? 'text-red-300' : 'text-emerald-300'
-                        } font-medium`}>
+                        } font-medium text-sm`}>
                           Analisi Output
                         </span>
                       </div>
                       <p className="text-slate-300 text-sm">{currentStepData.explanation}</p>
                     </div>
 
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center pt-2">
                       <Button
                         onClick={prevStep}
                         disabled={currentStep === 0}
                         variant="ghost"
+                        size="sm"
                         className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50"
                       >
                         ← Precedente
                       </Button>
                       <Button
                         onClick={nextStep}
+                        size="sm"
                         className="bg-purple-600 hover:bg-purple-700 text-white"
                       >
                         Prossimo Step →
@@ -361,29 +365,29 @@ const ContestoExercise = () => {
 
                 {/* Practice Steps */}
                 {currentStepData.type === 'practice' && (
-                  <div className="space-y-6">
+                  <div className="space-y-3">
                     {/* Suggestion */}
                     {!completedSteps[currentStep] && (
-                      <div className="bg-purple-900/20 border border-purple-700/40 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-purple-300 text-sm mb-2">💡 <strong>Prompt suggerito:</strong></p>
-                            <p className="text-slate-300 text-sm italic">"{currentStepData.suggestedPrompt}"</p>
+                      <div className="bg-purple-900/20 border border-purple-700/40 rounded-lg p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-purple-300 text-xs mb-1">💡 <strong>Prompt suggerito:</strong></p>
+                            <p className="text-slate-300 text-xs italic leading-relaxed">"{currentStepData.suggestedPrompt}"</p>
                           </div>
                           <Button 
                             onClick={() => setCurrentPrompt(currentStepData.suggestedPrompt)} 
                             variant="outline" 
                             size="sm" 
-                            className="ml-4 bg-purple-600 hover:bg-purple-700 text-white border-purple-500"
+                            className="shrink-0 bg-purple-600 hover:bg-purple-700 text-white border-purple-500 text-xs px-2 py-1"
                           >
-                            Usa questo
+                            Usa
                           </Button>
                         </div>
                       </div>
                     )}
 
-                    {/* Chat Area */}
-                    <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 min-h-[400px] max-h-[500px] overflow-y-auto">
+                    {/* Compact Chat Area */}
+                    <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3 chat-compact overflow-y-auto">
                       {userPrompts[currentStep - 2] ? (
                         <div className="space-y-4 animate-fade-in">
                           {/* User Message */}
@@ -440,12 +444,12 @@ const ContestoExercise = () => {
 
                     {/* Input Area */}
                     {!completedSteps[currentStep] && (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <Textarea
                           value={currentPrompt}
                           onChange={(e) => setCurrentPrompt(e.target.value)}
                           placeholder={currentStepData.placeholder}
-                          className="min-h-[100px] bg-slate-700/50 border-slate-600/50 text-slate-200 placeholder:text-slate-400 resize-none focus:border-purple-500/50 focus:ring-purple-500/20"
+                          className="min-h-[80px] bg-slate-700/50 border-slate-600/50 text-slate-200 placeholder:text-slate-400 resize-none focus:border-purple-500/50 focus:ring-purple-500/20 text-sm"
                         />
                         
                         <div className="flex justify-between items-center">
@@ -453,6 +457,7 @@ const ContestoExercise = () => {
                             onClick={prevStep}
                             disabled={currentStep === 0}
                             variant="ghost"
+                            size="sm"
                             className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50"
                           >
                             ← Precedente
@@ -460,7 +465,8 @@ const ContestoExercise = () => {
                           <Button
                             onClick={handlePromptSubmit}
                             disabled={!currentPrompt.trim() || isLoading}
-                            className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                            size="sm"
+                            className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
                           >
                             {isLoading ? (
                               <div className="flex items-center">
@@ -515,12 +521,12 @@ const ContestoExercise = () => {
 
                 {/* Final Explanation for last step */}
                 {currentStep === steps.length - 1 && completedSteps[currentStep] && (
-                  <div className="mt-6 bg-blue-900/20 border border-blue-700/40 rounded-lg p-6">
-                    <div className="flex items-center mb-4">
-                      <Lightbulb className="w-6 h-6 mr-3 text-yellow-400" />
-                      <h3 className="text-xl font-semibold text-white">Perché il contesto funziona?</h3>
+                  <div className="mt-4 bg-blue-900/20 border border-blue-700/40 rounded-lg p-4">
+                    <div className="flex items-center mb-3">
+                      <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
+                      <h3 className="text-lg font-semibold text-white">Perché il contesto funziona?</h3>
                     </div>
-                    <div className="space-y-4 text-slate-300">
+                    <div className="space-y-3 text-slate-300 text-sm">
                       <p className="leading-relaxed">
                         <strong className="text-blue-300">Disambiguazione:</strong> Il contesto elimina l'ambiguità, permettendo all'AI di comprendere esattamente cosa vuoi.
                       </p>
@@ -530,8 +536,8 @@ const ContestoExercise = () => {
                       <p className="leading-relaxed">
                         <strong className="text-blue-300">Architettura LLM:</strong> I Large Language Models sono addestrati per utilizzare il contesto per generare risposte più appropriate e utili.
                       </p>
-                      <div className="bg-purple-900/30 border border-purple-700/30 rounded p-4 mt-4">
-                        <p className="text-purple-200 text-sm">
+                      <div className="bg-purple-900/30 border border-purple-700/30 rounded p-3 mt-3">
+                        <p className="text-purple-200 text-xs">
                           <strong>Regola d'oro:</strong> Più contesto specifico fornisci, più l'output sarà preciso e actionable per le tue esigenze.
                         </p>
                       </div>

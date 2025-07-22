@@ -267,7 +267,7 @@ const ContestoExercise = () => {
         <div className="flex gap-6 relative">
           <CourseSidebar 
             currentModuleId="modulo-2"
-            currentLessonId={1}
+            currentLessonId="1"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

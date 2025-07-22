@@ -8,7 +8,7 @@ import { useUserProgress } from '@/hooks/useUserProgress';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Lesson {
-  id: number;
+  id: string;
   title: string;
   duration: string;
   completed: boolean;
@@ -28,7 +28,7 @@ interface Module {
 
 interface CourseSidebarProps {
   currentModuleId?: string;
-  currentLessonId?: number;
+  currentLessonId?: string;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }
@@ -83,12 +83,12 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     duration: module.totalDuration,
     completed: module.status === 'completed',
     route: module.lessons[0]?.route || `/${module.id}`,
-    lessons: module.lessons.map((lesson, index) => ({
-      id: index,
+    lessons: module.lessons.map((lesson) => ({
+      id: lesson.id,
       title: lesson.title,
       duration: lesson.duration,
       completed: lesson.completed,
-      current: location.pathname === lesson.route,
+      current: location.pathname === lesson.route || lesson.id === currentLessonId,
       description: lesson.description || ''
     }))
   })) : [];
@@ -110,10 +110,10 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     navigate(route);
   };
 
-  const handleLessonNavigation = async (moduleId: string, lessonIndex: number) => {
+  const handleLessonNavigation = async (lessonId: string) => {
     // Trova la lesson usando i dati dal database
-    const module = courseData?.modules.find(m => m.id === moduleId);
-    const lesson = module?.lessons[lessonIndex];
+    const module = courseData?.modules.find(m => m.lessons.some(l => l.id === lessonId));
+    const lesson = module?.lessons.find(l => l.id === lessonId);
     
     if (!lesson) return;
 
@@ -319,7 +319,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
                                     ? 'bg-emerald-800/10 hover:bg-emerald-800/20 border-emerald-400/50'
                                     : 'hover:bg-slate-700/20 border-transparent'
                                 }`}
-                                onClick={() => handleLessonNavigation(module.id, index)}
+                                onClick={() => handleLessonNavigation(lesson.id)}
                               >
                                 <div className="flex items-start justify-between">
                                   <div className="flex-1 min-w-0 pr-3">

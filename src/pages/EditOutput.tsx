@@ -278,7 +278,7 @@ const EditOutput = () => {
         <div className="flex gap-6 relative">
           <CourseSidebar 
             currentModuleId="modulo-2"
-            currentLessonId={4}
+            currentLessonId="4"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

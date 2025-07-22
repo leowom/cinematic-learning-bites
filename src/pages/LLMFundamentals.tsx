@@ -232,7 +232,7 @@ const LLMFundamentals = () => {
         <div className="flex gap-6 relative">
           <CourseSidebar 
             currentModuleId="modulo-1"
-            currentLessonId={0}
+            currentLessonId="0"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

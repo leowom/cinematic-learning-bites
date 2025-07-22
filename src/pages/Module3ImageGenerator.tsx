@@ -172,7 +172,7 @@ const Module3ImageGenerator: React.FC = () => {
           {/* Sidebar */}
           <CourseSidebar 
             currentModuleId="modulo-3"
-            currentLessonId={1}
+            currentLessonId="1"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

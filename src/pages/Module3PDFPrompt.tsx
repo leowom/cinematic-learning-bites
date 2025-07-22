@@ -180,7 +180,7 @@ USER_REQUEST: ${prompt}`;
           {/* Sidebar */}
           <CourseSidebar 
             currentModuleId="modulo-3"
-            currentLessonId={0}
+            currentLessonId="0"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

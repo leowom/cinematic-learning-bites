@@ -553,7 +553,7 @@ A presto,
         <div className="flex gap-6 relative">
           <CourseSidebar 
             currentModuleId="modulo-1"
-            currentLessonId={3}
+            currentLessonId="3"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

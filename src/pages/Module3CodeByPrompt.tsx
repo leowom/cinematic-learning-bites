@@ -340,7 +340,7 @@ const Module3CodeByPrompt: React.FC = () => {
           {/* Sidebar */}
           <CourseSidebar 
             currentModuleId="modulo-3"
-            currentLessonId={2}
+            currentLessonId="2"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

@@ -334,7 +334,7 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
         <div className="flex gap-6 relative">
           <CourseSidebar 
             currentModuleId="modulo-1"
-            currentLessonId={1}
+            currentLessonId="1"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

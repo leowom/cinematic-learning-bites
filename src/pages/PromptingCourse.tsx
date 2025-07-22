@@ -51,7 +51,7 @@ const PromptingCourse = () => {
         <div className="flex gap-6 relative">
           <CourseSidebar 
             currentModuleId="modulo-2"
-            currentLessonId={0}
+            currentLessonId="0"
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

@@ -127,33 +127,42 @@ export type Database = {
       }
       lessons: {
         Row: {
+          content: string | null
           created_at: string
           description: string | null
           duration: string
+          examples: Json | null
           id: string
           module_id: string
           order_index: number
           route: string
+          slides: Json | null
           title: string
         }
         Insert: {
+          content?: string | null
           created_at?: string
           description?: string | null
           duration: string
+          examples?: Json | null
           id: string
           module_id: string
           order_index: number
           route: string
+          slides?: Json | null
           title: string
         }
         Update: {
+          content?: string | null
           created_at?: string
           description?: string | null
           duration?: string
+          examples?: Json | null
           id?: string
           module_id?: string
           order_index?: number
           route?: string
+          slides?: Json | null
           title?: string
         }
         Relationships: [

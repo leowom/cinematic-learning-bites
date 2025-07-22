@@ -118,7 +118,7 @@ serve(async (req) => {
         
         console.log(`Processing lesson ${lessonIndex + 1}: ${lessonData.lessonTitle}`);
 
-        // Insert lesson
+        // Insert lesson with theoretical content
         const { error: lessonError } = await supabase
           .from('lessons')
           .insert({
@@ -128,7 +128,10 @@ serve(async (req) => {
             description: lessonData.content.substring(0, 200) + (lessonData.content.length > 200 ? '...' : ''),
             duration: lessonData.duration || '10-15 min',
             route: `/lesson/${lessonData.lessonTitle.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')}`,
-            order_index: lessonIndex + 1
+            order_index: lessonIndex + 1,
+            content: lessonData.content,
+            slides: lessonData.slides,
+            examples: lessonData.examples
           });
 
         if (lessonError) {

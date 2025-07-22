@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, BookOpen, Clock, CheckCircle, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCourseData } from '@/hooks/useCourseData';
 import { useUserProgress } from '@/hooks/useUserProgress';
 import CourseSidebar from '@/components/CourseSidebar';
+import LessonContentSection from '@/components/LessonContentSection';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 
@@ -233,61 +234,13 @@ const DynamicLessonPage = () => {
 
               {!showQuiz ? (
                 <>
-                  {/* Lesson Content */}
-                  {currentLesson.content && (
-                    <Card className="step-card glassmorphism-base">
-                      <CardHeader>
-                        <CardTitle className="text-white flex items-center">
-                          <BookOpen className="w-5 h-5 mr-2 text-blue-400" />
-                          Contenuto della Lezione
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="prose prose-invert max-w-none">
-                          <p className="text-slate-300 leading-relaxed">
-                            {currentLesson.content}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Slides */}
-                  {currentLesson.slides && currentLesson.slides.length > 0 && (
-                    <Card className="step-card glassmorphism-base">
-                      <CardHeader>
-                        <CardTitle className="text-white">Punti Chiave</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-3">
-                          {currentLesson.slides.map((slide: string, index: number) => (
-                            <li key={index} className="flex items-start space-x-3">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                              <p className="text-slate-300">{slide}</p>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Examples */}
-                  {currentLesson.examples && currentLesson.examples.length > 0 && (
-                    <Card className="step-card glassmorphism-base">
-                      <CardHeader>
-                        <CardTitle className="text-white">Esempi Pratici</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          {currentLesson.examples.map((example: string, index: number) => (
-                            <div key={index} className="p-4 bg-slate-800/40 rounded-lg border border-slate-700/40">
-                              <p className="text-slate-300">{example}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                  {/* Enhanced Lesson Content Section */}
+                  <LessonContentSection
+                    lesson={currentLesson}
+                    onStartQuiz={() => setShowQuiz(true)}
+                    onCompleteLesson={handleCompleteLesson}
+                    hasQuiz={quizQuestions.length > 0}
+                  />
 
                   {/* Navigation */}
                   <div className="flex items-center justify-between pt-8">
@@ -300,27 +253,16 @@ const DynamicLessonPage = () => {
                       Lezione precedente
                     </Button>
 
-                    <div className="flex items-center space-x-4">
-                      {quizQuestions.length > 0 && (
-                        <Button
-                          onClick={() => setShowQuiz(true)}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          <Play className="w-4 h-4 mr-2" />
-                          Inizia Quiz
-                        </Button>
-                      )}
-                      
-                      {quizQuestions.length === 0 && (
-                        <Button
-                          onClick={handleCompleteLesson}
-                          className="bg-emerald-600 hover:bg-emerald-700"
-                        >
-                          Completa Lezione
-                          <ChevronRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      )}
-                    </div>
+                    {/* Next lesson button - only show if no quiz or lesson is completed */}
+                    {quizQuestions.length === 0 && (
+                      <Button
+                        onClick={handleCompleteLesson}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        Completa Lezione
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    )}
                   </div>
                 </>
               ) : (

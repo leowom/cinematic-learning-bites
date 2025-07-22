@@ -6,10 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import CourseSidebar from '@/components/CourseSidebar';
 import { useNavigation } from '@/hooks/useNavigation';
+import { useUserProgress } from '@/hooks/useUserProgress';
+import { supabase } from '@/integrations/supabase/client';
 
 const ContestoExercise = () => {
   const navigate = useNavigate();
   const { getNextLesson } = useNavigation();
+  const { markLessonComplete } = useUserProgress();
   const [currentStep, setCurrentStep] = useState(0);
   const [showTutorial, setShowTutorial] = useState(true);
   const [userPrompts, setUserPrompts] = useState<string[]>(['', '']);
@@ -53,7 +56,8 @@ const ContestoExercise = () => {
       type: "practice",
       placeholder: "Ora arricchisci il tuo prompt con contesto, target, obiettivo...",
       suggestedPrompt: "Scrivimi un post LinkedIn per promuovere il mio nuovo corso di digital marketing rivolto a PMI. Voglio un tono professionale ma accessibile, includere una call-to-action e condividere un insight sul ROI del marketing digitale. Il post dovrebbe essere di circa 150 parole.",
-      simulatedResponse: "🚀 Hai mai calcolato il ROI del tuo marketing digitale?\n\nDopo 8 anni di esperienza con oltre 200 PMI, ho scoperto che il 73% delle aziende non traccia correttamente i propri risultati online. Questo significa perdere opportunità di ottimizzazione e budget sprecato.\n\nNel mio nuovo corso 'Digital Marketing per PMI' condivido le strategie concrete che hanno portato i miei clienti a:\n✅ Aumentare le conversioni del 40% in media\n✅ Ridurre il costo per acquisizione del 25%\n✅ Costruire sistemi di misurazione affidabili\n\nSe gestisci una PMI e vuoi trasformare il marketing da costo a investimento, questo corso fa per te.\n\n💡 Messaggio diretto per info e early bird (sconto 30%)\n\n#DigitalMarketing #PMI #ROI #MarketingStrategy"
+      simulatedResponse: "🚀 Hai mai calcolato il ROI del tuo marketing digitale?\n\nDopo 8 anni di esperienza con oltre 200 PMI, ho scoperto che il 73% delle aziende non traccia correttamente i propri risultati online. Questo significa perdere opportunità di ottimizzazione e budget sprecato.\n\nNel mio nuovo corso 'Digital Marketing per PMI' condivido le strategie concrete che hanno portato i miei clienti a:\n✅ Aumentare le conversioni del 40% in media\n✅ Ridurre il costo per acquisizione del 25%\n✅ Costruire sistemi di misurazione affidabili\n\nSe gestisci una PMI e vuoi trasformare il marketing da costo a investimento, questo corso fa per te.\n\n💡 Messaggio diretto per info e early bird (sconto 30%)\n\n#DigitalMarketing #PMI #ROI #MarketingStrategy",
+      acceptsCustomPrompt: true
     }
   ];
   
@@ -81,12 +85,29 @@ const ContestoExercise = () => {
     }
   };
 
-  const nextStep = () => {
+  // Handle Enter key press
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handlePromptSubmit();
+    }
+  };
+
+  const nextStep = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       setCurrentPrompt('');
     } else {
-      // If it's the last step, go to next lesson
+      // If it's the last step, mark lesson complete and go to next lesson
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await markLessonComplete('contesto-exercise', user.id);
+        }
+      } catch (error) {
+        console.error('Error marking lesson complete:', error);
+      }
+      
       const nextLesson = getNextLesson('/contesto');
       if (nextLesson) {
         navigate(nextLesson.route);

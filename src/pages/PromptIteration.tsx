@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Home, Bot, Send, MessageCircle, CheckCircle, ArrowRight, User, Loader2, RefreshCw, Target, Lightbulb, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,10 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import { useOpenAI } from '@/hooks/useOpenAI';
 import CourseSidebar from '@/components/CourseSidebar';
 import { toast } from 'sonner';
+import { useUserProgress } from '@/hooks/useUserProgress';
+import { supabase } from '@/integrations/supabase/client';
 
 const PromptIteration = () => {
   const navigate = useNavigate();
   const { testPromptWithGPT } = useOpenAI();
+  const { markLessonComplete } = useUserProgress();
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentPhase, setCurrentPhase] = useState<'intro' | 'phase1' | 'phase2' | 'completed'>('intro');
   const [currentStep, setCurrentStep] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -67,6 +71,23 @@ A presto,
     setCurrentStep(0);
   };
 
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [promptHistory]);
+
+  // Handle Enter key press
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      if (currentPhase === 'phase2') {
+        handleApiPrompt();
+      }
+    }
+  };
+
   const handleIssueToggle = (issue: string) => {
     setSelectedIssues(prev => 
       prev.includes(issue) 
@@ -104,11 +125,26 @@ A presto,
     }
   };
 
-  const handleCompletion = () => {
+  const handleCompletion = async () => {
     if (!reflection.trim()) {
       toast.error("Completa la riflessione finale prima di procedere");
       return;
     }
+    if (promptHistory.length < 2) {
+      toast.error("Devi provare almeno una iterazione prima di concludere");
+      return;
+    }
+    
+    // Mark lesson as complete
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await markLessonComplete('prompt-iteration', user.id);
+      }
+    } catch (error) {
+      console.error('Error marking lesson complete:', error);
+    }
+    
     setCurrentPhase('completed');
     toast.success("Esercizio completato con successo!");
   };
@@ -258,8 +294,15 @@ A presto,
                   <h2 className="text-2xl font-bold text-white mb-6 text-center">Output Migliorato</h2>
                   <div className="space-y-6 mb-8">
                     <div className="bg-slate-700/30 rounded-lg p-4">
-                      <h3 className="text-white font-semibold mb-3">Prompt Migliorato</h3>
+                      <h3 className="text-white font-semibold mb-3">Il Tuo Prompt Migliorato</h3>
                       <div className="bg-blue-600 text-white rounded-lg p-4">
+                        <p className="text-sm">{improvedPrompt}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h3 className="text-white font-semibold mb-3">Prompt Suggerito (Per confronto)</h3>
+                      <div className="bg-slate-600 text-white rounded-lg p-4">
                         <p className="text-sm">{mockupData.improvedPrompt}</p>
                       </div>
                     </div>
@@ -336,7 +379,7 @@ A presto,
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-white text-center">Iterazione Libera con IA Reale</h2>
                   
-                  <div className="bg-slate-700/30 rounded-lg p-4 h-64 overflow-y-auto space-y-4">
+                  <div ref={chatContainerRef} className="bg-slate-700/30 rounded-lg p-4 h-64 overflow-y-auto space-y-4">
                     {promptHistory.length === 0 ? (
                       <div className="text-center text-slate-400 py-8">
                         <Bot className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -363,7 +406,14 @@ A presto,
                   </div>
                   
                   <div className="space-y-3">
-                    <Textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Scrivi qui il tuo prompt per migliorare la descrizione del prodotto..." className="bg-slate-700/30 border-slate-600 text-white placeholder:text-slate-400" rows={3} />
+                    <Textarea 
+                      value={userInput} 
+                      onChange={(e) => setUserInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Scrivi qui il tuo prompt per migliorare la descrizione del prodotto..." 
+                      className="bg-slate-700/30 border-slate-600 text-white placeholder:text-slate-400" 
+                      rows={3} 
+                    />
                     <div className="flex gap-2">
                       <Button onClick={handleApiPrompt} disabled={isLoading || !userInput.trim()} className="bg-yellow-600 hover:bg-yellow-700 flex-1">
                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
@@ -377,9 +427,9 @@ A presto,
                     </div>
                   </div>
                   
-                  {promptHistory.length > 0 && (
-                    <div className="bg-green-500/20 rounded p-3 text-center">
-                      <p className="text-xs text-green-400 font-medium">✅ Obiettivo raggiunto! Hai iterato almeno una volta.</p>
+                  {promptHistory.length > 1 && (
+                    <div className="bg-emerald-800/50 border border-emerald-700/40 rounded p-3 text-center">
+                      <p className="text-sm text-emerald-400 font-medium">✅ Obiettivo raggiunto! Hai iterato almeno una volta.</p>
                     </div>
                   )}
                 </div>
@@ -392,7 +442,13 @@ A presto,
                     <label className="block text-sm font-medium mb-2 text-white">
                       Qual è stato l'errore del primo prompt? Cosa hai cambiato per migliorarlo?
                     </label>
-                    <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder="Es: Il primo prompt era troppo generico..." className="bg-slate-700/30 border-slate-600 text-white placeholder:text-slate-400" rows={5} />
+                    <Textarea 
+                      value={reflection} 
+                      onChange={(e) => setReflection(e.target.value)} 
+                      placeholder="Es: Il primo prompt era troppo generico..." 
+                      className="bg-slate-700/30 border-slate-600 text-white placeholder:text-slate-400" 
+                      rows={5} 
+                    />
                   </div>
                   
                   <div className="bg-blue-500/20 rounded-lg p-4">

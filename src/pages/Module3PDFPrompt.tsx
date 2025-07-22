@@ -232,7 +232,7 @@ USER_REQUEST: ${prompt}`;
                     </p>
                     <Button 
                       onClick={() => setShowTextInput(true)} 
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                       size="sm"
                     >
                       Oppure inserisci il testo manualmente
@@ -241,14 +241,14 @@ USER_REQUEST: ${prompt}`;
                 ) : (
                   <div className="text-green-400">
                     <Check className="w-8 h-8 mx-auto mb-2" />
-                    <p className="font-medium">{pdfFile.name}</p>
+                    <p className="font-medium text-slate-300">{pdfFile.name}</p>
                     
                     <div className="flex gap-2 mt-2">
-                      <Button onClick={() => fileInputRef.current?.click()} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" size="sm">
+                      <Button onClick={() => fileInputRef.current?.click()} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white" size="sm">
                         Cambia PDF
                       </Button>
                     </div>
-                    <p className="text-slate-400 text-xs mt-2">
+                    <p className="text-emerald-400 text-xs mt-2">
                       ✅ PDF pronto per l'analisi AI
                     </p>
                   </div>
@@ -256,22 +256,22 @@ USER_REQUEST: ${prompt}`;
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-slate-300 text-sm">
-                    💡 Copia e incolla il testo dal tuo documento PDF qui:
-                  </p>
-                  <Button 
-                    onClick={() => {
-                      setShowTextInput(false);
-                      setPdfText('');
-                      setPdfReady(false);
-                    }} 
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                    size="sm"
-                  >
-                    Carica PDF invece
-                  </Button>
-                </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-slate-300 text-sm">
+                      💡 Copia e incolla il testo dal tuo documento PDF qui:
+                    </p>
+                    <Button 
+                      onClick={() => {
+                        setShowTextInput(false);
+                        setPdfText('');
+                        setPdfReady(false);
+                      }} 
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                      size="sm"
+                    >
+                      Carica PDF invece
+                    </Button>
+                  </div>
                 <Textarea
                   value={pdfText}
                   onChange={(e) => {
@@ -282,7 +282,7 @@ USER_REQUEST: ${prompt}`;
                   className="min-h-[200px] bg-slate-800/50 border-slate-600 text-white placeholder-slate-400"
                 />
                 {pdfText.length > 10 && (
-                  <p className="text-green-400 text-sm">
+                  <p className="text-emerald-400 text-sm">
                     ✅ Testo pronto per l'analisi AI ({pdfText.length} caratteri)
                   </p>
                 )}
@@ -308,7 +308,7 @@ USER_REQUEST: ${prompt}`;
               </div>
             </div>
 
-            <Button onClick={handleSendPrompt} disabled={!pdfReady || !prompt.trim() || isProcessing} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+            <Button onClick={handleSendPrompt} disabled={!pdfReady || !prompt.trim() || isProcessing} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
               {isProcessing ? <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Processando...
@@ -336,14 +336,14 @@ USER_REQUEST: ${prompt}`;
                   </Button>}
               </div>
               
-              <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 min-h-[200px]">
+                <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 min-h-[200px]">
                 {isProcessing ? <div className="flex items-center justify-center h-32">
-                    <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
                     <span className="ml-3 text-slate-300">Generando risposta...</span>
-                  </div> : <div className="text-slate-200 whitespace-pre-wrap">
+                  </div> : <div className="text-slate-200 whitespace-pre-wrap leading-relaxed">
                     {response}
                   </div>}
-              </div>
+                </div>
               
               {response && <div className="mt-4 flex gap-3">
                   <Button onClick={() => {

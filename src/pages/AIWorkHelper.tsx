@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Home, Bot, Send, MessageCircle, Lightbulb, CheckCircle, ArrowRight, User, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { useOpenAI } from '@/hooks/useOpenAI';
 import CourseSidebar from '@/components/CourseSidebar';
 import { toast } from 'sonner';
+import { useUserProgress } from '@/hooks/useUserProgress';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StepData {
   id: number;
@@ -20,6 +22,8 @@ interface StepData {
 const AIWorkHelper = () => {
   const navigate = useNavigate();
   const { testPromptWithGPT } = useOpenAI();
+  const { markLessonComplete } = useUserProgress();
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -58,6 +62,25 @@ const AIWorkHelper = () => {
 
   const currentStepData = stepData[currentStep];
   const allStepsCompleted = stepData.every(step => step.isCompleted);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory, isLoading]);
+
+  // Handle Enter key press
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      if (allStepsCompleted && finalResponse) {
+        askFollowUpQuestion();
+      } else if (!allStepsCompleted) {
+        handleStepSubmit();
+      }
+    }
+  };
 
   if (showIntro) {
     return (
@@ -225,6 +248,12 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
       ]);
       
       toast.success('Perfetto! L\'IA ha generato suggerimenti personalizzati per te.');
+      
+      // Mark lesson as complete
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await markLessonComplete('ai-work-helper', user.id);
+      }
     } catch (error) {
       console.error('Errore durante l\'invio del prompt:', error);
       toast.error('Errore durante l\'invio del prompt. Riprova.');
@@ -410,6 +439,7 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
                           <Textarea
                             value={currentInput}
                             onChange={(e) => setCurrentInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
                             placeholder={currentStepData.placeholder}
                             className="bg-slate-800/50 border-slate-700 text-slate-200 mb-4 min-h-[100px] resize-none"
                           />
@@ -503,6 +533,7 @@ Genera un prompt personalizzato che l'utente possa utilizzare per ricevere suppo
                                 <Textarea
                                   value={currentInput}
                                   onChange={(e) => setCurrentInput(e.target.value)}
+                                  onKeyDown={handleKeyDown}
                                   placeholder="Chiedi approfondimenti su una delle soluzioni..."
                                   className="bg-slate-800/50 border-slate-700 text-slate-200 flex-1 resize-none min-h-[60px]"
                                 />

@@ -126,6 +126,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
           updated_at: string
         }
         Insert: {
@@ -133,6 +134,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
           updated_at?: string
         }
         Update: {
@@ -140,9 +142,87 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
           updated_at?: string
         }
         Relationships: []
+      }
+      quiz_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          explanation: string | null
+          id: string
+          lesson_id: string
+          options: Json | null
+          order_index: number
+          question_text: string
+          question_type: string
+          updated_at: string
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          lesson_id: string
+          options?: Json | null
+          order_index?: number
+          question_text: string
+          question_type?: string
+          updated_at?: string
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          lesson_id?: string
+          options?: Json | null
+          order_index?: number
+          question_text?: string
+          question_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quiz_results: {
+        Row: {
+          completed_at: string
+          id: string
+          is_correct: boolean
+          lesson_id: string
+          question_id: string | null
+          user_answer: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          is_correct: boolean
+          lesson_id: string
+          question_id?: string | null
+          user_answer: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          is_correct?: boolean
+          lesson_id?: string
+          question_id?: string | null
+          user_answer?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_results_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_progress: {
         Row: {
@@ -184,10 +264,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
+      is_admin_or_instructor: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "instructor" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -314,6 +404,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "instructor", "student"],
+    },
   },
 } as const

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -43,6 +42,9 @@ import AIWorkHelper from "./pages/AIWorkHelper";
 import PromptIteration from "./pages/PromptIteration";
 import Settings from "./pages/Settings";
 import CourseIndex from "./pages/CourseIndex";
+import AllCoursesIndex from "./pages/AllCoursesIndex";
+import DynamicCourseIndex from "./pages/DynamicCourseIndex";
+import DynamicLessonPage from "./components/DynamicLessonPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,7 +75,16 @@ const App = () => (
               <Route path="/ai-tutor" element={<ProtectedRoute><AITutor /></ProtectedRoute>} />
               <Route path="/live-sessions" element={<ProtectedRoute><LiveSessionScheduler /></ProtectedRoute>} />
               <Route path="/learning-automations" element={<ProtectedRoute><LearningAutomations /></ProtectedRoute>} />
-              <Route path="/course-index" element={<ProtectedRoute><CourseIndex /></ProtectedRoute>} />
+
+              {/* Course Routes */}
+              <Route path="/course-index" element={<ProtectedRoute><AllCoursesIndex /></ProtectedRoute>} />
+              <Route path="/course/:courseId" element={<ProtectedRoute><DynamicCourseIndex /></ProtectedRoute>} />
+              <Route path="/course/:courseId/lesson/:lessonId" element={<ProtectedRoute><DynamicLessonPage /></ProtectedRoute>} />
+
+              {/* Legacy course routes - keep for backward compatibility */}
+              <Route path="/corso-prompting" element={<ProtectedRoute><CourseIndex /></ProtectedRoute>} />
+
+              {/* Other pages */}
               <Route path="/prompt-lab" element={<ProtectedRoute><PromptEngineeringLab /></ProtectedRoute>} />
               <Route path="/ai-transformation-day1" element={<ProtectedRoute><AITransformationDay1 /></ProtectedRoute>} />
               <Route path="/introduzione" element={<ProtectedRoute><IntroduzioneCourse /></ProtectedRoute>} />

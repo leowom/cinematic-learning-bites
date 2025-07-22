@@ -1,49 +1,28 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Play, Clock, CheckCircle, Lock, BookOpen, ChevronRight, Settings } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Play, Clock, CheckCircle, Lock, BookOpen, ChevronRight, Settings, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
-import { useCourseData, type Lesson, type Module } from '@/hooks/useCourseData';
+import { useCourseData } from '@/hooks/useCourseData';
 import { useUserProgress } from '@/hooks/useUserProgress';
 
-const CourseIndex = () => {
+const DynamicCourseIndex = () => {
+  const { courseId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<{first_name?: string} | null>(null);
 
-  // Use the custom hooks for course data and progress - defaults to corso-prompting
-  const { courseData, loading, overallProgress, refetch } = useCourseData(user?.id, 'corso-prompting');
+  const { courseData, loading, overallProgress, refetch } = useCourseData(user?.id, courseId);
   const { markLessonComplete, markLessonAccessed } = useUserProgress();
 
-  // Motivational phrases array
-  const motivationalPhrases = [
-    "Cosa approfondiamo oggi?",
-    "Il prossimo passo del tuo percorso ti aspetta.",
-    "Continua a costruire le tue competenze, un modulo alla volta.",
-    "Sei a un clic da una nuova scoperta.",
-    "Studiare con costanza è il tuo superpotere.",
-    "Un giorno. Una lezione. Una nuova abilità.",
-    "Ogni sessione conta. Inizia quando vuoi.",
-    "Hai già fatto tanto. Oggi puoi fare ancora meglio.",
-    "Imparare è un viaggio: quale tappa affronti oggi?",
-    "Bentornato al centro di comando del tuo apprendimento."
-  ];
-
-  // Get random motivational phrase
-  const getRandomPhrase = () => {
-    const randomIndex = Math.floor(Math.random() * motivationalPhrases.length);
-    return motivationalPhrases[randomIndex];
-  };
-
   useEffect(() => {
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Fetch user profile when user logs in
         if (session?.user) {
           setTimeout(() => {
             fetchUserProfile(session.user.id);
@@ -52,7 +31,6 @@ const CourseIndex = () => {
       }
     );
 
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -84,18 +62,17 @@ const CourseIndex = () => {
     }
   };
 
-  const handleLessonClick = async (lesson: Lesson) => {
+  const handleLessonClick = async (lesson: any) => {
     if (lesson.locked) return;
     
-    // Mark lesson as accessed
     if (user?.id) {
       await markLessonAccessed(lesson.id, user.id);
     }
     
-    navigate(lesson.route);
+    navigate(`/course/${courseId}/lesson/${lesson.id}`);
   };
 
-  const getStatusIcon = (status: Module['status']) => {
+  const getStatusIcon = (status: any) => {
     switch (status) {
       case 'completed':
         return <CheckCircle className="w-5 h-5 text-emerald-400" />;
@@ -135,7 +112,7 @@ const CourseIndex = () => {
               onClick={() => navigate('/course-index')}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Vai a tutti i corsi
+              Torna ai corsi
             </button>
           </div>
         </div>
@@ -153,14 +130,17 @@ const CourseIndex = () => {
       <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 py-4 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between">
-            {/* Left side - Course info */}
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/course-index')}
+                className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors text-slate-300 hover:text-white"
+                title="Torna ai corsi"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/85e8a1d7-8421-46a8-88ef-d4a3206a8fe7.png" 
-                  alt="Course Icon" 
-                  className="w-6 h-6"
-                />
+                <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">{courseData.title}</h1>
@@ -168,15 +148,7 @@ const CourseIndex = () => {
               </div>
             </div>
             
-            {/* Right side - Stats */}
             <div className="flex items-center space-x-6">
-              <button
-                onClick={() => navigate('/course-index')}
-                className="px-4 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors text-slate-300 hover:text-white text-sm"
-                title="Tutti i corsi"
-              >
-                Tutti i corsi
-              </button>
               <button
                 onClick={() => navigate('/settings')}
                 className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors text-slate-300 hover:text-white"
@@ -206,7 +178,7 @@ const CourseIndex = () => {
                 Bentornato, {userProfile?.first_name || 'Studente'}! 👋
               </h2>
               <p className="text-slate-300 text-lg">
-                {getRandomPhrase()}
+                Continua il tuo percorso di apprendimento con questo corso.
               </p>
             </div>
           </div>
@@ -221,8 +193,7 @@ const CourseIndex = () => {
             <div className="step-card glassmorphism-base p-6">
               <h2 className="text-xl font-semibold text-white mb-4">Panoramica del Corso</h2>
               <p className="text-slate-300 mb-6">
-                Impara i concetti fondamentali dell'Intelligenza Artificiale e dei Large Language Models. 
-                Scopri come utilizzare e integrare modelli AI nelle tue applicazioni professionali.
+                {courseData.description}
               </p>
               
               <div className="w-full bg-slate-700/60 rounded-full h-3 mb-2">
@@ -340,4 +311,4 @@ const CourseIndex = () => {
   );
 };
 
-export default CourseIndex;
+export default DynamicCourseIndex;

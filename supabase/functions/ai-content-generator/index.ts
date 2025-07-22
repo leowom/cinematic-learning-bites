@@ -23,6 +23,18 @@ interface GenerateExplanationRequest {
   requestType: 'example' | 'simplify' | 'expand';
 }
 
+interface GenerateFullCourseRequest {
+  content: string;
+  topic?: string;
+  targetAudience: string;
+  moduleCount?: number;
+  lessonPerModule?: number;
+}
+
+interface ParsePDFRequest {
+  pdfContent: string;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -47,6 +59,12 @@ serve(async (req) => {
         break;
       case 'generate_explanation':
         response = await generateExplanation(requestData as GenerateExplanationRequest, openAIApiKey);
+        break;
+      case 'generate_full_course':
+        response = await generateFullCourse(requestData as GenerateFullCourseRequest, openAIApiKey);
+        break;
+      case 'parse_pdf':
+        response = await parsePDF(requestData as ParsePDFRequest, openAIApiKey);
         break;
       default:
         throw new Error('Invalid action');
@@ -250,4 +268,166 @@ Aggiungi informazioni utili e dettagli che aiutino la comprensione.`;
   return {
     enhanced_text: data.choices[0].message.content.trim()
   };
+}
+
+async function generateFullCourse(request: GenerateFullCourseRequest, apiKey: string) {
+  const moduleCount = request.moduleCount || 4;
+  const lessonPerModule = request.lessonPerModule || 3;
+  
+  const prompt = `Analizza il seguente contenuto e genera un corso completo strutturato secondo i principi del micro-learning.
+
+CONTENUTO DA ANALIZZARE:
+${request.content}
+
+PARAMETRI:
+- Titolo argomento: ${request.topic || 'Argomento principale'}
+- Target audience: ${request.targetAudience}
+- Numero moduli richiesti: ${moduleCount}
+- Lezioni per modulo: circa ${lessonPerModule}
+
+ISTRUZIONI SPECIFICHE:
+1. Analizza il contenuto e crea un titolo coinvolgente per il corso
+2. Suddividi in ${moduleCount} moduli logici che seguono una progressione didattica
+3. Per ogni modulo, crea ${lessonPerModule}-${lessonPerModule + 2} micro-lezioni (100-150 parole ciascuna)
+4. Ogni lezione deve includere:
+   - Titolo chiaro e specifico
+   - Contenuto micro-learning (100-150 parole max)
+   - 3-4 slide script (bullet points)
+   - 1-2 esempi pratici
+   - 1-2 quiz a scelta multipla (4 opzioni, 1 corretta)
+5. Aggiungi un test finale di 5 domande che copra tutti i moduli
+6. Linguaggio: chiaro, pratico, orientato all'azione
+7. Mantieni fedeltà al contenuto ma semplifica concetti complessi
+
+FORMATO RISPOSTA (JSON rigoroso):
+{
+  "courseTitle": "Titolo del Corso Completo",
+  "totalDuration": "durata stimata (es: 2h 30m)",
+  "description": "Descrizione breve del corso",
+  "modules": [
+    {
+      "moduleTitle": "Titolo del Modulo",
+      "description": "Descrizione del modulo (1-2 frasi)",
+      "duration": "durata stimata",
+      "lessons": [
+        {
+          "lessonTitle": "Titolo Micro-lezione",
+          "content": "Contenuto della lezione (100-150 parole, didattico e pratico)",
+          "duration": "5-8 min",
+          "slides": [
+            "Punto chiave 1",
+            "Punto chiave 2", 
+            "Punto chiave 3",
+            "Takeaway pratico"
+          ],
+          "examples": [
+            "Esempio pratico 1 con dettagli",
+            "Esempio pratico 2 applicativo"
+          ],
+          "quiz": [
+            {
+              "question": "Domanda specifica sulla lezione",
+              "options": ["Opzione A", "Opzione B", "Opzione C", "Opzione D"],
+              "correctAnswer": "Opzione corretta",
+              "explanation": "Spiegazione del perché è corretta"
+            }
+          ]
+        }
+      ],
+      "learningObjectives": [
+        "Obiettivo 1",
+        "Obiettivo 2"
+      ]
+    }
+  ],
+  "finalTest": [
+    {
+      "question": "Domanda di riepilogo generale",
+      "options": ["A", "B", "C", "D"],
+      "correctAnswer": "Risposta corretta",
+      "explanation": "Spiegazione dettagliata"
+    }
+  ]
+}
+
+IMPORTANTE: Rispondi ESCLUSIVAMENTE con il JSON valido, senza testo aggiuntivo o markdown.`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+  });
+
+  const data = await response.json();
+  
+  if (data.error) {
+    throw new Error(data.error.message);
+  }
+
+  try {
+    const result = JSON.parse(data.choices[0].message.content);
+    return result;
+  } catch (e) {
+    throw new Error('Invalid JSON response from AI: ' + data.choices[0].message.content.substring(0, 200));
+  }
+}
+
+async function parsePDF(request: ParsePDFRequest, apiKey: string) {
+  const prompt = `Analizza questo testo estratto da un PDF e ripuliscilo per l'uso didattico:
+
+TESTO GREZZO:
+${request.pdfContent}
+
+ISTRUZIONI:
+1. Rimuovi intestazioni ripetitive, numeri di pagina, riferimenti non essenziali
+2. Elimina formattazioni strane e caratteri di controllo
+3. Mantieni solo il contenuto principale educativo
+4. Organizza in paragrafi logici
+5. Correggi errori di OCR evidenti
+6. Mantieni terminologia tecnica importante
+7. Assicurati che il testo sia fluido e comprensibile
+
+FORMATO RISPOSTA (JSON):
+{
+  "cleanedText": "Testo ripulito e organizzato",
+  "wordCount": numero_parole,
+  "mainTopics": ["argomento 1", "argomento 2", "argomento 3"],
+  "suggestedTitle": "Titolo suggerito per il contenuto"
+}
+
+Rispondi SOLO con il JSON, senza testo aggiuntivo.`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+      max_tokens: 2000,
+    }),
+  });
+
+  const data = await response.json();
+  
+  if (data.error) {
+    throw new Error(data.error.message);
+  }
+
+  try {
+    return JSON.parse(data.choices[0].message.content);
+  } catch (e) {
+    throw new Error('Invalid JSON response from AI');
+  }
 }

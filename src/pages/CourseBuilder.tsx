@@ -399,6 +399,14 @@ const CourseBuilder = () => {
           </div>
 
           <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => navigate('/admin/course-builder-ai')}
+              className="bg-emerald-600 hover:bg-emerald-700"
+              size="sm"
+            >
+              <Wand2 className="w-4 h-4 mr-2" />
+              AI Course Builder
+            </Button>
             <Badge variant="outline" className="text-emerald-300 border-emerald-500/50">
               Editor Avanzato
             </Badge>

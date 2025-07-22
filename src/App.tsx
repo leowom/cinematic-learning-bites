@@ -17,6 +17,7 @@ import Analytics from "./pages/Analytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminDashboardLMS from "./pages/AdminDashboardLMS";
 import CourseBuilder from "./pages/CourseBuilder";
+import CourseBuilderAI from "./pages/CourseBuilderAI";
 import QuizBuilder from "./pages/QuizBuilder";
 import UserManagement from "./pages/UserManagement";
 import LearningPaths from "./pages/LearningPaths";
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin-lms" element={<ProtectedRoute><AdminDashboardLMS /></ProtectedRoute>} />
               <Route path="/admin/course-builder" element={<ProtectedRoute><CourseBuilder /></ProtectedRoute>} />
+              <Route path="/admin/course-builder-ai" element={<ProtectedRoute><CourseBuilderAI /></ProtectedRoute>} />
               <Route path="/admin/quiz-builder" element={<ProtectedRoute><QuizBuilder /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
               <Route path="/admin/learning-paths" element={<ProtectedRoute><LearningPaths /></ProtectedRoute>} />

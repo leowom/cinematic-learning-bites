@@ -3,11 +3,9 @@ import { Home, User, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CourseSidebar from '@/components/CourseSidebar';
-import { useNavigation } from '@/hooks/useNavigation';
 
 const PromptingCourse = () => {
   const navigate = useNavigate();
-  const { goToNextLesson, goToPreviousLesson } = useNavigation();
   const [currentLesson, setCurrentLesson] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -123,7 +121,7 @@ const PromptingCourse = () => {
                     ← Lezione precedente
                   </Button>
                   <Button
-                    onClick={() => goToNextLesson('/prompting')}
+                    onClick={() => navigate('/contesto')}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
                     Prossima lezione →

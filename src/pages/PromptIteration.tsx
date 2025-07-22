@@ -501,7 +501,7 @@ A presto,
                 <Button onClick={() => navigate('/dashboard')} variant="outline" className="border-slate-600 text-white hover:bg-slate-700/50">
                   <Home className="mr-2 h-4 w-4" />Torna alla Dashboard
                 </Button>
-                <Button onClick={() => navigate('/course/corso-prompting/lesson/prompting')} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => navigate('/prompting')} className="bg-blue-600 hover:bg-blue-700">
                   Prosegui il Corso <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>

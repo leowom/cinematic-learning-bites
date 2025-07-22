@@ -13,8 +13,11 @@ const CurrentCourseSection = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [expandedDescription, setExpandedDescription] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [allCourses, setAllCourses] = useState<any[]>([]);
   
-  const { courseData, loading, overallProgress } = useCourseData(userId);
+  // Get individual course data for the current course
+  const currentCourseId = allCourses[currentIndex]?.id;
+  const { courseData, loading: courseLoading, overallProgress } = useCourseData(userId, currentCourseId);
 
   useEffect(() => {
     const getUser = async () => {
@@ -24,22 +27,40 @@ const CurrentCourseSection = () => {
     getUser();
   }, []);
 
+  // Fetch all available courses
+  useEffect(() => {
+    const fetchAllCourses = async () => {
+      try {
+        const { data: courses } = await supabase
+          .from('courses')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        setAllCourses(courses || []);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+    
+    fetchAllCourses();
+  }, []);
+
   const nextCourse = () => {
-    if (isTransitioning || !courseData) return;
+    if (isTransitioning || allCourses.length <= 1) return;
     setIsTransitioning(true);
     setExpandedDescription(false);
     setTimeout(() => {
-      setCurrentIndex(0); // Since we only have one course now
+      setCurrentIndex((prev) => (prev + 1) % allCourses.length);
       setIsTransitioning(false);
     }, 150);
   };
 
   const prevCourse = () => {
-    if (isTransitioning || !courseData) return;
+    if (isTransitioning || allCourses.length <= 1) return;
     setIsTransitioning(true);
     setExpandedDescription(false);
     setTimeout(() => {
-      setCurrentIndex(0); // Since we only have one course now
+      setCurrentIndex((prev) => (prev - 1 + allCourses.length) % allCourses.length);
       setIsTransitioning(false);
     }, 150);
   };
@@ -75,7 +96,7 @@ const CurrentCourseSection = () => {
   };
 
   const nextLesson = getNextLesson();
-  const descriptionLimit = 100;
+  const loading = !allCourses.length || courseLoading;
   
   if (loading) {
     return (
@@ -86,7 +107,7 @@ const CurrentCourseSection = () => {
     );
   }
 
-  if (!courseData) {
+  if (!allCourses.length) {
     return (
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-3xl font-bold text-white mb-8">I Tuoi Corsi Attivi</h2>
@@ -95,14 +116,41 @@ const CurrentCourseSection = () => {
     );
   }
 
-  const shouldTruncate = courseData.description && courseData.description.length > descriptionLimit;
+  const currentCourse = allCourses[currentIndex];
+  const descriptionLimit = 100;
+
+  const shouldTruncate = currentCourse.description && currentCourse.description.length > descriptionLimit;
 
   return (
     <div className="max-w-6xl mx-auto relative" onWheel={handleWheel}>
-      <h2 className="text-3xl font-bold text-white mb-8 text-center">
-        I Tuoi Corsi Attivi
-      </h2>
+      <div className="flex items-center justify-center space-x-4 mb-8">
+        <h2 className="text-3xl font-bold text-white">I Tuoi Corsi Attivi</h2>
+        {allCourses.length > 1 && (
+          <div className="flex items-center space-x-2 text-white/60">
+            <span className="text-sm">{currentIndex + 1} di {allCourses.length}</span>
+          </div>
+        )}
+      </div>
       
+      {/* Navigation arrows */}
+      {allCourses.length > 1 && (
+        <>
+          <button
+            onClick={prevCourse}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+            disabled={isTransitioning}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={nextCourse}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+            disabled={isTransitioning}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
         {/* Course Card - Single Course Display */}
         <div className="relative overflow-hidden">
           <div className="perspective-1000">
@@ -132,14 +180,14 @@ const CurrentCourseSection = () => {
                     </div>
                     
                     <h3 className="text-2xl font-bold text-white leading-tight">
-                      {courseData.title}
+                      {currentCourse.title}
                     </h3>
                     
                     <div className="text-white/70 text-sm leading-relaxed">
                       <p>
                         {shouldTruncate && !expandedDescription
-                          ? `${courseData.description?.slice(0, descriptionLimit)}...`
-                          : courseData.description
+                          ? `${currentCourse.description?.slice(0, descriptionLimit)}...`
+                          : currentCourse.description
                         }
                       </p>
                       {shouldTruncate && (
@@ -174,31 +222,38 @@ const CurrentCourseSection = () => {
                   {/* Action Button - Always Visible */}
                   <button 
                     onClick={() => {
-                      if (isNewUser()) {
-                        navigate('/course-index');
-                      } else if (nextLesson) {
-                        navigate(nextLesson.route);
+                      if (courseData) {
+                        if (isNewUser()) {
+                          navigate(`/course/${currentCourse.id}`);
+                        } else if (nextLesson) {
+                          navigate(nextLesson.route);
+                        } else {
+                          navigate(`/course/${currentCourse.id}`);
+                        }
                       } else {
-                        navigate('/course-index');
+                        navigate(`/course/${currentCourse.id}`);
                       }
                     }}
                     className="group flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:shadow-xl px-5 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-105 mt-4"
                   >
                     <Play className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     <span className="text-sm">
-                      {isNewUser() 
-                        ? 'Continua: Introduzione' 
-                        : nextLesson 
-                          ? `Continua: ${nextLesson.title}` 
-                          : 'Visualizza corso'
-                      }
+                      {courseData ? (
+                        isNewUser() 
+                          ? 'Continua: Introduzione' 
+                          : nextLesson 
+                            ? `Continua: ${nextLesson.title}` 
+                            : 'Visualizza corso'
+                      ) : (
+                        'Inizia corso'
+                      )}
                     </span>
                   </button>
                 </div>
                 
                 {/* Progress Ring */}
                 <div className="flex justify-center items-center h-full">
-                  <ProgressRing3D progress={overallProgress} size={240} />
+                  <ProgressRing3D progress={overallProgress || 0} size={240} />
                 </div>
               </div>
             </GlassmorphismCard>

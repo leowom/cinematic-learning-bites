@@ -116,7 +116,7 @@ const PromptingCourse = () => {
                 {/* Navigation Buttons */}
                 <div className="flex justify-between items-center mt-6">
                   <Button
-                    onClick={() => goToPreviousLesson('/prompting')}
+                    onClick={() => navigate('/introduzione')}
                     variant="ghost"
                     className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50"
                   >

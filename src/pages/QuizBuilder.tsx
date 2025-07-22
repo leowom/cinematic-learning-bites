@@ -496,22 +496,21 @@ const QuizBuilder = () => {
                                     Aggiungi
                                   </Button>
                                 </div>
-                                <div className="space-y-2">
+                                <RadioGroup 
+                                  value={newQuestion.correct_answer} 
+                                  onValueChange={(value) => setNewQuestion(prev => ({...prev, correct_answer: value}))}
+                                  className="space-y-2"
+                                >
                                   {newQuestion.options.map((option, index) => (
                                     <div key={index} className="flex items-center space-x-2">
-                                      <RadioGroup 
-                                        value={newQuestion.correct_answer} 
-                                        onValueChange={(value) => setNewQuestion(prev => ({...prev, correct_answer: value}))}
-                                      >
-                                        <div className="flex items-center space-x-2">
-                                          <RadioGroupItem value={option} id={`option-${index}`} />
-                                        </div>
-                                      </RadioGroup>
+                                      <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option} id={`option-${index}`} />
+                                      </div>
                                       <Input 
                                         value={option}
                                         onChange={(e) => updateOption(index, e.target.value)}
                                         placeholder={`Opzione ${index + 1}`}
-                                        className="bg-slate-700 border-slate-600"
+                                        className="flex-1 bg-slate-700 border-slate-600"
                                       />
                                       {newQuestion.options.length > 2 && (
                                         <Button 
@@ -525,7 +524,7 @@ const QuizBuilder = () => {
                                       )}
                                     </div>
                                   ))}
-                                </div>
+                                </RadioGroup>
                                 <div className="text-xs text-slate-400 mt-2">
                                   Seleziona il radio button accanto alla risposta corretta
                                 </div>

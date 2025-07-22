@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Users, BookOpen, BarChart3, Settings, Plus, FileText, Trophy, Clock } from 'lucide-react';
+import { Home, Users, BookOpen, BarChart3, Settings, Plus, FileText, Trophy, Clock, Target, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -175,11 +175,27 @@ const AdminDashboardLMS = () => {
                       </Button>
 
                       <Button 
+                        onClick={() => navigate('/admin/learning-paths')}
+                        className="bg-orange-600 hover:bg-orange-700 text-white h-20 flex-col"
+                      >
+                        <Target className="w-6 h-6 mb-2" />
+                        Learning Paths
+                      </Button>
+
+                      <Button 
                         onClick={() => navigate('/admin/analytics')}
                         className="bg-yellow-600 hover:bg-yellow-700 text-white h-20 flex-col"
                       >
                         <BarChart3 className="w-6 h-6 mb-2" />
                         Analytics
+                      </Button>
+
+                      <Button 
+                        onClick={() => navigate('/admin/scheduler')}
+                        className="bg-pink-600 hover:bg-pink-700 text-white h-20 flex-col"
+                      >
+                        <Calendar className="w-6 h-6 mb-2" />
+                        Live Sessions
                       </Button>
                     </div>
                   </CardContent>

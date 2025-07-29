@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense } from "react";
 import { ThemeProvider } from "next-themes";
-import LoadingScreen from "./components/LoadingScreen";
+
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthGuard } from "./components/AuthGuard";
 import Index from "./pages/Index";
@@ -56,7 +56,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Suspense fallback={<LoadingScreen onComplete={() => {}} />}>
+          <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center">
+              <div className="text-slate-300">Loading...</div>
+            </div>
+          }>
             <Routes>
               <Route path="/" element={<AuthGuard />} />
               <Route path="/auth" element={<Auth />} />

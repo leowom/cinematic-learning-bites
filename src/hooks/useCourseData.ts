@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useCourseCache } from './useCourseCache';
 
 export interface Lesson {
   id: string;
@@ -35,11 +35,48 @@ export interface Course {
   modules: Module[];
 }
 
+export interface Lesson {
+  id: string;
+  title: string;
+  description: string;
+  route: string;
+  duration: string;
+  order_index: number;
+  module_id: string;
+  completed: boolean;
+  locked: boolean;
+  current: boolean;
+}
+
+export interface Module {
+  id: string;
+  title: string;
+  description: string;
+  order_index: number;
+  lessons: Lesson[];
+  status: 'completed' | 'in-progress' | 'locked';
+  completed_lessons: number;
+  total_lessons: number;
+  completion_rate: number;
+  total_duration: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  total_duration: string;
+  modules: Module[];
+  completed_lessons: number;
+  total_lessons: number;
+}
+
 export const useCourseData = (userId: string | null, courseId?: string) => {
   const [courseData, setCourseData] = useState<Course | null>(null);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [overallProgress, setOverallProgress] = useState(0);
+  const { fetchAllCourses, fetchCourseData, fetchUserProgress } = useCourseCache();
 
   useEffect(() => {
     if (courseId) {
@@ -49,18 +86,15 @@ export const useCourseData = (userId: string | null, courseId?: string) => {
     }
   }, [userId, courseId]);
 
+  // Fetch specific course by ID
   const fetchSpecificCourse = async (id: string) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const course = await fetchCourseById(id);
-      if (course) {
-        setCourseData(course);
-        calculateProgress(course);
-        
-        // Auto-enroll user if not already enrolled
-        if (userId) {
-          await autoEnrollUser(userId, id);
-        }
+      const course = await fetchCourseData(id);
+      if (course && userId) {
+        const processedCourse = await processCourseData(course, userId);
+        setCourseData(processedCourse);
+        setOverallProgress(calculateProgress(processedCourse));
       }
     } catch (error) {
       console.error('Error fetching specific course:', error);
@@ -69,39 +103,20 @@ export const useCourseData = (userId: string | null, courseId?: string) => {
     }
   };
 
+  // Fetch all courses and set default
   const fetchDefaultCourse = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      // Fetch all courses
-      const { data: courses } = await supabase
-        .from('courses')
-        .select(`
-          *,
-          modules (
-            *,
-            lessons (*)
-          )
-        `)
-        .order('created_at', { ascending: false });
+      const courses = await fetchAllCourses();
 
-      if (!courses || courses.length === 0) return;
-
-      const processedCourses = await Promise.all(
-        courses.map(course => processCourseData(course, userId))
-      );
-
-      setAllCourses(processedCourses);
-      
-      // Set the most recent course as default, or the hardcoded one if it exists
-      const defaultCourse = processedCourses.find(c => c.id === 'corso-prompting') || processedCourses[0];
-      if (defaultCourse) {
-        setCourseData(defaultCourse);
-        calculateProgress(defaultCourse);
+      if (courses && courses.length > 0) {
+        setAllCourses(courses);
         
-        // Auto-enroll user if not already enrolled
+        // Process and set the first course as default
         if (userId) {
-          await autoEnrollUser(userId, defaultCourse.id);
+          const processedCourse = await processCourseData(courses[0], userId);
+          setCourseData(processedCourse);
+          setOverallProgress(calculateProgress(processedCourse));
         }
       }
     } catch (error) {
@@ -111,109 +126,121 @@ export const useCourseData = (userId: string | null, courseId?: string) => {
     }
   };
 
+  // Helper function to fetch course by ID - now uses cache
   const fetchCourseById = async (id: string) => {
-    const { data: course } = await supabase
-      .from('courses')
-      .select(`
-        *,
-        modules (
-          *,
-          lessons (*)
-        )
-      `)
-      .eq('id', id)
-      .single();
-
-    if (!course) return null;
-    return await processCourseData(course, userId);
+    return await fetchCourseData(id);
   };
 
-  const processCourseData = async (course: any, userId: string | null) => {
-    // Fetch user progress only if user is logged in
-    let userProgress = null;
-    if (userId) {
-      const { data } = await supabase
-        .from('user_progress')
-        .select('*')
-        .eq('user_id', userId);
-      userProgress = data;
+  const processCourseData = async (course: any, userId: string | null): Promise<Course> => {
+    if (!userId) {
+      return {
+        ...course,
+        modules: course.modules?.map((module: any) => ({
+          ...module,
+          lessons: module.lessons?.map((lesson: any) => ({
+            ...lesson,
+            completed: false,
+            locked: lesson.order_index > 1,
+            current: lesson.order_index === 1
+          })) || [],
+          status: 'locked' as const,
+          completed_lessons: 0,
+          total_lessons: module.lessons?.length || 0,
+          completion_rate: 0
+        })) || [],
+        completed_lessons: 0,
+        total_lessons: course.modules?.reduce((total: number, module: any) => 
+          total + (module.lessons?.length || 0), 0) || 0
+      };
     }
 
-    // Process the data
-    const processedModules = course.modules
-      .sort((a: any, b: any) => a.order_index - b.order_index)
-      .map((module: any) => {
-        const sortedLessons = module.lessons
-          .sort((a: any, b: any) => a.order_index - b.order_index);
+    // Fetch user progress for all lessons in this course
+    const userProgress = await fetchUserProgress(userId);
 
-        const lessonsWithProgress = sortedLessons.map((lesson: any, index: number) => {
-          const progress = userProgress?.find(p => p.lesson_id === lesson.id);
-          const completed = progress?.completed || false;
+    const progressMap = new Map(
+      userProgress.map((progress: any) => [progress.lesson_id, progress])
+    );
+
+    let courseCompletedLessons = 0;
+    let courseTotalLessons = 0;
+
+    const processedModules = course.modules?.map((module: any, moduleIndex: number) => {
+      const sortedLessons = module.lessons?.sort((a: any, b: any) => a.order_index - b.order_index) || [];
+      let moduleCompletedLessons = 0;
+
+      const processedLessons = sortedLessons.map((lesson: any, lessonIndex: number) => {
+        const progress = progressMap.get(lesson.id);
+        const completed = progress?.completed || false;
+        
+        if (completed) {
+          moduleCompletedLessons++;
+          courseCompletedLessons++;
+        }
+        courseTotalLessons++;
+
+        // Determine if lesson is locked
+        let locked = false;
+        if (moduleIndex === 0 && lessonIndex === 0) {
+          locked = false; // First lesson is never locked
+        } else if (lessonIndex === 0) {
+          // First lesson of subsequent modules - check if previous module is completed
+          const prevModule = course.modules[moduleIndex - 1];
+          const prevModuleLessons = prevModule?.lessons?.length || 0;
+          let prevModuleCompleted = 0;
           
-          // Determine if lesson is locked
-          let locked = false;
-          if (index > 0) {
-            // Check if previous lesson is completed
-            const prevLesson = sortedLessons[index - 1];
-            const prevProgress = userProgress?.find(p => p.lesson_id === prevLesson.id);
-            locked = !prevProgress?.completed;
-          }
-
-          return {
-            id: lesson.id,
-            title: lesson.title,
-            duration: lesson.duration || '10 min',
-            completed,
-            locked,
-            route: lesson.route || `/course/${course.id}/lesson/${lesson.id}`,
-            description: lesson.description || '',
-            order_index: lesson.order_index,
-            content: lesson.content,
-            slides: lesson.slides,
-            examples: lesson.examples
-          };
-        });
-
-        const completedLessons = lessonsWithProgress.filter(l => l.completed).length;
-        const totalLessons = lessonsWithProgress.length;
-        const completionRate = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
-
-        let status: 'not-started' | 'in-progress' | 'completed' = 'not-started';
-        if (completionRate === 100) status = 'completed';
-        else if (completionRate > 0) status = 'in-progress';
+          prevModule?.lessons?.forEach((prevLesson: any) => {
+            if (progressMap.get(prevLesson.id)?.completed) {
+              prevModuleCompleted++;
+            }
+          });
+          
+          locked = prevModuleCompleted < prevModuleLessons;
+        } else {
+          // Check if previous lesson in same module is completed
+          const prevLesson = sortedLessons[lessonIndex - 1];
+          locked = !progressMap.get(prevLesson.id)?.completed;
+        }
 
         return {
-          id: module.id,
-          title: module.title,
-          description: module.description || '',
-          totalDuration: module.total_duration || '60 min',
-          completionRate,
-          status,
-          lessons: lessonsWithProgress,
-          order_index: module.order_index
+          ...lesson,
+          completed,
+          locked,
+          current: !completed && !locked
         };
       });
 
+      const moduleStatus = moduleCompletedLessons === sortedLessons.length ? 'completed' : 
+                          moduleCompletedLessons > 0 ? 'in-progress' : 'locked';
+      
+      const completionRate = sortedLessons.length > 0 ? 
+        Math.round((moduleCompletedLessons / sortedLessons.length) * 100) : 0;
+
+      return {
+        ...module,
+        lessons: processedLessons,
+        status: moduleStatus,
+        completed_lessons: moduleCompletedLessons,
+        total_lessons: sortedLessons.length,
+        completion_rate: completionRate
+      };
+    }) || [];
+
     return {
-      id: course.id,
-      title: course.title,
-      description: course.description || '',
-      totalDuration: course.total_duration || '2 ore',
-      modules: processedModules
+      ...course,
+      modules: processedModules,
+      completed_lessons: courseCompletedLessons,
+      total_lessons: courseTotalLessons
     };
   };
 
-  const calculateProgress = (course: Course) => {
-    const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
-    const completedLessons = course.modules.reduce((acc, module) => 
-      acc + module.lessons.filter(lesson => lesson.completed).length, 0);
-    const overall = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-    setOverallProgress(overall);
+  const calculateProgress = (course: Course): number => {
+    if (!course || course.total_lessons === 0) return 0;
+    return Math.round((course.completed_lessons / course.total_lessons) * 100);
   };
 
+  // Auto-enroll user in course if not already enrolled
   const autoEnrollUser = async (userId: string, courseId: string) => {
     try {
-      // Check if already enrolled
       const { data: existingEnrollment } = await supabase
         .from('user_enrollments')
         .select('id')
@@ -222,17 +249,24 @@ export const useCourseData = (userId: string | null, courseId?: string) => {
         .single();
 
       if (!existingEnrollment) {
-        // Auto-enroll the user
         await supabase
           .from('user_enrollments')
           .insert({
             user_id: userId,
             course_id: courseId,
-            status: 'active'
+            enrolled_at: new Date().toISOString()
           });
       }
     } catch (error) {
-      console.error('Error with auto-enrollment:', error);
+      console.error('Error enrolling user:', error);
+    }
+  };
+
+  const refetch = () => {
+    if (courseId) {
+      fetchSpecificCourse(courseId);
+    } else {
+      fetchDefaultCourse();
     }
   };
 
@@ -245,7 +279,7 @@ export const useCourseData = (userId: string | null, courseId?: string) => {
     allCourses,
     loading,
     overallProgress,
-    refetch: courseId ? () => fetchSpecificCourse(courseId) : fetchDefaultCourse,
+    refetch,
     switchCourse
   };
 };

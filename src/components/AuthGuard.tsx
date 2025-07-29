@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
-import LoadingScreen from "@/components/LoadingScreen";
+
 
 export const AuthGuard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -43,7 +43,11 @@ export const AuthGuard: React.FC = () => {
   }, [navigate]);
 
   if (loading) {
-    return <LoadingScreen onComplete={() => {}} />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center">
+        <div className="text-slate-300">Loading...</div>
+      </div>
+    );
   }
 
   return null;

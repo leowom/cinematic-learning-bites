@@ -27,23 +27,14 @@ const CurrentCourseSection = () => {
     getUser();
   }, []);
 
-  // Fetch all available courses
+  // Get all courses from useCourseData hook to avoid duplicate API calls
+  const { allCourses: cachedCourses, loading: allCoursesLoading } = useCourseData(userId);
+  
   useEffect(() => {
-    const fetchAllCourses = async () => {
-      try {
-        const { data: courses } = await supabase
-          .from('courses')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        setAllCourses(courses || []);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-      }
-    };
-    
-    fetchAllCourses();
-  }, []);
+    if (cachedCourses && cachedCourses.length > 0) {
+      setAllCourses(cachedCourses);
+    }
+  }, [cachedCourses]);
 
   const nextCourse = () => {
     if (isTransitioning || allCourses.length <= 1) return;

@@ -233,7 +233,7 @@ const AllCoursesIndex = () => {
                         <div className="flex items-center justify-center">
                           <div className="flex items-center text-slate-400 text-xs">
                             <Clock className="w-3 h-3 mr-1" />
-                            {course.totalDuration}
+                            {course.total_duration}
                           </div>
                         </div>
                       </div>

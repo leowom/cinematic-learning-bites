@@ -2,38 +2,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCourseCache } from './useCourseCache';
 
-export interface Lesson {
-  id: string;
-  title: string;
-  duration: string;
-  completed: boolean;
-  locked: boolean;
-  route: string;
-  description: string;
-  order_index: number;
-  content?: string;
-  slides?: string[];
-  examples?: string[];
-}
-
-export interface Module {
-  id: string;
-  title: string;
-  description: string;
-  totalDuration: string;
-  completionRate: number;
-  status: 'not-started' | 'in-progress' | 'completed';
-  lessons: Lesson[];
-  order_index: number;
-}
-
-export interface Course {
-  id: string;
-  title: string;
-  description: string;
-  totalDuration: string;
-  modules: Module[];
-}
 
 export interface Lesson {
   id: string;

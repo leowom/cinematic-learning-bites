@@ -223,19 +223,19 @@ const DynamicCourseIndex = () => {
                         </p>
                         <div className="flex items-center text-slate-400 text-sm">
                           <Clock className="w-4 h-4 mr-1" />
-                          {module.totalDuration}
+                          {module.total_duration}
                         </div>
                       </div>
                     </div>
                     
                     <div className="text-right">
                       <div className="text-sm font-medium text-white mb-1">
-                        {module.completionRate}% completo
+                        {module.completion_rate}% completo
                       </div>
                       <div className="w-24 bg-slate-700/60 rounded-full h-2">
                         <div 
-                          className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(module.completionRate)}`}
-                          style={{ width: `${module.completionRate}%` }}
+                          className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(module.completion_rate)}`}
+                          style={{ width: `${module.completion_rate}%` }}
                         />
                       </div>
                     </div>

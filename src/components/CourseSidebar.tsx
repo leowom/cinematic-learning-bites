@@ -80,7 +80,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
     id: module.id,
     title: module.title,
     description: module.description || '',
-    duration: module.totalDuration,
+    duration: module.total_duration,
     completed: module.status === 'completed',
     route: module.lessons[0]?.route || `/${module.id}`,
     lessons: module.lessons.map((lesson) => ({

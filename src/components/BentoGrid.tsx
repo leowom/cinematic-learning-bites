@@ -53,13 +53,13 @@ const BentoGrid = () => {
             {courseData && courseData.modules.map((module, index) => (
               <div key={module.id} className="p-3 rounded-lg bg-white/5 border border-white/10">
                 <div className="text-white font-medium">{module.title}</div>
-                <div className="text-sm text-white/60">{Math.round(module.completionRate)}% completato</div>
+                <div className="text-sm text-white/60">{Math.round(module.completion_rate)}% completato</div>
                 <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
                   <div 
                     className={`h-1.5 rounded-full transition-all duration-1000 ${
                       index === 0 ? 'bg-green-400' : index === 1 ? 'bg-purple-400' : 'bg-orange-400'
                     }`}
-                    style={{ width: `${module.completionRate}%` }}
+                    style={{ width: `${module.completion_rate}%` }}
                   />
                 </div>
               </div>
